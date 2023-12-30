@@ -20,10 +20,7 @@ class LoginView(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = VerifyOtpSerializer
 
-    @swagger_auto_schema(responses=atuh_schema.verify_otp_schema_dict,
-                         operation_id="verify otp",
-                         security=[],
-                         request_body=VerifyOtpSerializer)
+    @swagger_auto_schema(**atuh_schema.verify_otp_schema)
     def post(self, request, format=None):
         serializer = VerifyOtpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

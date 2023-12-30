@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, permissions
@@ -64,14 +65,14 @@ class UserDetailAdminView(generics.RetrieveAPIView):
         return Response(serializer.data)
 
 
-class UserDetailView(generics.GenericAPIView):
+class UserDetailView(generics.RetrieveAPIView):
     allowed_methods = ["GET"]
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
 
     @swagger_auto_schema(operation_id="get user info",
-                         security=[{"Token": []}])
+                         security=[{"Token": []}], repsonses={"200": openapi.Response("Success", examples={})})
     def get(self, *args, **kwargs):
         user = self.request.user
         serializer = self.get_serializer_class()

@@ -4,6 +4,13 @@ from drf_yasg import openapi
 register_schema = {
     "operation_id": "Register",
     "security": [],
+    "request_body": openapi.Schema(type=openapi.TYPE_OBJECT, required=["mobile", 'password', "first_name", "last_name"],
+                                   properties={
+                                       "mobile": openapi.Schema(type=openapi.TYPE_STRING),
+                                       "password": openapi.Schema(type=openapi.TYPE_STRING),
+                                       "first_name": openapi.Schema(type=openapi.TYPE_STRING),
+                                       "last_name": openapi.Schema(type=openapi.TYPE_STRING),
+                                   }),
     "responses": {
         "201": openapi.Response(description=_("Created successfully"), ),
         "400": openapi.Response(description=_("Invalid data"), examples={
@@ -33,6 +40,12 @@ register_schema = {
 create_otp_schema_dict = {
     "security": [],
     "operation_id": "Login",
+    "request_body": openapi.Schema(type=openapi.TYPE_OBJECT, required=["mobile", 'password'],
+                                   properties={
+                                       "mobile": openapi.Schema(type=openapi.TYPE_STRING, title='Mobile number',
+                                                                description="11 digits"),
+                                       "password": openapi.Schema(type=openapi.TYPE_STRING, title='User password'),
+                                   }),
     "responses": {
         "201": openapi.Response(description=_("OTP Created successfully")),
         "400": openapi.Response(
@@ -50,27 +63,40 @@ create_otp_schema_dict = {
         ),
     }
 }
-verify_otp_schema_dict = {
-    "200": openapi.Response(
-        description="verified otp",
-        examples={
-            "application/json": {
-                "expiry": "2023-12-29T06:48:01.863787+03:30",
-                "token": "4af8c1e27d872509c2e273b1a27df41e0daeb0367a7e08ecb8ad6eddad1f149z"
-            }
-        },
-    ),
-    "400": openapi.Response(
-        description="Error",
-        examples={
-            "application/json": {
-                "result": "error",
-                "message": {
-                    "status_code": 401,
-                    "message": _("Wrong OTP."),
-                    "description": _("Provided OTP is wrong."),
+
+verify_otp_schema = {
+    "operation_id": "verify otp",
+    "security": [],
+    "request_body": openapi.Schema(type=openapi.TYPE_OBJECT, required=["mobile", 'otp'],
+                                   properties={
+                                       "mobile": openapi.Schema(type=openapi.TYPE_STRING, title='Mobile number',
+                                                                description="11 digits"),
+                                       "otp": openapi.Schema(type=openapi.TYPE_STRING,
+                                                             title="OneTimePassword",
+                                                             description="Code sent to mobile", ),
+                                   }),
+    "responses": {
+        "200": openapi.Response(
+            description="verified otp",
+            examples={
+                "application/json": {
+                    "expiry": "2023-12-29T06:48:01.863787+03:30",
+                    "token": "4af8c1e27d872509c2e273b1a27df41e0daeb0367a7e08ecb8ad6eddad1f149z"
                 }
-            }
-        },
-    ),
+            },
+        ),
+        "400": openapi.Response(
+            description="Error",
+            examples={
+                "application/json": {
+                    "result": "error",
+                    "message": {
+                        "status_code": 401,
+                        "message": _("Wrong OTP."),
+                        "description": _("Provided OTP is wrong."),
+                    }
+                }
+            },
+        ),
+    }
 }
