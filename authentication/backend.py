@@ -10,7 +10,7 @@ class OtpAuthBackend(BaseBackend):
         if not mobile or not otp:
             return None
         try:
-            return OTP.objects.get(code=otp, user_id__mobile=mobile)
+            return OTP.objects.get(code=otp, user_id__mobile=mobile).user_id
         except Exception as e:
             return None
 

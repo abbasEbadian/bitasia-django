@@ -1,8 +1,11 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-
 # Create your models here.
 import uuid
+
+from authentication import vars
+from authentication.utils import send_otp_sms
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
 auth_status = [
     ('unauthorized', 'احراز نشده'),
     ('level1', 'سطح یک'),
@@ -38,15 +41,15 @@ class CustomUser(AbstractUser):
     national_code = models.CharField(
         max_length=10, verbose_name="کد ملی", null=True, blank=True)
     gender = models.CharField(max_length=10, verbose_name="جنسیت", choices=[
-                              ("male", 'آقا'), ('female', 'خانم')], null=True, blank=True)
+        ("male", 'آقا'), ('female', 'خانم')], null=True, blank=True)
     birth_date = models.DateTimeField(
         null=True, blank=True, verbose_name="تاریخ تولد")
     national_card_image = models.ImageField(
-        verbose_name='تصویر کارت ملی', upload_to=get_file_path_for_birth, null=True, blank=True,)
+        verbose_name='تصویر کارت ملی', upload_to=get_file_path_for_birth, null=True, blank=True, )
     birth_card_image = models.ImageField(
-        verbose_name='تصویر شناسنامه', upload_to=get_file_path_for_national, null=True, blank=True,)
+        verbose_name='تصویر شناسنامه', upload_to=get_file_path_for_national, null=True, blank=True, )
     avatar_image = models.ImageField(
-        verbose_name='تصویر کاربری', upload_to=get_file_path_for_avatar, null=True, blank=True,)
+        verbose_name='تصویر کاربری', upload_to=get_file_path_for_avatar, null=True, blank=True, )
     last_login = models.DateTimeField(verbose_name="آخرین ورود", null=True, blank=True, auto_now=True)
 
     def __str__(self):
@@ -67,8 +70,18 @@ class CustomUser(AbstractUser):
 
     @property
     def has_birth_card_image(self):
-        return  not not self.birth_card_image and True or False
+        return not not self.birth_card_image and True or False
 
     @property
     def has_avatar_image(self):
-        return  not not self.avatar_image and True or False
+        return not not self.avatar_image and True or False
+
+    def send_otp(self, type=vars.OTP_TYPE_LOGIN):
+        code, success = send_otp_sms(self.mobile)
+        if success:
+            self.otp_set.create(code=code, type=type)
+            return True
+        return False
+
+    def validate_otp(self, code, type=vars.OTP_TYPE_LOGIN):
+        return not not self.otp_set.filter(code=code, type=type)

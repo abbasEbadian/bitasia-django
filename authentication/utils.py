@@ -1,9 +1,10 @@
+import os
+import random
 import re
 import string
-import random
+
 import environ
 import ghasedakpack
-import os
 from django.conf import settings
 
 BASE_DIR = settings.BASE_DIR
@@ -27,14 +28,16 @@ def check_email(email=''):
 
 
 def generate_otp(length=4):
-    characters = string.digits
+    characters = string.digits.replace('0', '')
     otp = ''.join(random.choice(characters) for _ in range(length))
     return otp
 
 
 def send_otp_sms(mobile):
     otp = generate_otp()
-    print({'receptor': mobile, 'type': '1', 'template': otp_template_id, 'param1': mobile})
-    # sms.verification({'receptor': mobile, 'type': '1', 'template': otp_template_id, 'param1': mobile})
-    # print(sms.status({'id': 'messageId', 'type': '1'}))سث
-    return [otp, True]
+    try:
+        res = sms.verification({'receptor': mobile, 'type': '1', 'template': otp_template_id, 'param1': otp})
+    except Exception as e:
+        print(e)
+        res = False
+    return [otp, res]

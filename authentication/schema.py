@@ -1,25 +1,76 @@
-from drf_yasg import openapi
-from drf_yasg.openapi import Schema
 from django.utils.translation import gettext as _
+from drf_yasg import openapi
+
+register_schema = {
+    "operation_id": "Register",
+    "security": [],
+    "responses": {
+        "201": openapi.Response(description=_("Created successfully"), ),
+        "400": openapi.Response(description=_("Invalid data"), examples={
+            "application/json": {
+                "result": "error",
+                "error": {
+                    "status_code": 400,
+                    "message": _("Invalid last name"),
+                    "description": _("Last name must be at least 6 characters."),
+                }
+            }
+        }),
+        "409": openapi.Response(description=_("This mobile already exists"), examples={
+            "application/json": {
+                "result": "error",
+                "error": {
+                    "status_code": 409,
+                    "message": _("Mobile already exists."),
+                    "description": _("There is an account registered with this mobile."),
+                }
+            }
+        }),
+        "500": openapi.Response(description="Server error, CONTACT ADMIN")
+    }
+}
 
 create_otp_schema_dict = {
+    "security": [],
+    "operation_id": "Login",
+    "responses": {
+        "201": openapi.Response(description=_("OTP Created successfully")),
+        "400": openapi.Response(
+            description="Error",
+            examples={
+                "application/json": {
+                    "result": "error",
+                    "error": {
+                        "status_code": 400,
+                        "message": _("Empty password."),
+                        "description": _("Password can not be empty."),
+                    }
+                }
+            },
+        ),
+    }
+}
+verify_otp_schema_dict = {
     "200": openapi.Response(
-        description="mobile login",
+        description="verified otp",
         examples={
             "application/json": {
-                "result": "success",
+                "expiry": "2023-12-29T06:48:01.863787+03:30",
+                "token": "4af8c1e27d872509c2e273b1a27df41e0daeb0367a7e08ecb8ad6eddad1f149z"
             }
         },
     ),
-     "400": openapi.Response(
+    "400": openapi.Response(
         description="Error",
         examples={
             "application/json": {
                 "result": "error",
-                "reason": _("Invalid Mobile")
+                "message": {
+                    "status_code": 401,
+                    "message": _("Wrong OTP."),
+                    "description": _("Provided OTP is wrong."),
+                }
             }
         },
     ),
-
-
 }

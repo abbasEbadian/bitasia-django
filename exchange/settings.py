@@ -155,3 +155,16 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'exchange.utils.custom_exception_handler'
 }
 
+
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+      'Basic': {
+            'type': 'basic'
+      },
+      'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+      }
+   }
+}
