@@ -10,10 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 import environ
-import os
 from rest_framework import authentication
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,7 +34,8 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "82.115.18.227"]
-
+CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = ["http://localhost", "http://*"]
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,12 +52,13 @@ INSTALLED_APPS = [
     'api',
     'authentication',
     'users',
-
+    "corsheaders"
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
