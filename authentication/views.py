@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from exchange import error_codes as ERRORS
-from . import schema as atuh_schema, vars
+from . import schema as atuh_schema
 from .exception import CustomError
 from .serializer import RegisterSerializer, OtpSerializer, VerifyOtpSerializer
 
@@ -59,7 +59,8 @@ class RegisterView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         try:
             user = serializer.validated_data['user']
-            result = user.send_otp(vars.OTP_TYPE_REGISTER)
+            if not user:
+                raise Exception("Err")
             return Response(
                 {"result": "success", "message": _('Account has been created')},
                 status=status.HTTP_201_CREATED)
