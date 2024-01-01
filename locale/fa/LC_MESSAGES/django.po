@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-28 15:14+0330\n"
+"POT-Creation-Date: 2024-01-01 11:53+0330\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,28 +18,167 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: authentication/schema.py:19
+#: authentication/models.py:11
+msgid "Login"
+msgstr "ورود"
+
+#: authentication/models.py:12
+msgid "Register"
+msgstr "ثبت نام"
+
+#: authentication/models.py:13
+msgid "Reset Password"
+msgstr "بازیابی رمزعبور"
+
+#: authentication/models.py:14
+msgid "Make a Transaction"
+msgstr "ایجاد تراکنش"
+
+#: authentication/schema.py:15
+msgid "Created successfully"
+msgstr "با موفقیت ایجاد شد."
+
+#: authentication/schema.py:16
+#, fuzzy
+#| msgid "Invalid method"
+msgid "Invalid data"
+msgstr "مقدار فیلد method نادرست است."
+
+#: authentication/schema.py:21 exchange/error_codes.py:63
+#, fuzzy
+#| msgid "Invalid mobile"
+msgid "Invalid last name"
+msgstr "شماره تماس نامعتبر است."
+
+#: authentication/schema.py:22 exchange/error_codes.py:64
+msgid "Last name must be at least 6 characters."
+msgstr "نام خانوادگی باید حداقل 6 حرف داشته باشد."
+
+#: authentication/schema.py:26
+msgid "This mobile already exists"
+msgstr "شماره تماس تکراری است."
+
+#: authentication/schema.py:31 exchange/error_codes.py:33
+msgid "Mobile already exists."
+msgstr "شماره تماس تکراری است."
+
+#: authentication/schema.py:32 exchange/error_codes.py:34
+msgid "There is an account registered with this mobile."
+msgstr "با این شماره تماس از قبل حساب ساخته شده است."
+
+#: authentication/schema.py:50
+msgid "OTP Created successfully"
+msgstr "کد اعتبارسنجی ارسال شد."
+
+#: authentication/schema.py:58 exchange/error_codes.py:20
+msgid "Empty password."
+msgstr "رمز عبور الزامی است."
+
+#: authentication/schema.py:59 exchange/error_codes.py:21
+msgid "Password can not be empty."
+msgstr "رمز عبور نمی تواند خالی باشد."
+
+#: authentication/schema.py:95 exchange/error_codes.py:51
+msgid "Wrong OTP."
+msgstr "کد وارد شده نامعتبر است."
+
+#: authentication/schema.py:96 exchange/error_codes.py:52
+msgid "Provided OTP is wrong."
+msgstr "کد وارد شده نامعتبر است."
+
+#: authentication/validator.py:14
+msgid "This value is invalid"
+msgstr "این مقدار نامعتبر است."
+
+#: authentication/views.py:44
+#, fuzzy
+#| msgid "Cant connect to sms provider"
+msgid "Cant connect to sms provider."
+msgstr "خطا در اتصال به قاصدک"
+
+#: authentication/views.py:47
+msgid "Otp has been sent to your mobile."
+msgstr "کد اعتبارسنجی پیامک شد."
+
+#: authentication/views.py:64
+msgid "Account has been created"
+msgstr "حساب کاربری با موفقیت ایجاد شد."
+
+#: exchange/error_codes.py:8
+#, fuzzy
+#| msgid "Invalid mobile"
+msgid "Invalid mobile."
+msgstr "شماره تماس نامعتبر است"
+
+#: exchange/error_codes.py:9
+msgid "Provided mobile should contain exactly 11 DIGITS and start with 09"
+msgstr "شماره تماس باید ۱۱ عدد داشته باشد و با 09 شروع شود"
+
+#: exchange/error_codes.py:14
+msgid "Invalid password pattern."
+msgstr "رمز عبور وارد شده ضعیف است"
+
+#: exchange/error_codes.py:15
+msgid ""
+"Provided password should contain at least 1 uppercase, 1 lowercase and 8 "
+"digits"
+msgstr "رمز عبور وارد شده باید از یک حرف بزرگ یک حرف کوچک و 8 عدد تشکیل شده باشد."
+
+#: exchange/error_codes.py:26
+msgid "Wrong password."
+msgstr "رمز عبور اشتباه است."
+
+#: exchange/error_codes.py:27
+msgid "Provided password is wrong."
+msgstr "رمز عبور اشتباه است."
+
+#: exchange/error_codes.py:39
+msgid "User does not exist"
+msgstr "کاربر یافت نشد."
+
+#: exchange/error_codes.py:40
+msgid "There is not any account registered with this mobile."
+msgstr "با این شماره تماس، ‌حسابی ایجاد نشده است."
+
+#: exchange/error_codes.py:45
+msgid "Empty OTP."
+msgstr "کد اعتبار سنجی الزامیست."
+
+#: exchange/error_codes.py:46
+msgid "OTP must be 4 digits."
+msgstr "کد اعتبارسنجی باید 4 رقمی باشد."
+
+#: exchange/error_codes.py:57
+#, fuzzy
+#| msgid "Invalid mobile"
+msgid "Invalid first name"
+msgstr "شماره تماس نامعتبر است."
+
+#: exchange/error_codes.py:58
+msgid "First name must be at least 3 characters."
+msgstr "نام باید حداقل ۳ کاراکتر باشد."
+
+#: exchange/error_codes.py:73
+msgid "Failed to send sms."
+msgstr "خطا در ارسال پیامک."
+
+#: exchange/error_codes.py:74 exchange/error_codes.py:75
+#, fuzzy
+#| msgid "Cant connect to sms provider"
+msgid "Cant connect to SMS provider."
+msgstr "خطا در اتصال به قاصدک"
+
+#: users/schema.py:33
 #, fuzzy
 #| msgid "Invalid mobile"
 msgid "Invalid Mobile"
 msgstr "شماره تماس نامعتبر است"
 
-#: authentication/views.py:39
-msgid "Invalid method"
-msgstr "مقدار فیلد method نادرست است"
-
-#: authentication/views.py:41
-msgid "Must provide mobile"
+#: users/serializer.py:34
+#, fuzzy
+#| msgid "Must provide mobile"
+msgid "Must provide mobile number."
 msgstr "موبایل نمی تواند خالی باشد"
 
-#: authentication/views.py:43
-msgid "Must provide email"
-msgstr "ایمیل نمی تواند خالی باشد"
-
-#: authentication/views.py:48 authentication/views.py:52
-msgid "Invalid mobile"
-msgstr "شماره تماس نامعتبر است"
-
-#: authentication/views.py:55
-msgid "Cant connect to sms provider"
-msgstr "خطا در اتصال به قاصدک"
+#~ msgid "Must provide email"
+#~ msgstr "ایمیل نمی تواند خالی باشد"

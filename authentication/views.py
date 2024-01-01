@@ -3,7 +3,7 @@ from django.contrib.auth import login
 from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 from knox.views import LoginView as KnoxLoginView
-from rest_framework import permissions, serializers, generics
+from rest_framework import permissions, generics
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -41,7 +41,7 @@ class CreateOTPView(generics.CreateAPIView):
         user = serializer.validated_data['user']
         sent = user.send_otp()
         if not sent:
-            raise serializers.ValidationError(_("Cant connect to sms provider."))
+            raise CustomError(ERRORS.ERROR_FAIL_TO_SEND_SMS)
         return Response({
             "result": "success",
             "message": _("Otp has been sent to your mobile.")
