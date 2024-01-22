@@ -38,5 +38,5 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'gender', 'birth_date',
+        fields = ('first_name', 'last_name', 'email', 'gender', 'birthdate',
                   'national_card_image', 'birth_card_image', 'avatar_image')
