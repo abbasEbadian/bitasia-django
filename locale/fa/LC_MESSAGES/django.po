@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-01 11:53+0330\n"
+"POT-Creation-Date: 2024-01-22 20:47+0330\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,67 +34,69 @@ msgstr "بازیابی رمزعبور"
 msgid "Make a Transaction"
 msgstr "ایجاد تراکنش"
 
-#: authentication/schema.py:15
+#: authentication/schema.py:18
 msgid "Created successfully"
 msgstr "با موفقیت ایجاد شد."
 
-#: authentication/schema.py:16
+#: authentication/schema.py:19
 #, fuzzy
 #| msgid "Invalid method"
 msgid "Invalid data"
 msgstr "مقدار فیلد method نادرست است."
 
-#: authentication/schema.py:21 exchange/error_codes.py:63
+#: authentication/schema.py:24 exchange/error_codes.py:63
 #, fuzzy
 #| msgid "Invalid mobile"
 msgid "Invalid last name"
 msgstr "شماره تماس نامعتبر است."
 
-#: authentication/schema.py:22 exchange/error_codes.py:64
+#: authentication/schema.py:25 exchange/error_codes.py:64
 msgid "Last name must be at least 6 characters."
 msgstr "نام خانوادگی باید حداقل 6 حرف داشته باشد."
 
-#: authentication/schema.py:26
+#: authentication/schema.py:29
 msgid "This mobile already exists"
 msgstr "شماره تماس تکراری است."
 
-#: authentication/schema.py:31 exchange/error_codes.py:33
+#: authentication/schema.py:34 exchange/error_codes.py:33
 msgid "Mobile already exists."
 msgstr "شماره تماس تکراری است."
 
-#: authentication/schema.py:32 exchange/error_codes.py:34
+#: authentication/schema.py:35 exchange/error_codes.py:34
 msgid "There is an account registered with this mobile."
 msgstr "با این شماره تماس از قبل حساب ساخته شده است."
 
-#: authentication/schema.py:50
+#: authentication/schema.py:53
 msgid "OTP Created successfully"
 msgstr "کد اعتبارسنجی ارسال شد."
 
-#: authentication/schema.py:58 exchange/error_codes.py:20
+#: authentication/schema.py:61 exchange/error_codes.py:20
 msgid "Empty password."
 msgstr "رمز عبور الزامی است."
 
-#: authentication/schema.py:59 exchange/error_codes.py:21
+#: authentication/schema.py:62 exchange/error_codes.py:21
 msgid "Password can not be empty."
 msgstr "رمز عبور نمی تواند خالی باشد."
 
-#: authentication/schema.py:95 exchange/error_codes.py:51
+#: authentication/schema.py:98 exchange/error_codes.py:51
 msgid "Wrong OTP."
 msgstr "کد وارد شده نامعتبر است."
 
-#: authentication/schema.py:96 exchange/error_codes.py:52
+#: authentication/schema.py:99 exchange/error_codes.py:52
 msgid "Provided OTP is wrong."
 msgstr "کد وارد شده نامعتبر است."
+
+#: authentication/serializer.py:98
+msgid "Male"
+msgstr ""
+
+#: authentication/serializer.py:98
+msgid "Female"
+msgstr ""
 
 #: authentication/validator.py:14
 msgid "This value is invalid"
 msgstr "این مقدار نامعتبر است."
-
-#: authentication/views.py:44
-#, fuzzy
-#| msgid "Cant connect to sms provider"
-msgid "Cant connect to sms provider."
-msgstr "خطا در اتصال به قاصدک"
 
 #: authentication/views.py:47
 msgid "Otp has been sent to your mobile."
@@ -103,6 +105,140 @@ msgstr "کد اعتبارسنجی پیامک شد."
 #: authentication/views.py:64
 msgid "Account has been created"
 msgstr "حساب کاربری با موفقیت ایجاد شد."
+
+#: authentication/views_verification.py:36
+#, fuzzy
+#| msgid "Created successfully"
+msgid "Updated successfully"
+msgstr "با موفقیت ایجاد شد."
+
+#: authority/admin.py:11
+msgid "Options"
+msgstr "فیلدها"
+
+#: authority/admin.py:29
+msgid "Rules"
+msgstr "قوانین"
+
+#: authority/models.py:17 authority/models.py:36
+msgid "title"
+msgstr "عنوان"
+
+#: authority/models.py:18
+msgid "field key"
+msgstr "کلید فیلد"
+
+#: authority/models.py:19
+msgid "field type"
+msgstr "نوع فیلد"
+
+#: authority/models.py:21
+msgid "type"
+msgstr "نوع"
+
+#: authority/models.py:21
+msgid "Range"
+msgstr "رنج"
+
+#: authority/models.py:21
+msgid "Defined"
+msgstr "تعریف شده یا نشده"
+
+#: authority/models.py:22
+msgid "Is form"
+msgstr "در وبسایت نمایش داده شود"
+
+#: authority/models.py:23
+msgid "min value"
+msgstr "حداقل"
+
+#: authority/models.py:24
+msgid "max value"
+msgstr "حداکثر"
+
+#: authority/models.py:25
+msgid "َApproximate processing time"
+msgstr ""
+
+#: authority/models.py:25
+msgid "1 Day, 2 Hours, ..."
+msgstr "۱روز ،‌ ۲ساعت ..."
+
+#: authority/models.py:28
+msgid "Authority rule option"
+msgstr "فیلد قانون احراز هویت"
+
+#: authority/models.py:29
+msgid "Authority rule options"
+msgstr "فیلدهای قانون احراز هویت"
+
+#: authority/models.py:38
+msgid "Priority"
+msgstr "اولویت"
+
+#: authority/models.py:42
+msgid "Authority rule"
+msgstr "قانون احراز هویت"
+
+#: authority/models.py:43
+msgid "Authority rules"
+msgstr "قوانین احراز هویت"
+
+#: authority/models.py:50
+msgid "Level"
+msgstr "سطح"
+
+#: authority/models.py:52
+msgid "daily Rial deposit limit"
+msgstr "محدودیت واریز ریالی روزانه"
+
+#: authority/models.py:53
+msgid "daily Rial deposit limit description"
+msgstr "توضیح محدودیت واریز ریالی روزانه"
+
+#: authority/models.py:54
+msgid "daily Rial withdraw limit"
+msgstr "محدودیت برداشت ریالی روزانه"
+
+#: authority/models.py:55
+msgid "daily Rial withdraw limit description"
+msgstr "توضیح محدودیت برداشت ریالی روزانه"
+
+#: authority/models.py:56
+msgid "daily Crypto deposit limit"
+msgstr "محدودیت واریز رمزارز روزانه"
+
+#: authority/models.py:57
+msgid "daily Crypto deposit limit description"
+msgstr " توضیح محدودیت واریز رمزارز روزانه"
+
+#: authority/models.py:58
+msgid "daily Crypto withdraw limit"
+msgstr "محدودیت برداشت رمزارز روزانه"
+
+#: authority/models.py:59
+msgid "daily Crypto withdraw limit description"
+msgstr "توضیح محدودیت برداشت رمزارز روزانه"
+
+#: authority/models.py:69
+msgid "Requesting user"
+msgstr "کاربر درخواست کننده"
+
+#: authority/models.py:70
+msgid "Rule ID"
+msgstr "شناسه قانون احراز هویت"
+
+#: authority/models.py:72
+msgid "Admin message"
+msgstr ""
+
+#: authority/models.py:75
+msgid "Authority request"
+msgstr "درخواست احراز هویت"
+
+#: authority/models.py:76
+msgid "Authority requests"
+msgstr "درخواست های احراز هویت"
 
 #: exchange/error_codes.py:8
 #, fuzzy
@@ -122,7 +258,8 @@ msgstr "رمز عبور وارد شده ضعیف است"
 msgid ""
 "Provided password should contain at least 1 uppercase, 1 lowercase and 8 "
 "digits"
-msgstr "رمز عبور وارد شده باید از یک حرف بزرگ یک حرف کوچک و 8 عدد تشکیل شده باشد."
+msgstr ""
+"رمز عبور وارد شده باید از یک حرف بزرگ یک حرف کوچک و 8 عدد تشکیل شده باشد."
 
 #: exchange/error_codes.py:26
 msgid "Wrong password."
@@ -158,11 +295,47 @@ msgstr "شماره تماس نامعتبر است."
 msgid "First name must be at least 3 characters."
 msgstr "نام باید حداقل ۳ کاراکتر باشد."
 
-#: exchange/error_codes.py:73
+#: exchange/error_codes.py:69
+#, fuzzy
+#| msgid "Invalid method"
+msgid "Invalid birthdate"
+msgstr "مقدار فیلد method نادرست است."
+
+#: exchange/error_codes.py:70
+msgid "birthdate must follow format: YYYY-MM-DD"
+msgstr "تاریخ تولد باید مشابه : 1380-08-11 باشد"
+
+#: exchange/error_codes.py:75
+#, fuzzy
+#| msgid "Invalid method"
+msgid "Invalid gender"
+msgstr "مقدار فیلد method نادرست است."
+
+#: exchange/error_codes.py:76
+msgid "gender must be provided (male or female)"
+msgstr "جنسیت باید ارسال شود."
+
+#: exchange/error_codes.py:81 exchange/error_codes.py:82
+#, fuzzy
+#| msgid "Invalid mobile"
+msgid "Invalid rule id"
+msgstr "شناسه قانون نامعتبر است"
+
+#: exchange/error_codes.py:87
+#, fuzzy
+#| msgid "Invalid password pattern."
+msgid "invalid parameters"
+msgstr "رمز عبور وارد شده ضعیف است"
+
+#: exchange/error_codes.py:88
+msgid "Provided values are not satisfying"
+msgstr "مقادیر ارسالی صحیح نمی باشد"
+
+#: exchange/error_codes.py:97
 msgid "Failed to send sms."
 msgstr "خطا در ارسال پیامک."
 
-#: exchange/error_codes.py:74 exchange/error_codes.py:75
+#: exchange/error_codes.py:98 exchange/error_codes.py:99
 #, fuzzy
 #| msgid "Cant connect to sms provider"
 msgid "Cant connect to SMS provider."
@@ -179,6 +352,11 @@ msgstr "شماره تماس نامعتبر است"
 #| msgid "Must provide mobile"
 msgid "Must provide mobile number."
 msgstr "موبایل نمی تواند خالی باشد"
+
+#, fuzzy
+#~| msgid "Cant connect to sms provider"
+#~ msgid "Cant connect to sms provider."
+#~ msgstr "خطا در اتصال به قاصدک"
 
 #~ msgid "Must provide email"
 #~ msgstr "ایمیل نمی تواند خالی باشد"

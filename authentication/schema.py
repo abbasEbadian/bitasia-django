@@ -104,12 +104,13 @@ verify_otp_schema = {
     }
 }
 
-verify_account_step1_schema = {
-    "operation_id": "Verify account - Step 1",
+verify_account_schema = {
+    "operation_id": "Verify account",
     'security': [{"Token": []}],
     "tags": ["Verify Account"],
     "manual_parameters": [
-        openapi.Parameter(name="image", in_=IN_FORM, type=openapi.TYPE_FILE, required=True)
+        openapi.Parameter(name="national_card_image", in_=IN_FORM, type=openapi.TYPE_FILE),
+        openapi.Parameter(name="birth_card_image", in_=IN_FORM, type=openapi.TYPE_FILE),
     ],
     "responses": {
         "200": openapi.Response(

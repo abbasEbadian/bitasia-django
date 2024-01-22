@@ -1,11 +1,9 @@
-import re
-
 from django.contrib.auth import authenticate, get_user_model
 from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext as _
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
+from authority.models import AuthorityRule
 from exchange import error_codes as ERRORS
 from .exception import CustomError
 from .utils import check_mobile
@@ -91,26 +89,28 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class VerifyAccountSerializer(serializers.Serializer):
-    first_name = serializers.CharField(min_length=3)
-    last_name = serializers.CharField(min_length=3)
-    birthdate = serializers.RegexField(BIRTHDAY_FORMAT)
-    gender = serializers.ChoiceField(choices=(('male', _('Male')), ('female', _('Female'))))
-    image_name = serializers.ChoiceField(choices=(('national_card', 'National Card'), ('birth_card', 'Birth Card')))
-    image = serializers.ImageField(validators=[FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg"])])
+    rule_id = serializers.IntegerField(required=True)
+    first_name = serializers.CharField(min_length=3, required=False)
+    last_name = serializers.CharField(min_length=3, required=False)
+    national_code = serializers.CharField(min_length=10, max_length=10, required=False)
+    birthdate = serializers.RegexField(BIRTHDAY_FORMAT, required=False)
+    gender = serializers.ChoiceField(choices=(('male', _('Male')), ('female', _('Female'))), required=False)
+    national_card_image = serializers.ImageField(
+        validators=[FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg"])],
+        required=False)
+    birth_card_image = serializers.ImageField(
+        validators=[FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg"])],
+        required=False)
 
     def validate(self, attrs, **kw):
-        first_name = attrs.get('first_name', None)
-        if not first_name: raise ValidationError(ERRORS.ERROR_INVALID_FIRST_NAME)
-
-        last_name = attrs.get('first_name', None)
-        if not last_name: raise ValidationError(ERRORS.ERROR_INVALID_LAST_NAME)
-
-        birthdate = attrs.get('birthdate', None)
-        ok_bd = re.compile(BIRTHDAY_FORMAT).match(birthdate)
-        if not birthdate or not ok_bd:
-            raise ValidationError(ERRORS.ERROR_INVALID_BIRTHDATE)
-
-        gender = attrs.get('gender', None)
-        if not gender: raise ValidationError(ERRORS.ERROR_INVALID_GENDER)
-
+        rule_id = attrs.get('rule_id', None)
+        rule = AuthorityRule.objects.filter(pk=int(rule_id))
+        if not rule: raise CustomError(ERRORS.ERROR_INVALID_RULE)
+        rule = rule.first()
+        fields = list(map(lambda x: x.field_key, rule.option_ids.all()))
+        for field in fields:
+            value = attrs.get(field, None)
+            if not value:
+                raise CustomError(ERRORS.GENERAL_UNMET_PARAMS_ERROR)
+        del attrs['rule_id']
         return attrs

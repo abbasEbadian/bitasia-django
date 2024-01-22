@@ -68,13 +68,25 @@ AUTH_ERRORS = {
         "status_code": status.HTTP_400_BAD_REQUEST,
         "message": _("Invalid birthdate"),
         "description": _("birthdate must follow format: YYYY-MM-DD"),
-        "description_en": _("birthdate must follow format: YYYY-MM-DD"),
+        "description_en": "birthdate must follow format: YYYY-MM-DD",
     },
     "ERROR_INVALID_GENDER": {
         "status_code": status.HTTP_400_BAD_REQUEST,
         "message": _("Invalid gender"),
         "description": _("gender must be provided (male or female)"),
-        "description_en": _("gender must be provided (male or female)"),
+        "description_en": "gender must be provided (male or female)",
+    },
+    "ERROR_INVALID_RULE": {
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "message": _("Invalid rule id"),
+        "description": _("Invalid rule id"),
+        "description_en": "invalid rule id",
+    },
+    "GENERAL_UNMET_PARAMS_ERROR": {
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "message": _("invalid parameters"),
+        "description": _("Provided values are not satisfying"),
+        "description_en": "Provided values are not satisfying",
     },
 }
 
@@ -106,3 +118,6 @@ ERROR_INVALID_LAST_NAME = API_ERRORS["ERROR_INVALID_LAST_NAME"]
 ERROR_FAIL_TO_SEND_SMS = API_ERRORS["ERROR_FAIL_TO_SEND_SMS"]
 ERROR_INVALID_BIRTHDATE = API_ERRORS["ERROR_INVALID_BIRTHDATE"]
 ERROR_INVALID_GENDER = API_ERRORS["ERROR_INVALID_GENDER"]
+
+ERROR_INVALID_RULE = API_ERRORS["ERROR_INVALID_RULE"]
+GENERAL_UNMET_PARAMS_ERROR = API_ERRORS["GENERAL_UNMET_PARAMS_ERROR"]

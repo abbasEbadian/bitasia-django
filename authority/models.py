@@ -68,8 +68,12 @@ class AuthorityLevel(BaseModelWithDate):
 class AuthorityRequest(BaseModelWithDate):
     user_id = models.ForeignKey(User, verbose_name=_("Requesting user"), on_delete=models.CASCADE)
     rule_id = models.ForeignKey(AuthorityRule, verbose_name=_("Rule ID"), on_delete=models.CASCADE)
-    approved = models.BooleanField()
+    approved = models.BooleanField(default=False)
     admin_message = models.CharField(_("Admin message"), blank=True, null=True)
+
+    def approve(self):
+        self.approved = True
+        self.save()
 
     class Meta:
         verbose_name = _("Authority request")
@@ -77,3 +81,16 @@ class AuthorityRequest(BaseModelWithDate):
 
     def __str__(self):
         return f"{_('Authority request')} - {str(self.user_id or '')}"
+
+
+def get_user_level(user):
+    level = 0
+    user_approved_rules = [x.rule_id.id for x in user.authorityrequest_set.filter(approved=True)]
+    for lvl in AuthorityLevel.objects.all():
+        for rule in lvl.rule_ids.all():
+            print(rule)
+            if rule.id not in user_approved_rules:
+                return level
+        level = lvl.level
+
+    return level
