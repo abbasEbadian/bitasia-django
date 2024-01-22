@@ -35,6 +35,6 @@ class VerifyAccountView(generics.GenericAPIView):
         return Response(
             {
                 "result": "success",
-                "message": _('User updated successfully')
+                "message": _('Updated successfully')
             },
             status=status.HTTP_200_OK, content_type="application/json")
