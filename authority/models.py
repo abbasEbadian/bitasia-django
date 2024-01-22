@@ -16,6 +16,8 @@ class BaseModelWithDate(models.Model):
 class AuthorityRuleOption(BaseModelWithDate):
     title = models.CharField(_("title"))
     field_key = models.CharField(_("field key"))
+    field_type = models.CharField(_("field type"),
+                                  choices=[("text", "text"), ("image", "image"), ("boolean", "boolean")])
     type = models.CharField(_("type"), choices=[('range', _("Range")), ('defined', _("Defined"))])
     is_form = models.BooleanField(_("Is form"), default=False)
     min_value = models.IntegerField(_("min value"), blank=True)
@@ -33,17 +35,10 @@ class AuthorityRuleOption(BaseModelWithDate):
 class AuthorityRule(BaseModelWithDate):
     title = models.CharField(_("title"))
     option_ids = models.ManyToManyField(AuthorityRuleOption)
-
-    deposit_ir_limit = models.IntegerField(_("daily Rial deposit limit"))
-    deposit_ir_limit_text = models.CharField(_("daily Rial deposit limit description"))
-    withdraw_ir_limit = models.IntegerField(_("daily Rial withdraw limit"))
-    withdraw_ir_limit_text = models.CharField(_("daily Rial withdraw limit description"))
-    deposit_crypto_limit = models.IntegerField(_("daily Crypto deposit limit"))
-    deposit_crypto_limit_text = models.CharField(_("daily Crypto deposit limit description"))
-    withdraw_crypto_limit = models.IntegerField(_("daily Crypto withdraw limit"))
-    withdraw_crypto_limit_text = models.CharField(_("daily Crypto withdraw limit description"))
+    sequence = models.IntegerField(_("Priority"), default=1)
 
     class Meta:
+        ordering = ('sequence',)
         verbose_name = _("Authority rule")
         verbose_name_plural = _("Authority rules")
 
@@ -54,6 +49,14 @@ class AuthorityRule(BaseModelWithDate):
 class AuthorityLevel(BaseModelWithDate):
     level = models.CharField(_("Level"))
     rule_ids = models.ManyToManyField(AuthorityRule)
+    deposit_ir_limit = models.IntegerField(_("daily Rial deposit limit"))
+    deposit_ir_limit_text = models.CharField(_("daily Rial deposit limit description"))
+    withdraw_ir_limit = models.IntegerField(_("daily Rial withdraw limit"))
+    withdraw_ir_limit_text = models.CharField(_("daily Rial withdraw limit description"))
+    deposit_crypto_limit = models.IntegerField(_("daily Crypto deposit limit"))
+    deposit_crypto_limit_text = models.CharField(_("daily Crypto deposit limit description"))
+    withdraw_crypto_limit = models.IntegerField(_("daily Crypto withdraw limit"))
+    withdraw_crypto_limit_text = models.CharField(_("daily Crypto withdraw limit description"))
 
     class Meta:
         ordering = ('level',)
@@ -73,4 +76,4 @@ class AuthorityRequest(BaseModelWithDate):
         verbose_name_plural = _("Authority requests")
 
     def __str__(self):
-        return f"{_('Authority request')} - str(self.user_id or '')"
+        return f"{_('Authority request')} - {str(self.user_id or '')}"

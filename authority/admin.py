@@ -6,11 +6,7 @@ from .models import AuthorityRuleOption, AuthorityRule, AuthorityLevel, Authorit
 
 @admin.register(AuthorityRule)
 class AuthorityRuleAdmin(admin.ModelAdmin):
-    list_display = ('title', "options"
-                    , "deposit_ir_limit", "deposit_ir_limit_text",
-                    "withdraw_ir_limit", "withdraw_ir_limit_text",
-                    "deposit_crypto_limit", "deposit_crypto_limit_text",
-                    "withdraw_crypto_limit", "withdraw_crypto_limit_text")
+    list_display = ('title', "options")
 
     @admin.display(description=_("Options"))
     def options(self, obj):
@@ -20,12 +16,15 @@ class AuthorityRuleAdmin(admin.ModelAdmin):
 
 @admin.register(AuthorityRuleOption)
 class AuthorityRuleOptionAdmin(admin.ModelAdmin):
-    list_display = ('title', "type", "process_time", "min_value", "max_value", "is_form")
+    list_display = ('title', "field_key", "field_type", "type", "process_time", "min_value", "max_value", "is_form")
 
 
 @admin.register(AuthorityLevel)
 class AuthorityLevelAdmin(admin.ModelAdmin):
-    list_display = ('level', "rules")
+    list_display = ('level', "rules", "deposit_ir_limit", "deposit_ir_limit_text",
+                    "withdraw_ir_limit", "withdraw_ir_limit_text",
+                    "deposit_crypto_limit", "deposit_crypto_limit_text",
+                    "withdraw_crypto_limit", "withdraw_crypto_limit_text")
 
     @admin.display(description=_("Rules"))
     def rules(self, obj):
