@@ -66,7 +66,7 @@ class AuthorityRequest(BaseModelWithDate):
     user_id = models.ForeignKey(User, verbose_name=_("Requesting user"), on_delete=models.CASCADE)
     rule_id = models.ForeignKey(AuthorityRule, verbose_name=_("Rule ID"), on_delete=models.CASCADE)
     approved = models.BooleanField()
-    admin_message = models.CharField(_("Admin message"), blank=True)
+    admin_message = models.CharField(_("Admin message"), blank=True, null=True)
 
     class Meta:
         verbose_name = _("Authority request")
