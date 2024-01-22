@@ -18,9 +18,16 @@ class AuthorityRuleOption(BaseModelWithDate):
     field_key = models.CharField(_("field key"))
     type = models.CharField(_("type"), choices=[('range', _("Range")), ('defined', _("Defined"))])
     is_form = models.BooleanField(_("Is form"), default=False)
-    min_value = models.IntegerField(_("min value"))
-    max_value = models.IntegerField(_("max value"))
-    process_time = models.CharField(_("َApproximate processing time"), help_text=_("1 Day, 2 Hours, ..."))
+    min_value = models.IntegerField(_("min value"), blank=True)
+    max_value = models.IntegerField(_("max value"), blank=True)
+    process_time = models.CharField(_("َApproximate processing time"), help_text=_("1 Day, 2 Hours, ..."), blank=True)
+
+    class Meta:
+        verbose_name = _("Authority rule option")
+        verbose_name_plural = _("Authority rule options")
+
+    def __str__(self):
+        return f"{_('Authority rule option')} ({self.title})"
 
 
 class AuthorityRule(BaseModelWithDate):
@@ -36,9 +43,34 @@ class AuthorityRule(BaseModelWithDate):
     withdraw_crypto_limit = models.IntegerField(_("daily Crypto withdraw limit"))
     withdraw_crypto_limit_text = models.CharField(_("daily Crypto withdraw limit description"))
 
+    class Meta:
+        verbose_name = _("Authority rule")
+        verbose_name_plural = _("Authority rules")
+
+    def __str__(self):
+        return self.title
+
+
+class AuthorityLevel(BaseModelWithDate):
+    level = models.CharField(_("Level"))
+    rule_ids = models.ManyToManyField(AuthorityRule)
+
+    class Meta:
+        ordering = ('level',)
+
+    def __str__(self):
+        return f"{_('Level')} {self.level}"
+
 
 class AuthorityRequest(BaseModelWithDate):
     user_id = models.ForeignKey(User, verbose_name=_("Requesting user"), on_delete=models.CASCADE)
-    AuthorityRule = models.ForeignKey(AuthorityRule, verbose_name=_("Rule ID"), on_delete=models.CASCADE)
+    rule_id = models.ForeignKey(AuthorityRule, verbose_name=_("Rule ID"), on_delete=models.CASCADE)
     approved = models.BooleanField()
-    admin_message = models.CharField(_("Admin message"))
+    admin_message = models.CharField(_("Admin message"), blank=True)
+
+    class Meta:
+        verbose_name = _("Authority request")
+        verbose_name_plural = _("Authority requests")
+
+    def __str__(self):
+        return f"{_('Authority request')} - str(self.user_id or '')"
