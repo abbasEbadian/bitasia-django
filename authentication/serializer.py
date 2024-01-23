@@ -1,11 +1,15 @@
 from django.contrib.auth import authenticate, get_user_model
+from django.core.validators import FileExtensionValidator
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
+from authority.models import AuthorityRule
 from exchange import error_codes as ERRORS
 from .exception import CustomError
 from .utils import check_mobile
 
 User = get_user_model()
+BIRTHDAY_FORMAT = r"^\d{4}-\d{2}-\d{2}$"
 
 
 # Generate otp for login
@@ -84,18 +88,29 @@ class RegisterSerializer(serializers.Serializer):
         return attrs
 
 
-"""
-'null': 'This field cannot be null.'
-'blank': 'This field cannot be blank.'
-'invalid' : 'Enter a valid email address.'
-'invalid_choice': 'Value is not a valid choice.'
-'required': 'This field is required.'
-'max_length': '...'
-'min_length': '...'
-'max_value': '...'
-'min_value': '...'
-'max_digits': '...'
-'invalid_list': '...'
-'max_decimal_places': '....'
-'empty': '....'
-"""
+class VerifyAccountSerializer(serializers.Serializer):
+    rule_id = serializers.IntegerField(required=True)
+    first_name = serializers.CharField(min_length=3, required=False)
+    last_name = serializers.CharField(min_length=3, required=False)
+    national_code = serializers.CharField(min_length=10, max_length=10, required=False)
+    birthdate = serializers.RegexField(BIRTHDAY_FORMAT, required=False)
+    gender = serializers.ChoiceField(choices=(('male', _('Male')), ('female', _('Female'))), required=False)
+    national_card_image = serializers.ImageField(
+        validators=[FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg"])],
+        required=False)
+    birth_card_image = serializers.ImageField(
+        validators=[FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg"])],
+        required=False)
+
+    def validate(self, attrs, **kw):
+        rule_id = attrs.get('rule_id', None)
+        rule = AuthorityRule.objects.filter(pk=int(rule_id))
+        if not rule: raise CustomError(ERRORS.ERROR_INVALID_RULE)
+        rule = rule.first()
+        fields = list(map(lambda x: x.field_key, rule.option_ids.all()))
+        for field in fields:
+            value = attrs.get(field, None)
+            if not value:
+                raise CustomError(ERRORS.GENERAL_UNMET_PARAMS_ERROR)
+        del attrs['rule_id']
+        return attrs

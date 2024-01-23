@@ -1,5 +1,8 @@
 from django.utils.translation import gettext as _
 from drf_yasg import openapi
+from drf_yasg.openapi import IN_FORM
+
+from exchange.error_codes import ERROR_INVALID_GENDER
 
 register_schema = {
     "operation_id": "Register",
@@ -95,6 +98,36 @@ verify_otp_schema = {
                         "message": _("Wrong OTP."),
                         "description": _("Provided OTP is wrong."),
                     }
+                }
+            },
+        ),
+    }
+}
+
+verify_account_schema = {
+    "operation_id": "Verify account",
+    'security': [{"Token": []}],
+    "tags": ["Verify Account"],
+    "manual_parameters": [
+        openapi.Parameter(name="national_card_image", in_=IN_FORM, type=openapi.TYPE_FILE),
+        openapi.Parameter(name="birth_card_image", in_=IN_FORM, type=openapi.TYPE_FILE),
+    ],
+    "responses": {
+        "200": openapi.Response(
+            description="Updated successfully",
+            examples={
+                "application/json": {
+                    "result": "success",
+                    "message": "Updated successfully"
+                }
+            },
+        ),
+        "400": openapi.Response(
+            description="Error",
+            examples={
+                "application/json": {
+                    "result": "error",
+                    "message": {**ERROR_INVALID_GENDER}
                 }
             },
         ),

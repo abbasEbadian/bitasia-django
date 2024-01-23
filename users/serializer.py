@@ -3,10 +3,26 @@ from django.core.validators import MinLengthValidator, MaxLengthValidator, Email
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
+from authority.models import get_user_level
+
 User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    user_level = serializers.SerializerMethodField('_get_user_level')
+    approved_rule_ids = serializers.SerializerMethodField('_approved_rule_ids')
+    authentication_status = serializers.SerializerMethodField('_authentication_status')
+
+    def _get_user_level(self, obj):
+        return get_user_level(obj)
+
+    def _approved_rule_ids(self, obj):
+        return [x.rule_id.id for x in obj.authorityrequest_set.filter(approved=True)]
+
+    def _authentication_status(self, obj):
+        return obj.authorityrequest_set.filter(
+            approved=False).count() > 0 and "pending" or f"level_{self._get_user_level(obj)}"
+
     class Meta:
         model = User
         exclude = ('password', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
@@ -38,5 +54,5 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'gender', 'birth_date',
+        fields = ('first_name', 'last_name', 'email', 'gender', 'birthdate',
                   'national_card_image', 'birth_card_image', 'avatar_image')
