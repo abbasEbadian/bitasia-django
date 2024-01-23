@@ -7,7 +7,7 @@ from rest_framework import permissions, generics
 from rest_framework import status
 from rest_framework.response import Response
 
-from authority.models import AuthorityRequest
+from authority.models import AuthorityRequest, AuthorityRule
 from exchange import error_codes as ERRORS
 from . import schema as atuh_schema
 from .exception import CustomError
@@ -27,7 +27,9 @@ class LoginView(KnoxLoginView):
         serializer = VerifyOtpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        req, created = AuthorityRequest.objects.get_or_create(rule_id=MOBILE_AUTHORITY, user_id=user,
+        rule_id = AuthorityRule.objects.filter(pk=MOBILE_AUTHORITY).first()
+
+        req, created = AuthorityRequest.objects.get_or_create(rule_id=rule_id, user_id=user,
                                                               defaults={"approved": True})
         req.approve()
         login(request, user)
