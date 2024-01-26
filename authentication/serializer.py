@@ -59,20 +59,19 @@ class VerifyOtpSerializer(serializers.Serializer):
 
 class RegisterSerializer(serializers.Serializer):
     mobile = serializers.CharField()
-    password = serializers.CharField(required=True, allow_blank=False, trim_whitespace=False, min_length=8)
-    first_name = serializers.CharField(required=True, allow_blank=False, min_length=3)
-    last_name = serializers.CharField(required=True, allow_blank=False, min_length=6)
+    password = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
 
     def validate(self, attrs):
         mobile = attrs.get('mobile')
         password = attrs.get('password')
         first_name = attrs.get('first_name')
         last_name = attrs.get('last_name')
-
         if not mobile or not check_mobile(mobile) or len(mobile) != 11:
             raise CustomError(ERRORS.ERROR_INVALID_MOBILE)
-        if not password:
-            raise CustomError(ERRORS.ERROR_INVALID_PASSWORD)
+        if not password or len(password) < 6:
+            raise CustomError(ERRORS.ERROR_INVALID_PASSWORD_PATTERN)
         if not first_name or len(first_name) < 3:
             raise CustomError(ERRORS.ERROR_INVALID_FIRST_NAME)
         if not last_name or len(last_name) < 3:
@@ -81,8 +80,9 @@ class RegisterSerializer(serializers.Serializer):
         if User.objects.filter(mobile=mobile).exists():
             raise CustomError(ERRORS.ERROR_MOBILE_ALREADY_EXISTS)
 
-        user = User.objects.create_user(mobile=mobile, password=password, username=mobile, first_name=first_name,
+        user = User.objects.create_user(mobile=mobile, username=mobile, first_name=first_name,
                                         last_name=last_name)
+        user.set_password(password)
         attrs['user'] = user
 
         return attrs

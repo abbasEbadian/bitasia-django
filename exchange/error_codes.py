@@ -12,8 +12,8 @@ AUTH_ERRORS = {
     "ERROR_INVALID_PASSWORD_PATTERN": {
         "status_code": status.HTTP_400_BAD_REQUEST,
         "message": _("Invalid password pattern."),
-        "description": _("Provided password should contain at least 1 uppercase, 1 lowercase and 8 digits"),
-        "description_en": "Provided password should contain at least 1 uppercase, 1 lowercase and 8 digits"
+        "description": _("Provided password should contain at least 6 characters"),
+        "description_en": "Provided password should contain at least 6 characters"
     },
     "ERROR_INVALID_PASSWORD": {
         "status_code": status.HTTP_400_BAD_REQUEST,
