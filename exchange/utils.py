@@ -16,7 +16,8 @@ def custom_exception_handler(exc, context):
             for key, value in exc.detail.items():
                 if key == "API_ERROR":
                     q = {**value}
-                    del q["description_en"]
+                    if "description_en" in q:
+                        del q["description_en"]
                     response.data["error"] = q
 
     return response

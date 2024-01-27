@@ -1,5 +1,6 @@
 #
-from django.utils.translation import gettext as _
+
+from django.utils.translation import gettext as _, gettext_lazy
 from rest_framework import status
 
 AUTH_ERRORS = {
@@ -88,6 +89,12 @@ AUTH_ERRORS = {
         "description": _("Provided values are not satisfying"),
         "description_en": "Provided values are not satisfying",
     },
+    "DUPLICATE_CREDITCARD_ERROR": {
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "message": _("Credit card or IBAN already exists."),
+        "description": _("Credit card or IBAN already exists."),
+        "description_en": "Credit card or IBAN already exists."
+    }
 }
 
 SMS_ERRORS = {
@@ -105,19 +112,41 @@ API_ERRORS = {
     **SMS_ERRORS
 }
 
-ERROR_INVALID_MOBILE = API_ERRORS["ERROR_INVALID_MOBILE"]
-ERROR_INVALID_PASSWORD_PATTERN = API_ERRORS["ERROR_INVALID_PASSWORD_PATTERN"]
-ERROR_INVALID_PASSWORD = API_ERRORS["ERROR_INVALID_PASSWORD"]
-ERROR_WRONG_PASSWORD = API_ERRORS["ERROR_WRONG_PASSWORD"]
-ERROR_MOBILE_ALREADY_EXISTS = API_ERRORS["ERROR_MOBILE_ALREADY_EXISTS"]
-ERROR_USER_DOES_NOT_EXIST = API_ERRORS["ERROR_USER_DOES_NOT_EXIST"]
-ERROR_INVALID_OTP = API_ERRORS["ERROR_INVALID_OTP"]
-ERROR_WRONG_OTP = API_ERRORS["ERROR_WRONG_OTP"]
-ERROR_INVALID_FIRST_NAME = API_ERRORS["ERROR_INVALID_FIRST_NAME"]
-ERROR_INVALID_LAST_NAME = API_ERRORS["ERROR_INVALID_LAST_NAME"]
-ERROR_FAIL_TO_SEND_SMS = API_ERRORS["ERROR_FAIL_TO_SEND_SMS"]
-ERROR_INVALID_BIRTHDATE = API_ERRORS["ERROR_INVALID_BIRTHDATE"]
-ERROR_INVALID_GENDER = API_ERRORS["ERROR_INVALID_GENDER"]
 
-ERROR_INVALID_RULE = API_ERRORS["ERROR_INVALID_RULE"]
-GENERAL_UNMET_PARAMS_ERROR = API_ERRORS["GENERAL_UNMET_PARAMS_ERROR"]
+class ERRORS:
+    @staticmethod
+    def empty_field_error(field_name):
+        return ({
+            "status_code": status.HTTP_400_BAD_REQUEST,
+            "message": f'{_("Invalid ")} {field_name}',
+            "description": f'{_(field_name)} Can\'t be empty.',
+        })
+
+    @staticmethod
+    def length_error(field_name, minL, maxL):
+        msg = gettext_lazy('%(f)s must have %(mn)d to %(mx)d digits')
+        if minL == maxL:
+            msg = gettext_lazy('%(f)s must have %(mn)d digits')
+
+        return {
+            "status_code": status.HTTP_400_BAD_REQUEST,
+            "message": msg % {"f": field_name, "mn": minL, "mx": maxL},
+            "description": msg % {"f": field_name, "mn": minL, "mx": maxL},
+        }
+
+    ERROR_DUPLICATE_CREDITCARD = API_ERRORS["DUPLICATE_CREDITCARD_ERROR"]
+    ERROR_INVALID_MOBILE = API_ERRORS["ERROR_INVALID_MOBILE"]
+    ERROR_INVALID_PASSWORD_PATTERN = API_ERRORS["ERROR_INVALID_PASSWORD_PATTERN"]
+    ERROR_INVALID_PASSWORD = API_ERRORS["ERROR_INVALID_PASSWORD"]
+    ERROR_WRONG_PASSWORD = API_ERRORS["ERROR_WRONG_PASSWORD"]
+    ERROR_MOBILE_ALREADY_EXISTS = API_ERRORS["ERROR_MOBILE_ALREADY_EXISTS"]
+    ERROR_USER_DOES_NOT_EXIST = API_ERRORS["ERROR_USER_DOES_NOT_EXIST"]
+    ERROR_INVALID_OTP = API_ERRORS["ERROR_INVALID_OTP"]
+    ERROR_WRONG_OTP = API_ERRORS["ERROR_WRONG_OTP"]
+    ERROR_INVALID_FIRST_NAME = API_ERRORS["ERROR_INVALID_FIRST_NAME"]
+    ERROR_INVALID_LAST_NAME = API_ERRORS["ERROR_INVALID_LAST_NAME"]
+    ERROR_FAIL_TO_SEND_SMS = API_ERRORS["ERROR_FAIL_TO_SEND_SMS"]
+    ERROR_INVALID_BIRTHDATE = API_ERRORS["ERROR_INVALID_BIRTHDATE"]
+    ERROR_INVALID_GENDER = API_ERRORS["ERROR_INVALID_GENDER"]
+    ERROR_INVALID_RULE = API_ERRORS["ERROR_INVALID_RULE"]
+    GENERAL_UNMET_PARAMS_ERROR = API_ERRORS["GENERAL_UNMET_PARAMS_ERROR"]

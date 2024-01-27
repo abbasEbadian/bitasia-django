@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from authority.models import AuthorityRequest, AuthorityRule
-from exchange import error_codes as ERRORS
+from exchange.error_codes import ERRORS
 from . import schema as atuh_schema
 from .exception import CustomError
 from .serializer import RegisterSerializer, OtpSerializer, VerifyOtpSerializer

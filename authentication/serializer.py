@@ -4,7 +4,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from authority.models import AuthorityRule
-from exchange import error_codes as ERRORS
+from exchange.error_codes import ERRORS
 from .exception import CustomError
 from .utils import check_mobile
 

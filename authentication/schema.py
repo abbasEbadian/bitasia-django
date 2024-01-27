@@ -2,7 +2,7 @@ from django.utils.translation import gettext as _
 from drf_yasg import openapi
 from drf_yasg.openapi import IN_FORM
 
-from exchange.error_codes import ERROR_INVALID_GENDER
+from exchange.error_codes import ERRORS
 
 register_schema = {
     "operation_id": "Register",
@@ -127,7 +127,7 @@ verify_account_schema = {
             examples={
                 "application/json": {
                     "result": "error",
-                    "message": {**ERROR_INVALID_GENDER}
+                    "message": {**ERRORS.ERROR_INVALID_GENDER}
                 }
             },
         ),
