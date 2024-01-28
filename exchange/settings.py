@@ -51,9 +51,9 @@ INSTALLED_APPS = [
     "corsheaders",
     "creditcard"
 ]
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "82.115.18.227"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "82.115.18.227", "bitasia.ir"]
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = ["http://localhost", "http://*"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost", "http://*", "http://bitasia.ir/"]
 # Application definition
 
 
