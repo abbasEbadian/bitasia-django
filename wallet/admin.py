@@ -5,7 +5,7 @@ from wallet.models import Wallet, Currency
 
 @admin.register(Wallet)
 class WalletAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'balance', 'user_ud', 'currency_id')
+    list_display = ('id', 'balance', 'user_id', 'currency_id')
 
 
 @admin.register(Currency)

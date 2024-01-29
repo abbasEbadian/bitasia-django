@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from authority.models import get_user_level
+from wallet.serializers import WalletSerializer
 
 User = get_user_model()
 
@@ -12,12 +13,16 @@ class UserSerializer(serializers.ModelSerializer):
     user_level = serializers.SerializerMethodField('_get_user_level')
     approved_rule_ids = serializers.SerializerMethodField('_approved_rule_ids')
     authentication_status = serializers.SerializerMethodField('_authentication_status')
+    wallets = serializers.SerializerMethodField('_wallets')
 
     def _get_user_level(self, obj):
         return get_user_level(obj)
 
     def _approved_rule_ids(self, obj):
         return [x.rule_id.id for x in obj.authorityrequest_set.filter(approved=True)]
+
+    def _wallets(self, obj):
+        return WalletSerializer(obj.wallet_set.all(), many=True).data
 
     def _authentication_status(self, obj):
         return obj.authorityrequest_set.filter(
