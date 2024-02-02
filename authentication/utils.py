@@ -10,7 +10,7 @@ from django.conf import settings
 BASE_DIR = settings.BASE_DIR
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-sms = ghasedakpack.Ghasedak(env("API_KEY"))
+sms = ghasedakpack.Ghasedak(env("SMS_API_KEY"))
 
 otp_template_id = 'generate0otp0code'
 

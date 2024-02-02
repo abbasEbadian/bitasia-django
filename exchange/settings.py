@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'authentication',
     "corsheaders",
     "creditcard",
-    "wallet"
+    "wallet",
+    "order"
 ]
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "82.115.18.227", "bitasia.ir"]
 CORS_ALLOW_ALL_ORIGINS = True

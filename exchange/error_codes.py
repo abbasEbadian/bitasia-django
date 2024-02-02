@@ -107,6 +107,28 @@ SMS_ERRORS = {
     }
 }
 
+PAYMENT_ERRORS = {
+    "ERROR_INVALID_AMOUNT": {
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "message": _("Invalid amount"),
+        "description": _("Amount must be greater than 1000 T"),
+        "description_en": "Amount must be greater than 1000 T"
+    },
+    "ERROR_INVALID_CARD": {
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "message": _("Invalid card"),
+        "description": _("Provided card is not valid or is not approved"),
+        "description_en": "Provided card is not valid or is not approved",
+    },
+    "ERROR_GATEWAY": {
+        "status_code": status.HTTP_400_BAD_REQUEST,
+        "message": _("Gateway error"),
+        "description": _("Some error occurred while connecting to payment gateway"),
+        "description_en": "Some error occurred while connecting to payment gateway"
+    },
+
+}
+
 API_ERRORS = {
     **AUTH_ERRORS,
     **SMS_ERRORS
@@ -120,6 +142,13 @@ class ERRORS:
             "status_code": status.HTTP_400_BAD_REQUEST,
             "message": f'{_("Invalid ")} {field_name}',
             "description": f'{_(field_name)} Can\'t be empty.',
+        })
+
+    @staticmethod
+    def custom_message_error(message):
+        return ({
+            "status_code": status.HTTP_400_BAD_REQUEST,
+            "message": f'{message}'
         })
 
     @staticmethod
@@ -150,3 +179,7 @@ class ERRORS:
     ERROR_INVALID_GENDER = API_ERRORS["ERROR_INVALID_GENDER"]
     ERROR_INVALID_RULE = API_ERRORS["ERROR_INVALID_RULE"]
     GENERAL_UNMET_PARAMS_ERROR = API_ERRORS["GENERAL_UNMET_PARAMS_ERROR"]
+
+    ERROR_INVALID_AMOUNT = PAYMENT_ERRORS["ERROR_INVALID_AMOUNT"]
+    ERROR_INVALID_CARD = PAYMENT_ERRORS["ERROR_INVALID_CARD"]
+    ERROR_GATEWAY = PAYMENT_ERRORS["ERROR_GATEWAY"]
