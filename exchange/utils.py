@@ -5,7 +5,6 @@ from rest_framework.views import exception_handler
 
 def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
-
     # Now add the HTTP status code to the response.
     d = {"result": "error", "error": {}}
     if response is not None:
@@ -18,4 +17,5 @@ def custom_exception_handler(exc, context):
                     if "description_en" in q:
                         del q["description_en"]
                     d["error"] = q
-    return JsonResponse(d, status=d["error"].get('status_code', status.HTTP_400_BAD_REQUEST))
+
+    return JsonResponse(d, status=status.HTTP_200_OK)
