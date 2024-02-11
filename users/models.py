@@ -1,6 +1,7 @@
 # Create your models here.
 import uuid
 
+from django.apps import apps
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -86,3 +87,16 @@ class CustomUser(AbstractUser):
 
     def validate_otp(self, code, type=vars.OTP_TYPE_LOGIN):
         return not not self.otp_set.filter(code=code, type=type)
+
+    def create_wallet(self, code):
+        Currency = apps.get_model('currency', 'Currency')
+        currency = Currency.objects.get(symbol=code)
+        wallet = self.wallet_set.create(currency_id=currency)
+        return wallet
+
+    def get_wallet(self, code):
+        wallet = self.wallet_set.filter(currency_id__symbol=code).first()
+        if not wallet:
+            wallet = self.create_wallet(code)
+
+        return wallet

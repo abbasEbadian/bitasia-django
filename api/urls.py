@@ -5,5 +5,5 @@ urlpatterns = [
     path('users/', include('users.urls'), name='users'),
     path('authority/', include('authority.urls'), name='authority'),
     path('creditcard/', include('creditcard.urls'), name='creditcard'),
-    path('idp/', include('order.urls'), name='order'),
+    path('idp/', include('zarinpal.urls'), name='order'),
 ]

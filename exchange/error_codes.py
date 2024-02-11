@@ -139,7 +139,7 @@ class ERRORS:
     @staticmethod
     def empty_field_error(field_name):
         return ({
-            "status_code": status.HTTP_400_BAD_REQUEST,
+            "status_code": status.HTTP_200_OK,
             "message": f'{_("Invalid ")} {field_name}',
             "description": f'{_(field_name)} Can\'t be empty.',
         })
@@ -147,7 +147,7 @@ class ERRORS:
     @staticmethod
     def custom_message_error(message):
         return ({
-            "status_code": status.HTTP_400_BAD_REQUEST,
+            "status_code": status.HTTP_200_OK,
             "message": f'{message}'
         })
 
@@ -158,7 +158,7 @@ class ERRORS:
             msg = gettext_lazy('%(f)s must have %(mn)d digits')
 
         return {
-            "status_code": status.HTTP_400_BAD_REQUEST,
+            "status_code": status.HTTP_200_OK,
             "message": msg % {"f": field_name, "mn": minL, "mx": maxL},
             "description": msg % {"f": field_name, "mn": minL, "mx": maxL},
         }

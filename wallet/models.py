@@ -3,27 +3,9 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from authority.models import BaseModelWithDate
+from currency.models import Currency
 
 User = get_user_model()
-
-
-def get_file_path_for_icon(instance, filename):
-    ext = filename.split('.')[-1]
-    filename = "images/avatars/%s.%s" % (instance.name, ext)
-    return filename
-
-
-class Currency(BaseModelWithDate):
-    name = models.CharField(_('Name'))
-    symbol = models.CharField(_('Symbol'))
-    icon = models.ImageField(_('Icon'), upload_to=get_file_path_for_icon)
-
-    def __str__(self):
-        return str(self.name)
-
-    class Meta:
-        verbose_name = _('Currency')
-        verbose_name_plural = _('Currencies')
 
 
 class Wallet(BaseModelWithDate):
@@ -32,7 +14,7 @@ class Wallet(BaseModelWithDate):
     balance = models.FloatField(_('Balance'), default=0.0)
 
     def __str__(self):
-        return f"{self.user_id.name} ({self.balance})"
+        return f"{self.user_id.username} ({self.balance})"
 
     class Meta:
         verbose_name = _('Wallet')
@@ -41,12 +23,14 @@ class Wallet(BaseModelWithDate):
     def get_balance(self):
         return self.balance
 
-    def modify_balance(self, amount: float):
+    def charge(self, amount: float):
         if amount < 0:
             if self.balance < amount:
                 return False
-            self.balance -= amount
+            self.balance -= float(amount)
+            self.save()
             return True
 
-        self.balance += amount
+        self.balance += float(amount)
+        self.save()
         return True

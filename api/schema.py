@@ -7,7 +7,7 @@ create_payment_schema = {
     "request_body": openapi.Schema(type=openapi.TYPE_OBJECT,
                                    required=["amount", 'card_number'],
                                    properties={
-                                       "amount": openapi.Schema(type=openapi.TYPE_STRING),
+                                       "amount": openapi.Schema(type=openapi.TYPE_NUMBER),
                                        "card_number": openapi.Schema(type=openapi.TYPE_STRING)
                                    }),
 }

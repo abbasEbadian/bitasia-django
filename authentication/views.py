@@ -31,6 +31,7 @@ class LoginView(KnoxLoginView):
 
         req, created = AuthorityRequest.objects.get_or_create(rule_id=rule_id, user_id=user,
                                                               defaults={"approved": True})
+        user.get_wallet("IRT")
         req.approve()
         login(request, user)
         return super(LoginView, self).post(request, format=None)

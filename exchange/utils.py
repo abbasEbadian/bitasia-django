@@ -1,16 +1,19 @@
-from django.http import Http404, JsonResponse
-from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
 
 def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
+    print(response, exc, context)
+
     # Now add the HTTP status code to the response.
     d = {"result": "error", "error": {}}
     if response is not None:
-        if isinstance(exc, Http404):
+        if response.status_code in [401, 403, 404]:
             return response
+        print(isinstance(exc.detail, dict))
         if isinstance(exc.detail, dict):
+            print(exc.detail)
             for key, value in exc.detail.items():
                 if key == "API_ERROR":
                     q = {**value}
@@ -18,4 +21,4 @@ def custom_exception_handler(exc, context):
                         del q["description_en"]
                     d["error"] = q
 
-    return JsonResponse(d, status=status.HTTP_200_OK)
+    return Response(d, status=500)

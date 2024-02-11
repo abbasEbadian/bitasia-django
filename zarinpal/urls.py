@@ -1,6 +1,6 @@
 from django.urls import path
 
-from order import views
+from . import views
 
 urlpatterns = [
     path('create_rial_payment/', views.create_rial_deposit, name='create_rial_payment'),
