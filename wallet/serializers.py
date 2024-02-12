@@ -10,7 +10,7 @@ class CurrencySerializer(serializers.ModelSerializer):
 
 
 class WalletSerializer(serializers.ModelSerializer):
-    currency_id = CurrencySerializer(source='currency_id')
+    currency_id = CurrencySerializer()
 
     class Meta:
         model = Wallet
