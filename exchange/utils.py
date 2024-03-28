@@ -21,4 +21,4 @@ def custom_exception_handler(exc, context):
                         del q["description_en"]
                     d["error"] = q
 
-    return Response(d, status=500)
+    return Response(d, status=400)
