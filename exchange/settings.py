@@ -65,7 +65,8 @@ INSTALLED_APPS = [
 ]
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "bitasia.ir"]
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = ["http://localhost", "https://*bitasia.ir/"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost", "https://api.bitasia.ir", "https://dashborad.bitasia.ir",
+                        "https://bitasia.ir"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
