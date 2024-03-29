@@ -40,9 +40,9 @@ APPS = [
     "api",
     "creditcard",
     "wallet",
+    "bitpin",
     "order",
     "zarinpal",
-    "bitpin"
 ]
 LIBS = [
     "rest_framework",

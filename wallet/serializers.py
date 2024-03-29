@@ -1,11 +1,12 @@
 from rest_framework import serializers
 
-from wallet.models import Currency, Wallet
+from bitpin.models import BitPinCurrency
+from wallet.models import Wallet
 
 
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Currency
+        model = BitPinCurrency
         exclude = ['create_date', 'write_date']
 
 

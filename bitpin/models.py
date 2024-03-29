@@ -56,3 +56,10 @@ class BitPinCurrency(BaseModelWithDate):
     price_info_usdt_amount = models.DecimalField(_("Market Amount USDT"), max_digits=20, decimal_places=8)
     price_info_usdt_market_value = models.DecimalField(_("Total Market Value USDT"), max_digits=20, decimal_places=8)
     price_info_usdt_market_amount = models.DecimalField(_("Total Market Amount USDT"), max_digits=20, decimal_places=8)
+
+    def __str__(self):
+        return f"{self.title} ({self.title_fa})"
+
+    class Meta:
+        verbose_name = _('Currency')
+        verbose_name_plural = _('Currencies')
