@@ -14,7 +14,6 @@ from django.utils.translation import gettext as _
 
 from authentication.exception import CustomError
 from authority.models import BaseModelWithDate
-from currency.models import CurrencyKey
 from exchange.error_codes import ERRORS
 
 _logger = logging.getLogger(__name__)
@@ -80,7 +79,7 @@ class RialDeposit(BaseModelWithDate):
         return self.status == 'pending'
 
     def success(self):
-        wallet = self.user_id.get_wallet(CurrencyKey.IRT)
+        wallet = self.user_id.get_wallet("IRT")
         self.status = 'success'
         charged = wallet.charge(self.amount)
         self.save()

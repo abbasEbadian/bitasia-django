@@ -89,13 +89,13 @@ class CustomUser(AbstractUser):
         return not not self.otp_set.filter(code=code, type=type)
 
     def create_wallet(self, code):
-        Currency = apps.get_model('currency', 'Currency')
-        currency = Currency.objects.get(symbol=code)
+        Currency = apps.get_model('bitpin', 'BitPinCurrency')
+        currency = Currency.objects.get(code=code)
         wallet = self.wallet_set.create(currency_id=currency)
         return wallet
 
     def get_wallet(self, code):
-        wallet = self.wallet_set.filter(currency_id__symbol=code).first()
+        wallet = self.wallet_set.filter(currency_id__code=code).first()
         if not wallet:
             wallet = self.create_wallet(code)
 

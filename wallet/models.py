@@ -3,15 +3,15 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from authority.models import BaseModelWithDate
-from currency.models import Currency
+from bitpin.models import BitPinCurrency
 
 User = get_user_model()
 
 
 class Wallet(BaseModelWithDate):
     user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    currency_id = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True)
-    balance = models.FloatField(_('Balance'), default=0.0)
+    currency_id = models.ForeignKey(BitPinCurrency, on_delete=models.SET_NULL, null=True)
+    balance = models.FloatField(_('Balance'), default=0.0, )
 
     def __str__(self):
         return f"{self.user_id.username} ({self.balance})"

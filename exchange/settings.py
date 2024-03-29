@@ -33,6 +33,25 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don"t run with debug turned on in production!
 DEBUG = True
 
+APPS = [
+    "users",
+    "authority",
+    "authentication",
+    "api",
+    "creditcard",
+    "wallet",
+    "bitpin",
+    "order",
+    "zarinpal",
+]
+LIBS = [
+    "rest_framework",
+    "drf_yasg",
+    "knox",
+    "corsheaders",
+    "django_crontab"
+]
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -40,24 +59,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    *LIBS,
+    *APPS
 
-    "users",
-    "authority",
-    "rest_framework",
-    "drf_yasg",
-    "knox",
-    "api",
-    "authentication",
-    "corsheaders",
-    "creditcard",
-    "wallet",
-    "order",
-    "zarinpal",
-    "currency"
 ]
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "82.115.18.227", "bitasia.ir"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "bitasia.ir"]
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = ["http://localhost", "http://*", "https://bitasia.ir/"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost", "https://*bitasia.ir/"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -170,3 +178,7 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+CRONJOBS = [
+    ("* * * * *", "bitpin.crons.get_bitpin_currencies_cron", ">> /var/log/bitasia/cron/log.log")
+]
