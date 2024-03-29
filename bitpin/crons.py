@@ -19,7 +19,6 @@ def get_bitpin_currencies_cron():
         price = row.pop("price_info") if "price_info" in row else {}
         price_usdt = row.pop("price_info_usdt") if "price_info_usdt" in row else {}
         networks = row.pop("networks") if "networks" in row else {}
-        cc = False
         try:
             prices = {}
             for k, v in price.items():
@@ -40,10 +39,6 @@ def get_bitpin_currencies_cron():
             if not created:
                 currency = currency.first()
             for net in networks:
-
-                if not cc:
-                    print(dir(currency.network_ids))
-                    cc = not cc
                 network, c = BitPinNetwork.objects.get_or_create(code=net.get('code'),
                                                                  defaults={"title": row.get("title"),
                                                                            "title_fa": row.get(
