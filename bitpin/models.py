@@ -11,6 +11,7 @@ class BitPinNetwork(BaseModelWithDate):
 
 
 class BitPinCurrency(BaseModelWithDate):
+    active = models.BooleanField(_("Active"), default=True)
     title = models.CharField(_("Title (English)"), max_length=255)
     title_fa = models.CharField(_("Title (فارسی)"), max_length=255, blank=True)
     code = models.CharField(_("Code"), max_length=10)
@@ -33,9 +34,9 @@ class BitPinCurrency(BaseModelWithDate):
     recommend_for_deposit_weight = models.IntegerField(_("Recommend for Deposit Weight"))
     for_loan = models.BooleanField(_("For Loan"))
     for_stake = models.BooleanField(_("For Stake"))
-    network_id = models.ManyToManyField(BitPinNetwork, )
+    network_ids = models.ManyToManyField(BitPinNetwork, blank=True)
     price_info_price = models.DecimalField(_("Price"), max_digits=20, decimal_places=8)
-    price_info_time = models.DateTimeField(_("Time"))
+    price_info_time = models.DateTimeField(_("Time"), null=True, blank=True)
     price_info_change = models.DecimalField(_("Change"), max_digits=10, decimal_places=4)
     price_info_min = models.DecimalField(_("Minimum"), max_digits=20, decimal_places=8)
     price_info_max = models.DecimalField(_("Maximum"), max_digits=20, decimal_places=8)
@@ -46,7 +47,7 @@ class BitPinCurrency(BaseModelWithDate):
     price_info_market_value = models.DecimalField(_("Total Market Value"), max_digits=20, decimal_places=8)
     price_info_market_amount = models.DecimalField(_("Total Market Amount"), max_digits=20, decimal_places=8)
     price_info_usdt_price = models.DecimalField(_("Price USDT"), max_digits=20, decimal_places=8)
-    price_info_usdt_time = models.DateTimeField(_("Time USDT"))
+    price_info_usdt_time = models.DateTimeField(_("Time USDT"), null=True, blank=True)
     price_info_usdt_change = models.DecimalField(_("Change USDT"), max_digits=10, decimal_places=4)
     price_info_usdt_min = models.DecimalField(_("Minimum USDT"), max_digits=20, decimal_places=8)
     price_info_usdt_max = models.DecimalField(_("Maximum USDT"), max_digits=20, decimal_places=8)

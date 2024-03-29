@@ -49,6 +49,7 @@ LIBS = [
     "drf_yasg",
     "knox",
     "corsheaders",
+    "django_crontab"
 ]
 
 INSTALLED_APPS = [
@@ -177,3 +178,7 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+CRONJOBS = [
+    ("* * * * *", "bitpin.crons.get_bitpin_currencies_cron", ">> /var/log/bitasia/cron/log.log")
+]
