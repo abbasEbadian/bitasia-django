@@ -55,4 +55,3 @@ def get_bitpin_currencies_cron():
             print("DONE")
         except Exception as e:
             print(e)
-        print("DONE")
