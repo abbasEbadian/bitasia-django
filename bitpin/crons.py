@@ -31,12 +31,14 @@ def get_bitpin_currencies_cron():
                 prices[f"price_info_usdt_{k}"] = v
 
             currency = BitPinCurrency.objects.filter(code=row.get('code'))
+            created = bool(currency)
             if not currency:
                 defaults = {k: v for k, v in row.items()}
                 currency = BitPinCurrency.objects.create(**defaults, **prices)
             else:
                 currency.update(**prices)
-            currency = currency.first()
+            if not created:
+                currency = currency.first()
             for net in networks:
 
                 if not cc:
