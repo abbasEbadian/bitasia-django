@@ -18,7 +18,7 @@ def get_bitpin_currencies_cron():
         del row["id"]
         price = row.pop("price_info") if "price_info" in row else {}
         price_usdt = row.pop("price_info_usdt") if "price_info_usdt" in row else {}
-        networks = row.pop("networks") if "networks" in row else {}
+        networks = row.pop("networks") if "networks" in row else []
         try:
             prices = {}
             for k, v in price.items():

@@ -9,6 +9,13 @@ class BitPinNetwork(BaseModelWithDate):
     title = models.CharField(max_length=255)
     title_fa = models.CharField(max_length=255)
 
+    def __str__(self):
+        return f"{self.code} : ({self.title})"
+
+    class Meta:
+        verbose_name = _('Network')
+        verbose_name_plural = _('Networks')
+
 
 class BitPinCurrency(BaseModelWithDate):
     active = models.BooleanField(_("Active"), default=True)
