@@ -6,6 +6,7 @@ from bitpin.models import BitPinCurrency, BitPinNetwork
 
 
 def get_bitpin_currencies_cron():
+    print("CRONJOB start:", datatime.datetime.now())
     response = requests.get("https://api.bitpin.ir/v1/mkt/currencies/")
     if response.status_code != 200:
         print("cron fail at:", datetime.datetime.now(), response)
@@ -32,13 +33,14 @@ def get_bitpin_currencies_cron():
                 prices[f"price_info_usdt_{k}"] = v
 
             currency = BitPinCurrency.objects.filter(code=row.get('code'))
-            created = bool(currency)
-            if not currency:
+            created = False
+            if not bool(currency):
                 defaults = {k: v for k, v in row.items()}
                 defaults["bitasia_active"] = bitasia_active
+		created = True
                 currency = BitPinCurrency.objects.create(**defaults, **prices)
             else:
-                currency.update(**prices)
+		currency.update(**prices)
             if not created:
                 currency = currency.first()
             for net in networks:

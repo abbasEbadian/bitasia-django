@@ -90,9 +90,12 @@ class CustomUser(AbstractUser):
 
     def create_wallet(self, code):
         Currency = apps.get_model('bitpin', 'BitPinCurrency')
-        currency = Currency.objects.get(code=code)
-        wallet = self.wallet_set.create(currency_id=currency)
-        return wallet
+        try:
+            currency = Currency.objects.get(code=code)
+            wallet = self.wallet_set.create(currency_id=currency)
+            return wallet
+        except Exception as e:
+            return None
 
     def get_wallet(self, code):
         wallet = self.wallet_set.filter(currency_id__code=code).first()

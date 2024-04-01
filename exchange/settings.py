@@ -181,5 +181,4 @@ SWAGGER_SETTINGS = {
 }
 
 CRONJOBS = [
-    ("* * * * *", "bitpin.crons.get_bitpin_currencies_cron", ">> /var/log/bitasia/cron/log.log")
-]
+    ("* * * * *", "bitpin.crons.get_bitpin_currencies_cron", ">> /srv/bitasia-django/log.log")]
