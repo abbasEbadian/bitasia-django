@@ -6,7 +6,7 @@ from users.serializer import UserSerializer
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    user_id = UserSerializer(many=True)
+    user_id = UserSerializer()
     currency_id = CurrencySerializer()
 
     class Meta:
