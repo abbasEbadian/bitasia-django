@@ -37,10 +37,10 @@ def get_bitpin_currencies_cron():
             if not bool(currency):
                 defaults = {k: v for k, v in row.items()}
                 defaults["bitasia_active"] = bitasia_active
-		created = True
+                created = True
                 currency = BitPinCurrency.objects.create(**defaults, **prices)
             else:
-		currency.update(**prices)
+                currency.update(**prices)
             if not created:
                 currency = currency.first()
             for net in networks:
