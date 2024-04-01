@@ -6,7 +6,7 @@ from bitpin.models import BitPinCurrency, BitPinNetwork
 class NetworkSerializer(serializers.ModelSerializer):
     class Meta:
         model = BitPinNetwork
-        fields = '__all__'
+        exclude = ["create_date", "write_date"]
 
 
 class CurrencySerializer(serializers.ModelSerializer):
@@ -14,4 +14,5 @@ class CurrencySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BitPinCurrency
-        fields = '__all__'
+        exclude = ["create_date", "write_date"]
+        depth = 1

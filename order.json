@@ -1,0 +1,44 @@
+[
+  {
+    "model": "order.order",
+    "pk": 2,
+    "fields": {
+      "create_date": "2024-04-01T19:48:26.360Z",
+      "write_date": "2024-04-01T19:48:26.360Z",
+      "user_id": 1,
+      "currency_id": 833,
+      "type": "deposit",
+      "status": "pending",
+      "tx_id": "asd[fkpof904jfm4fh",
+      "amount": "1.12220000"
+    }
+  },
+  {
+    "model": "order.order",
+    "pk": 3,
+    "fields": {
+      "create_date": "2024-04-01T19:48:54.756Z",
+      "write_date": "2024-04-01T19:48:54.756Z",
+      "user_id": 1,
+      "currency_id": 835,
+      "type": "withdrawal",
+      "status": "cancel",
+      "tx_id": "56456fr46534f168443v",
+      "amount": "300.00000000"
+    }
+  },
+  {
+    "model": "order.order",
+    "pk": 4,
+    "fields": {
+      "create_date": "2024-04-01T19:49:30.811Z",
+      "write_date": "2024-04-01T19:49:30.811Z",
+      "user_id": 1,
+      "currency_id": 836,
+      "type": "deposit",
+      "status": "success",
+      "tx_id": "6525665256lhkhkvjndzv",
+      "amount": "200.00000000"
+    }
+  }
+]

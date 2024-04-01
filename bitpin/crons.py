@@ -21,7 +21,9 @@ def get_bitpin_currencies_cron():
         networks = row.pop("networks") if "networks" in row else []
         try:
             prices = {}
+            bitasia_active = False
             for k, v in price.items():
+                if k == "price" and v != "0": bitasia_active = True
                 if k == "time" and v == "0": v = None
                 prices[f"price_info_{k}"] = v
 
@@ -33,6 +35,7 @@ def get_bitpin_currencies_cron():
             created = bool(currency)
             if not currency:
                 defaults = {k: v for k, v in row.items()}
+                defaults["bitasia_active"] = bitasia_active
                 currency = BitPinCurrency.objects.create(**defaults, **prices)
             else:
                 currency.update(**prices)

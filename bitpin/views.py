@@ -1,9 +1,11 @@
 from django.utils.translation import gettext as _
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
 
 from bitpin.models import BitPinCurrency, BitPinNetwork
+from .serializers import CurrencySerializer
 
 
 class CurrencyView(generics.ListAPIView):
@@ -15,11 +17,18 @@ class CurrencyView(generics.ListAPIView):
         return False
 
     def get_queryset(self):
-        return BitPinCurrency.objects.all()
+        request = self.request
+        show_inactive = request.GET.get("show_inactive", False)
+        filters = {"bitasia_active": True}
+        if show_inactive and show_inactive != 'false':
+            filters = {}
+        return BitPinCurrency.objects.filter(**filters)
 
-    @swagger_auto_schema(operation_id=_("Get Currency List"))
+    @swagger_auto_schema(operation_id=_("Get Currency List"), manual_parameters=[
+        openapi.Parameter(name="show_inactive", in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN),
+    ])
     def get(self, request):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
+        serializer = CurrencySerializer(self.get_queryset(), many=True)
         return Response({
             "result": "success",
             "objects": serializer.data

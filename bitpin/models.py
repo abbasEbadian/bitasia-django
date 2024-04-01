@@ -18,7 +18,8 @@ class BitPinNetwork(BaseModelWithDate):
 
 
 class BitPinCurrency(BaseModelWithDate):
-    active = models.BooleanField(_("Active"), default=True)
+    bitasia_active = models.BooleanField(_("Bitasia Active"), default=True)
+    active = models.BooleanField(_("BitPin Active"), default=True)
     title = models.CharField(_("Title (English)"), max_length=255)
     title_fa = models.CharField(_("Title (فارسی)"), max_length=255, blank=True)
     code = models.CharField(_("Code"), max_length=10)
@@ -69,5 +70,6 @@ class BitPinCurrency(BaseModelWithDate):
         return f"{self.title} ({self.title_fa})"
 
     class Meta:
+        ordering = ("id",)
         verbose_name = _('Currency')
         verbose_name_plural = _('Currencies')

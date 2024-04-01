@@ -7,4 +7,5 @@ urlpatterns = [
     path('creditcard/', include('creditcard.urls'), name='creditcard'),
     path('idp/', include('zarinpal.urls'), name='order'),
     path('currency/', include('bitpin.urls'), name='currency'),
+    path('order/', include('order.urls'), name='orders'),
 ]

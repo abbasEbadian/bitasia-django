@@ -17,6 +17,7 @@ class Wallet(BaseModelWithDate):
         return f"{self.user_id.username} ({self.balance})"
 
     class Meta:
+        ordering = ('-balance',)
         verbose_name = _('Wallet')
         verbose_name_plural = _('Wallets')
 
