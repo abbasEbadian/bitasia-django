@@ -135,7 +135,6 @@ class RialDeposit(BaseModelWithDate):
                 self.verifyline_set.create(**line)
                 _logger.error("Zarinpal -> check_transaction_integrity: not %d " % req.status_code)
                 raise CustomError(ERRORS.ERROR_GATEWAY)
-            print(req.json())
             result = req.json()
             data = result.get("data", [])
             success = True

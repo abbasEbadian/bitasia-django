@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
@@ -80,7 +81,7 @@ def payment_callback(request):
 
     if not transaction:
         return Response({
-            "result": success,
+            "result": success and "success" or "error",
             "message": message
         })
     if not success:
@@ -88,7 +89,10 @@ def payment_callback(request):
     else:
         transaction.success()
 
-    return Response({
-        "result": success,
-        "message": message
+    return render(request, "zarinpal/payment_callback.html", {
+        "success": success,
+        "card_number": transaction.card_number,
+        "amount": f"{transaction.amount:,}",
+        "factor_number": transaction.factor_number,
+        "ref_id": transaction.verifyline_set.last() and transaction.verifyline_set.last().ref_id
     })

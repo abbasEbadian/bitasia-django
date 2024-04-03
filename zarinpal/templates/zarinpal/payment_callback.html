@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 400px;
+            margin: 50px auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        .message.success {
+            color: green;
+        }
+
+        .message.error {
+            color: crimson;
+        }
+
+
+        .info {
+            margin-bottom: 20px;
+        }
+
+        .info p {
+            margin-bottom: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0095ff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            margin-top: 24px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        {% if success %}
+            <h1 class="message success">پرداخت موفق </h1>
+        {% else %}
+            <h1 class="message error">پرداخت ناموفق </h1>
+        {% endif %}
+    </header>
+
+    <main>
+
+        <br/>
+        <br/>
+        <div class="info">
+            <p>مبلغ: {{ amount }} تومان</p>
+            <p>شماره کارت: {{ card_number }}</p>
+            <p>شماره فاکتور: {{ factor_number }}</p>
+            {% if ref_id %}<p>شماره فاکتور: {{ ref_id }}</p>ِ{% endif %}
+        </div>
+        {% if not success %}
+            <h3 class="message"> در صورت کسر وجه، طی 72 ساعت آینده عودت داده خواهد شد.</h3>
+        {% endif %}
+        <a href="https://dashboard.bitasia.ir/" class="button">ادامه به پنل کاربری</a>
+    </main>
+</div>
+</body>
+</html>
