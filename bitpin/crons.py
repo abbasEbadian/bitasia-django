@@ -49,8 +49,8 @@ def get_bitpin_currencies_cron():
                 currency = currency.first()
             for net in networks:
                 network, c = BitPinNetwork.objects.get_or_create(code=net.get('code'),
-                                                                 defaults={"title": row.get("title"),
-                                                                           "title_fa": row.get(
+                                                                 defaults={"title": net.get("title"),
+                                                                           "title_fa": net.get(
                                                                                "title_fa")})
                 if network.id not in [x.id for x in currency.network_ids.all()]:
                     currency.network_ids.add(network)
