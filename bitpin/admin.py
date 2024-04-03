@@ -5,7 +5,8 @@ from .models import BitPinCurrency, BitPinNetwork
 
 @admin.register(BitPinCurrency)
 class BitPinCurrencyAdmin(admin.ModelAdmin):
-    list_display = ("title", "title_fa", "code", "price_info_price", "price_info_usdt_price")
+    list_display = ("id", "title", "title_fa", "code", "price_info_price", "price_info_usdt_price")
+    search_fields = ["title", "title_fa", "code"]
 
 
 @admin.register(BitPinNetwork)

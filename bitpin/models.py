@@ -43,28 +43,36 @@ class BitPinCurrency(BaseModelWithDate):
     for_loan = models.BooleanField(_("For Loan"))
     for_stake = models.BooleanField(_("For Stake"))
     network_ids = models.ManyToManyField(BitPinNetwork, blank=True)
-    price_info_price = models.DecimalField(_("Price"), max_digits=20, decimal_places=8)
+    price_info_price = models.DecimalField(_("Price"), max_digits=20, decimal_places=8, null=True, blank=True)
     price_info_time = models.DateTimeField(_("Time"), null=True, blank=True)
-    price_info_change = models.DecimalField(_("Change"), max_digits=10, decimal_places=4)
-    price_info_min = models.DecimalField(_("Minimum"), max_digits=20, decimal_places=8)
-    price_info_max = models.DecimalField(_("Maximum"), max_digits=20, decimal_places=8)
-    price_info_mean = models.DecimalField(_("Mean"), max_digits=20, decimal_places=8)
+    price_info_change = models.DecimalField(_("Change"), max_digits=10, decimal_places=4, null=True, blank=True)
+    price_info_min = models.DecimalField(_("Minimum"), max_digits=20, decimal_places=8, default="0")
+    price_info_max = models.DecimalField(_("Maximum"), max_digits=20, decimal_places=8, null=True, blank=True)
+    price_info_mean = models.DecimalField(_("Mean"), max_digits=20, decimal_places=8, null=True, blank=True)
     price_info_value = models.DecimalField(_("Market Value"), max_digits=20,
-                                           decimal_places=8)  # Assuming value refers to market value
-    price_info_amount = models.DecimalField(_("Market Amount"), max_digits=20, decimal_places=8)
-    price_info_market_value = models.DecimalField(_("Total Market Value"), max_digits=20, decimal_places=8)
-    price_info_market_amount = models.DecimalField(_("Total Market Amount"), max_digits=20, decimal_places=8)
-    price_info_usdt_price = models.DecimalField(_("Price USDT"), max_digits=20, decimal_places=8)
+                                           decimal_places=8, null=True,
+                                           blank=True)  # Assuming value refers to market value
+    price_info_amount = models.DecimalField(_("Market Amount"), max_digits=20, decimal_places=8, null=True, blank=True)
+    price_info_market_value = models.DecimalField(_("Total Market Value"), max_digits=20, decimal_places=8,
+                                                  null=True, blank=True)
+    price_info_market_amount = models.DecimalField(_("Total Market Amount"), max_digits=20, decimal_places=8,
+                                                   null=True, blank=True)
+    price_info_usdt_price = models.DecimalField(_("Price USDT"), max_digits=20, decimal_places=8, null=True, blank=True)
     price_info_usdt_time = models.DateTimeField(_("Time USDT"), null=True, blank=True)
-    price_info_usdt_change = models.DecimalField(_("Change USDT"), max_digits=10, decimal_places=4)
-    price_info_usdt_min = models.DecimalField(_("Minimum USDT"), max_digits=20, decimal_places=8)
-    price_info_usdt_max = models.DecimalField(_("Maximum USDT"), max_digits=20, decimal_places=8)
-    price_info_usdt_mean = models.DecimalField(_("Mean USDT"), max_digits=20, decimal_places=8)
+    price_info_usdt_change = models.DecimalField(_("Change USDT"), max_digits=10, decimal_places=4, null=True,
+                                                 blank=True)
+    price_info_usdt_min = models.DecimalField(_("Minimum USDT"), max_digits=20, decimal_places=8, null=True, blank=True)
+    price_info_usdt_max = models.DecimalField(_("Maximum USDT"), max_digits=20, decimal_places=8, null=True, blank=True)
+    price_info_usdt_mean = models.DecimalField(_("Mean USDT"), max_digits=20, decimal_places=8, null=True, blank=True)
     price_info_usdt_value = models.DecimalField(_("Market Value USDT"), max_digits=20,
-                                                decimal_places=8)  # Assuming value refers to market value
-    price_info_usdt_amount = models.DecimalField(_("Market Amount USDT"), max_digits=20, decimal_places=8)
-    price_info_usdt_market_value = models.DecimalField(_("Total Market Value USDT"), max_digits=20, decimal_places=8)
-    price_info_usdt_market_amount = models.DecimalField(_("Total Market Amount USDT"), max_digits=20, decimal_places=8)
+                                                decimal_places=8,
+                                                null=True, blank=True)  # Assuming value refers to market value
+    price_info_usdt_amount = models.DecimalField(_("Market Amount USDT"), max_digits=20, decimal_places=8,
+                                                 null=True, blank=True)
+    price_info_usdt_market_value = models.DecimalField(_("Total Market Value USDT"), max_digits=20, decimal_places=8,
+                                                       null=True, blank=True)
+    price_info_usdt_market_amount = models.DecimalField(_("Total Market Amount USDT"), max_digits=20, decimal_places=8,
+                                                        null=True, blank=True)
 
     def __str__(self):
         return f"{self.title} ({self.title_fa})"

@@ -11,7 +11,7 @@ from .serializers import CurrencySerializer
 class CurrencyView(generics.ListAPIView):
     authentication_classes = ()
     permission_classes = []
-    serializer_class = []
+    serializer_class = CurrencySerializer
 
     def paginator(self):
         return False
@@ -28,7 +28,7 @@ class CurrencyView(generics.ListAPIView):
         openapi.Parameter(name="show_inactive", in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN),
     ])
     def get(self, request):
-        serializer = CurrencySerializer(self.get_queryset(), many=True)
+        serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response({
             "result": "success",
             "objects": serializer.data
@@ -38,7 +38,7 @@ class CurrencyView(generics.ListAPIView):
 class NetworkView(generics.ListAPIView):
     authentication_classes = ()
     permission_classes = []
-    serializer_class = []
+    serializer_class = None
 
     def paginator(self):
         return False
