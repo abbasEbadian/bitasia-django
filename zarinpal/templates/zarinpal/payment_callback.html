@@ -69,13 +69,16 @@
         <br/>
         <br/>
         <div class="info">
-            <p>مبلغ: {{ amount }} تومان</p>
+            <p>مبلغ: {{ amount }} ریال</p>
             <p>شماره کارت: {{ card_number }}</p>
             <p>شماره فاکتور: {{ factor_number }}</p>
-            {% if ref_id %}<p>شماره فاکتور: {{ ref_id }}</p>ِ{% endif %}
+            {% if ref_id %}<p>شماره پیگیری: {{ ref_id }}</p>ِ{% endif %}
         </div>
-        {% if not success %}
+        {% if not success and not message %}
             <h3 class="message"> در صورت کسر وجه، طی 72 ساعت آینده عودت داده خواهد شد.</h3>
+        {% endif %}
+        {% if message %}
+            {{ message }}
         {% endif %}
         <a href="https://dashboard.bitasia.ir/" class="button">ادامه به پنل کاربری</a>
     </main>

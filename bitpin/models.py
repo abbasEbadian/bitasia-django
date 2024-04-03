@@ -24,15 +24,15 @@ class BitPinCurrency(BaseModelWithDate):
     title_fa = models.CharField(_("Title (فارسی)"), max_length=255, blank=True)
     code = models.CharField(_("Code"), max_length=10)
     image = models.URLField(_("Image URL"), null=True, blank=True)
-    min_withdraw = models.DecimalField(_("Minimum Withdrawal"), max_digits=10, decimal_places=6, blank=True,
-                                       null=True)
+    min_withdraw = models.FloatField(_("Minimum Withdrawal"), blank=True,
+                                     null=True)
     color = models.CharField(_("Color"), max_length=6)
     alias = models.CharField(_("Alias"), max_length=255, blank=True)
-    withdraw_commission = models.DecimalField(_("Withdrawal Commission"), max_digits=10, decimal_places=8, blank=True,
-                                              null=True)
+    withdraw_commission = models.FloatField(_("Withdrawal Commission"), blank=True,
+                                            null=True)
     withdraw_commission_type = models.CharField(_("Withdrawal Commission Type"), max_length=10, blank=True, null=True)
-    max_withdraw_commission = models.DecimalField(_("Maximum Withdrawal Commission"), max_digits=10,
-                                                  decimal_places=8, blank=True, null=True)
+    max_withdraw_commission = models.FloatField(_("Maximum Withdrawal Commission"),
+                                                blank=True, null=True)
     tradable = models.BooleanField(_("Tradable"), default=False)
     for_test = models.BooleanField(_("For Test"), default=False)
     decimal = models.IntegerField(_("Decimal Places"), default=0)
@@ -44,36 +44,36 @@ class BitPinCurrency(BaseModelWithDate):
     for_loan = models.BooleanField(_("For Loan"), default=False)
     for_stake = models.BooleanField(_("For Stake"), default=False)
     network_ids = models.ManyToManyField(BitPinNetwork, blank=True)
-    price_info_price = models.DecimalField(_("Price"), max_digits=20, decimal_places=8, null=True, blank=True)
+    price_info_price = models.FloatField(_("Price"), null=True, blank=True)
     price_info_time = models.DateTimeField(_("Time"), null=True, blank=True)
-    price_info_change = models.DecimalField(_("Change"), max_digits=10, decimal_places=4, null=True, blank=True)
-    price_info_min = models.DecimalField(_("Minimum"), max_digits=20, decimal_places=8, null=True, blank=True)
-    price_info_max = models.DecimalField(_("Maximum"), max_digits=20, decimal_places=8, null=True, blank=True)
-    price_info_mean = models.DecimalField(_("Mean"), max_digits=20, decimal_places=8, null=True, blank=True)
-    price_info_value = models.DecimalField(_("Market Value"), max_digits=20,
-                                           decimal_places=8, null=True,
-                                           blank=True)  # Assuming value refers to market value
-    price_info_amount = models.DecimalField(_("Market Amount"), max_digits=20, decimal_places=8, null=True, blank=True)
-    price_info_market_value = models.DecimalField(_("Total Market Value"), max_digits=20, decimal_places=8,
-                                                  null=True, blank=True)
-    price_info_market_amount = models.DecimalField(_("Total Market Amount"), max_digits=20, decimal_places=8,
-                                                   null=True, blank=True)
-    price_info_usdt_price = models.DecimalField(_("Price USDT"), max_digits=20, decimal_places=8, null=True, blank=True)
-    price_info_usdt_time = models.DateTimeField(_("Time USDT"), null=True, blank=True)
-    price_info_usdt_change = models.DecimalField(_("Change USDT"), max_digits=10, decimal_places=4, null=True,
-                                                 blank=True)
-    price_info_usdt_min = models.DecimalField(_("Minimum USDT"), max_digits=20, decimal_places=8, null=True, blank=True)
-    price_info_usdt_max = models.DecimalField(_("Maximum USDT"), max_digits=20, decimal_places=8, null=True, blank=True)
-    price_info_usdt_mean = models.DecimalField(_("Mean USDT"), max_digits=20, decimal_places=8, null=True, blank=True)
-    price_info_usdt_value = models.DecimalField(_("Market Value USDT"), max_digits=20,
-                                                decimal_places=8,
-                                                null=True, blank=True)  # Assuming value refers to market value
-    price_info_usdt_amount = models.DecimalField(_("Market Amount USDT"), max_digits=20, decimal_places=8,
+    price_info_change = models.FloatField(_("Change"), null=True, blank=True)
+    price_info_min = models.FloatField(_("Minimum"), null=True, blank=True)
+    price_info_max = models.FloatField(_("Maximum"), null=True, blank=True)
+    price_info_mean = models.FloatField(_("Mean"), null=True, blank=True)
+    price_info_value = models.FloatField(_("Market Value"),
+                                         null=True,
+                                         blank=True)  # Assuming value refers to market value
+    price_info_amount = models.FloatField(_("Market Amount"), null=True, blank=True)
+    price_info_market_value = models.FloatField(_("Total Market Value"),
+                                                null=True, blank=True)
+    price_info_market_amount = models.FloatField(_("Total Market Amount"),
                                                  null=True, blank=True)
-    price_info_usdt_market_value = models.DecimalField(_("Total Market Value USDT"), max_digits=20, decimal_places=8,
-                                                       null=True, blank=True)
-    price_info_usdt_market_amount = models.DecimalField(_("Total Market Amount USDT"), max_digits=20, decimal_places=8,
-                                                        null=True, blank=True)
+    price_info_usdt_price = models.FloatField(_("Price USDT"), null=True, blank=True)
+    price_info_usdt_time = models.DateTimeField(_("Time USDT"), null=True, blank=True)
+    price_info_usdt_change = models.FloatField(_("Change USDT"), null=True,
+                                               blank=True)
+    price_info_usdt_min = models.FloatField(_("Minimum USDT"), null=True, blank=True)
+    price_info_usdt_max = models.FloatField(_("Maximum USDT"), null=True, blank=True)
+    price_info_usdt_mean = models.FloatField(_("Mean USDT"), null=True, blank=True)
+    price_info_usdt_value = models.FloatField(_("Market Value USDT"),
+
+                                              null=True, blank=True)  # Assuming value refers to market value
+    price_info_usdt_amount = models.FloatField(_("Market Amount USDT"),
+                                               null=True, blank=True)
+    price_info_usdt_market_value = models.FloatField(_("Total Market Value USDT"),
+                                                     null=True, blank=True)
+    price_info_usdt_market_amount = models.FloatField(_("Total Market Amount USDT"),
+                                                      null=True, blank=True)
 
     def __str__(self):
         return f"{self.title} ({self.title_fa})"

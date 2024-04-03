@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
+from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -10,6 +11,33 @@ from api.schema import create_payment_schema
 from authentication.exception import CustomError
 from exchange.error_codes import ERRORS
 from .models import RialDeposit
+from .serializers import RialDepositAdminSerializer, RialDepositSerializer
+
+
+class RialDepositView(generics.ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def paginator(self):
+        return False
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return RialDeposit.objects.all()
+        return RialDeposit.objects.filter(user_id=self.request.user)
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return RialDepositAdminSerializer
+        return RialDepositSerializer
+
+    @swagger_auto_schema(operation_id=_("Get Rial deposit list"))
+    def get(self, *args, **kwargs):
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response({
+            "result": "success",
+            "object": serializer.data
+        })
 
 
 @swagger_auto_schema(**create_payment_schema)
@@ -24,7 +52,7 @@ def create_rial_deposit(request):
     try:
         int(amount)
         amount = int(amount)
-        if not amount or amount < 1000:
+        if not amount or amount < 10000:
             raise CustomError(ERRORS.ERROR_INVALID_AMOUNT)
 
         card = user.creditcard_set.filter(card_number=card_number)
@@ -91,6 +119,7 @@ def payment_callback(request):
 
     return render(request, "zarinpal/payment_callback.html", {
         "success": success,
+        "message": message,
         "card_number": transaction.card_number,
         "amount": f"{transaction.amount:,}",
         "factor_number": transaction.factor_number,

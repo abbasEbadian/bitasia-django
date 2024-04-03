@@ -111,8 +111,8 @@ PAYMENT_ERRORS = {
     "ERROR_INVALID_AMOUNT": {
         "status_code": status.HTTP_400_BAD_REQUEST,
         "message": _("Invalid amount"),
-        "description": _("Amount must be greater than 1000 T"),
-        "description_en": "Amount must be greater than 1000 T"
+        "description": _("Amount must be greater than 10000 R"),
+        "description_en": "Amount must be greater than 10000 R"
     },
     "ERROR_INVALID_CARD": {
         "status_code": status.HTTP_400_BAD_REQUEST,

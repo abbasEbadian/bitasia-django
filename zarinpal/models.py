@@ -81,7 +81,7 @@ class RialDeposit(BaseModelWithDate):
     def success(self):
         wallet = self.user_id.get_wallet("IRT")
         self.status = 'success'
-        charged = wallet.charge(self.amount)
+        charged = wallet.charge(self.amount // 10)
         self.save()
         return charged
 
@@ -90,9 +90,9 @@ class RialDeposit(BaseModelWithDate):
             "merchant_id": RialDepositVars.merchant_id,
             "callback_url": RialDepositVars.callback_url,
             "amount": self.amount,
-            "currency": "IRT",
+            "currency": "IRR",
             "metadata": self.get_user_metadata(),
-            "description": f" واریز {self.amount} تومان برای شارژ کیف پول ریالی بیت آسیا",
+            "description": f" واریز {self.amount} ریال برای شارژ کیف پول ریالی بیت آسیا",
         }
 
         req = requests.post(RialDepositVars.create_url, data=json.dumps(body), headers=json_headers)

@@ -5,6 +5,31 @@ import requests
 from bitpin.models import BitPinCurrency, BitPinNetwork
 
 
+def get_default_prices():
+    return {
+        "price_info_price": 0.0,
+        "price_info_time": None,
+        "price_info_change": 0.0,
+        "price_info_min": 0.0,
+        "price_info_max": 0.0,
+        "price_info_mean": 0.0,
+        "price_info_value": 0.0,
+        "price_info_amount": 0.0,
+        "price_info_market_value": 0.0,
+        "price_info_market_amount": 0.0,
+        "price_info_usdt_price": 0.0,
+        "price_info_usdt_change": 0.0,
+        "price_info_usdt_time": None,
+        "price_info_usdt_min": 0.0,
+        "price_info_usdt_max": 0.0,
+        "price_info_usdt_mean": 0.0,
+        "price_info_usdt_value": 0.0,
+        "price_info_usdt_amount": 0.0,
+        "price_info_usdt_market_value": 0.0,
+        "price_info_usdt_market_amount": 0.0
+    }
+
+
 def get_bitpin_currencies_cron():
     print("CRONJOB start:", datetime.datetime.now())
     response = requests.get("https://api.bitpin.ir/v1/mkt/currencies/")
@@ -33,6 +58,9 @@ def get_bitpin_currencies_cron():
             for k, v in price_usdt.items():
                 if k == "time" and v == "0": v = None
                 prices[f"price_info_usdt_{k}"] = v
+
+            if not prices:
+                prices = get_default_prices()
 
             currency = BitPinCurrency.objects.filter(code=row.get('code'))
             created = False
