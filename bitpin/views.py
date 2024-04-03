@@ -5,7 +5,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from bitpin.models import BitPinCurrency, BitPinNetwork
-from .serializers import CurrencySerializer
+from .serializers import CurrencySerializer, NetworkSerializer
 
 
 class CurrencyView(generics.ListAPIView):
@@ -38,7 +38,7 @@ class CurrencyView(generics.ListAPIView):
 class NetworkView(generics.ListAPIView):
     authentication_classes = ()
     permission_classes = []
-    serializer_class = None
+    serializer_class = NetworkSerializer
 
     def paginator(self):
         return False
