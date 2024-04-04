@@ -89,7 +89,7 @@ class PurchaseAdminConfirmView(generics.UpdateAPIView):
     serializer_class = PurchaseSubmitSerializer
     http_method_names = ["patch"]
 
-    @swagger_auto_schema(operation_id=_("Submit a purchase"), ex={"extra": "put"})
+    @swagger_auto_schema(operation_id=_("Submit a purchase"))
     def patch(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=False)

@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import os
@@ -40,6 +41,11 @@ class RialDepositVars:
 
 
 class RialDeposit(BaseModelWithDate):
+    class Status(models.TextChoices):
+        PENDING = "pending", _("Pending")
+        SUCCESS = "success", _("Success")
+        CANCEL = "cancel", _("Cancel")
+
     user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(_("Amount"), decimal_places=0, max_digits=6)
     factor_number = models.CharField(_("Factor number"), unique=True)
@@ -50,11 +56,7 @@ class RialDeposit(BaseModelWithDate):
     gateway_message = models.CharField(_("Gateway Message"), blank=True, null=True)
 
     card_number = models.CharField(_("Card Number"), max_length=16)
-    status = models.CharField(_("Status"), choices=[
-        ('pending', _("Pending")),
-        ('success', _("Success")),
-        ('cancel', _("Cancel")),
-    ], default="pending")
+    status = models.CharField(_("Status"), choices=Status.choices, default=Status.PENDING)
 
     def __str__(self):
         return f"{_('Rial deposit')} | {self.amount}"
@@ -72,15 +74,15 @@ class RialDeposit(BaseModelWithDate):
         verbose_name_plural = _("Rial deposits")
 
     def cancel(self):
-        self.status = 'cancel'
+        self.status = self.Status.CANCEL
         self.save()
 
     def is_pending(self):
-        return self.status == 'pending'
+        return self.status == self.Status.PENDING
 
     def success(self):
         wallet = self.user_id.get_wallet("IRT")
-        self.status = 'success'
+        self.status = self.Status.SUCCESS
         charged = wallet.charge(self.amount // 10)
         self.save()
         return charged
@@ -158,6 +160,56 @@ class RialDeposit(BaseModelWithDate):
             return False
 
 
+class RialWithdraw(BaseModelWithDate):
+    class Status(models.TextChoices):
+        PENDING = "pending", _("Pending")
+        SUCCESS = "success", _("Success")
+        CANCEL = "cancel", _("Cancel")
+
+    user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    amount = models.DecimalField(_("Amount"), decimal_places=0, max_digits=10)
+    factor_number = models.CharField(_("Factor number"), unique=True)
+
+    sheba_number = models.CharField(_("Sheba Number"), max_length=26)
+    status = models.CharField(_("Status"), choices=Status.choices, default=Status.PENDING, max_length=7)
+    submit_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{_('Rial withdraw')} | {self.amount}"
+
+    class Meta:
+        ordering = ('-id',)
+        verbose_name = _("Rial withdraw")
+        verbose_name_plural = _("Rial withdraws")
+
+    def _rollback(self):
+        wallet = self.user_id.get_wallet("IRT")
+        wallet.charge(self.amount // 10)
+        self.save()
+        return True
+
+    def cancel(self):
+        self.status = self.Status.CANCEL
+        self.submit_date = datetime.datetime.now()
+        self._rollback()
+        self.save()
+
+    def is_pending(self):
+        return self.status == self.Status.PENDING
+
+    def submit(self):
+        wallet = self.user_id.get_wallet("IRT")
+        wallet.charge(-1 * self.amount // 10)
+        self.save()
+        return True
+
+    def confirm(self):
+        self.status = self.Status.SUCCESS
+        self.submit_date = datetime.datetime.now()
+        self.save()
+        return True
+
+
 class VerifyLine(BaseModelWithDate):
     deposit_id = models.ForeignKey(RialDeposit, on_delete=models.CASCADE)
     ref_id = models.CharField(_("Verify Ref ID"), blank=True, null=True)
@@ -172,6 +224,17 @@ class VerifyLine(BaseModelWithDate):
     class Meta:
         verbose_name = _("Verify Deposit Attempt")
         verbose_name_plural = _("Verify Deposit Attempts")
+
+
+@receiver(post_save, sender=RialWithdraw, dispatch_uid="update_rial_withdraw")
+def update_rial_withdraw(sender, instance, created, **kwargs):
+    if created and not instance.factor_number and instance.pk:
+        # RD : Rial Deposit
+        instance.factor_number = f"RW-{str(instance.pk).rjust(4, '0')}"
+        instance.save()
+
+
+post_save.connect(update_rial_withdraw, sender=RialWithdraw)
 
 
 @receiver(post_save, sender=RialDeposit, dispatch_uid="update_rial_deposit")

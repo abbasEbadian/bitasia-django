@@ -23,7 +23,7 @@ AUTH_ERRORS = {
         "description_en": "Password can not be empty."
     },
     "ERROR_WRONG_PASSWORD": {
-        "status_code": status.HTTP_401_UNAUTHORIZED,
+        "status_code": status.HTTP_400_BAD_REQUEST,
         "message": _("Wrong password."),
         "description": _("Provided password is wrong."),
         "description_en": "Provided password is wrong."
@@ -139,7 +139,7 @@ class ERRORS:
     @staticmethod
     def empty_field_error(field_name):
         return ({
-            "status_code": status.HTTP_200_OK,
+            "status_code": status.HTTP_400_BAD_REQUEST,
             "message": f'{_("Invalid ")} {field_name}',
             "description": f'{_(field_name)} Can\'t be empty.',
         })
@@ -147,7 +147,7 @@ class ERRORS:
     @staticmethod
     def custom_message_error(message):
         return ({
-            "status_code": status.HTTP_200_OK,
+            "status_code": status.HTTP_400_BAD_REQUEST,
             "message": f'{message}'
         })
 

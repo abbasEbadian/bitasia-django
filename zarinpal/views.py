@@ -2,16 +2,74 @@ from django.shortcuts import render
 from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from api.schema import create_payment_schema
 from authentication.exception import CustomError
 from exchange.error_codes import ERRORS
-from .models import RialDeposit
-from .serializers import RialDepositAdminSerializer, RialDepositSerializer
+from .models import RialDeposit, RialWithdraw
+from .serializers import RialDepositAdminSerializer, RialDepositSerializer, RialWithdrawCreateSerializer, \
+    RialWithdrawAdminSerializer, RialWithdrawSerializer, ConfirmRialWithdrawSerializer
+
+
+class RialWithdrawView(generics.ListCreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def paginator(self):
+        return False
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return RialWithdraw.objects.all()
+        return RialWithdraw.objects.filter(user_id=self.request.user)
+
+    def get_serializer_class(self):
+        if self.request.method.lower() == 'get':
+            if self.request.user.is_staff:
+                return RialWithdrawAdminSerializer
+            return RialWithdrawSerializer
+        return RialWithdrawCreateSerializer
+
+    @swagger_auto_schema(operation_id=_("Get Rial withdraw list"), tags=["Rial Transactions"])
+    def get(self, *args, **kwargs):
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response({
+            "result": "success",
+            "object": serializer.data
+        })
+
+    @swagger_auto_schema(operation_id=_("Create new withdraw"), tags=["Rial Transactions"])
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, context={"user_id": request.user})
+        serializer.is_valid(raise_exception=True)
+        withdraw = serializer.save()
+        withdraw.submit()
+
+        return Response({
+            "result": "success",
+            "object": serializer.data
+        }, status=status.HTTP_201_CREATED)
+
+
+class RialWithdrawConfirmView(generics.UpdateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminUser]
+    serializer_class = ConfirmRialWithdrawSerializer
+    http_method_names = ["patch"]
+
+    @swagger_auto_schema(operation_id=_("Approve or reject withdraw"), tags=["Rial Transactions"])
+    def patch(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({
+            "result": "success",
+            "message": _("Submitted successfully")
+        })
 
 
 class RialDepositView(generics.ListAPIView):
@@ -31,7 +89,7 @@ class RialDepositView(generics.ListAPIView):
             return RialDepositAdminSerializer
         return RialDepositSerializer
 
-    @swagger_auto_schema(operation_id=_("Get Rial deposit list"))
+    @swagger_auto_schema(operation_id=_("Get Rial deposit list"), tags=["Rial Transactions"])
     def get(self, *args, **kwargs):
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response({
@@ -74,6 +132,7 @@ def create_rial_deposit(request):
         raise CustomError(ERRORS.ERROR_GATEWAY)
 
 
+@swagger_auto_schema(auto_schema=None, method="GET")
 @api_view(['GET'])
 @permission_classes([])
 @authentication_classes([])

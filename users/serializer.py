@@ -14,6 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
     approved_rule_ids = serializers.SerializerMethodField('_approved_rule_ids')
     authentication_status = serializers.SerializerMethodField('_authentication_status')
     wallets = serializers.SerializerMethodField('_wallets')
+    total_ir_balance = serializers.SerializerMethodField("_total_balance")
 
     def _get_user_level(self, obj):
         return get_user_level(obj)
@@ -27,6 +28,16 @@ class UserSerializer(serializers.ModelSerializer):
     def _authentication_status(self, obj):
         return obj.authorityrequest_set.filter(
             approved=False).count() > 0 and "pending" or f"level_{self._get_user_level(obj)}"
+
+    def _total_balance(self, obj):
+        total = float(0)
+        for wallet in obj.wallet_set.all():
+            if wallet.currency_id.code == "IRT":
+                total += wallet.balance
+            else:
+                total += wallet.currency_id.price_info_price * wallet.balance
+
+        return total
 
     class Meta:
         model = User

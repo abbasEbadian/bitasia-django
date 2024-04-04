@@ -2,8 +2,10 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext as _
 
+from authentication.exception import CustomError
 from authority.models import BaseModelWithDate
 from bitpin.models import BitPinCurrency
+from exchange.error_codes import ERRORS
 
 User = get_user_model()
 
@@ -27,8 +29,8 @@ class Wallet(BaseModelWithDate):
     def charge(self, amount: float):
         if amount < 0:
             if self.balance < amount:
-                return False
-            self.balance -= float(amount)
+                raise CustomError(ERRORS.custom_message_error(_("Insufficient balance.")))
+            self.balance += float(amount)
             self.save()
             return True
 
