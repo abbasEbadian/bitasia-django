@@ -34,7 +34,7 @@ class RialWithdrawView(generics.ListCreateAPIView):
             return RialWithdrawSerializer
         return RialWithdrawCreateSerializer
 
-    @swagger_auto_schema(operation_id=_("Get Rial withdraw list"), tags=["Rial Transactions"])
+    @swagger_auto_schema(operation_id=_("Get Rial withdraw list"), tags=["Transactions - Rial"])
     def get(self, *args, **kwargs):
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response({
@@ -42,7 +42,7 @@ class RialWithdrawView(generics.ListCreateAPIView):
             "object": serializer.data
         })
 
-    @swagger_auto_schema(operation_id=_("Create new withdraw"), tags=["Rial Transactions"])
+    @swagger_auto_schema(operation_id=_("Create new withdraw"), tags=["Transactions - Rial"])
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data, context={"user_id": request.user})
         serializer.is_valid(raise_exception=True)
@@ -61,7 +61,7 @@ class RialWithdrawConfirmView(generics.UpdateAPIView):
     serializer_class = ConfirmRialWithdrawSerializer
     http_method_names = ["patch"]
 
-    @swagger_auto_schema(operation_id=_("Approve or reject withdraw"), tags=["Rial Transactions"])
+    @swagger_auto_schema(operation_id=_("Approve or reject withdraw"), tags=["Transactions - Rial"])
     def patch(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -89,7 +89,7 @@ class RialDepositView(generics.ListAPIView):
             return RialDepositAdminSerializer
         return RialDepositSerializer
 
-    @swagger_auto_schema(operation_id=_("Get Rial deposit list"), tags=["Rial Transactions"])
+    @swagger_auto_schema(operation_id=_("Get Rial deposit list"), tags=["Transactions - Rial"])
     def get(self, *args, **kwargs):
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response({

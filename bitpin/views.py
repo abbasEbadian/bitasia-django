@@ -45,6 +45,22 @@ class CurrencyView(generics.ListAPIView):
         }, status=status.HTTP_200_OK)
 
 
+class CurrencyDetailView(generics.RetrieveAPIView):
+    authentication_classes = []
+    permission_classes = []
+    serializer_class = CurrencySerializer
+    lookup_field = "id"
+    queryset = BitPinCurrency.objects.all()
+
+    @swagger_auto_schema(operation_id=_("Get Currency Detail"))
+    def get(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object())
+        return Response({
+            "result": "success",
+            "objects": serializer.data
+        }, status=status.HTTP_200_OK)
+
+
 class NetworkView(generics.ListAPIView):
     authentication_classes = ()
     permission_classes = []
