@@ -16,3 +16,9 @@ class CurrencySerializer(serializers.ModelSerializer):
         model = BitPinCurrency
         exclude = ["create_date", "write_date"]
         depth = 1
+
+
+class CurrencyDashboardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BitPinCurrency
+        fields = ["title", "title_fa", "code", "image", "price_info_price", "price_info_change"]

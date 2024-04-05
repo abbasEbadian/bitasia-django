@@ -5,7 +5,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from bitpin.models import BitPinCurrency, BitPinNetwork
-from .serializers import CurrencySerializer, NetworkSerializer
+from .serializers import CurrencySerializer, NetworkSerializer, CurrencyDashboardSerializer
 
 
 class CurrencyView(generics.ListAPIView):
@@ -16,16 +16,26 @@ class CurrencyView(generics.ListAPIView):
     def paginator(self):
         return False
 
+    def get_serializer_class(self):
+        for_dashboard = self.request.GET.get("for_dashboard", False)
+        if for_dashboard:
+            return CurrencyDashboardSerializer
+        return CurrencySerializer
+
     def get_queryset(self):
         request = self.request
         show_inactive = request.GET.get("show_inactive", False)
-        filters = {"bitasia_active": True}
+        for_dashboard = request.GET.get("for_dashboard", False)
+        filters = {}
         if show_inactive and show_inactive != 'false':
-            filters = {}
+            filters.update({"bitasia_active": True})
+        if for_dashboard and for_dashboard != 'false':
+            filters.update({"show_in_dashboard": True})
         return BitPinCurrency.objects.filter(**filters)
 
     @swagger_auto_schema(operation_id=_("Get Currency List"), manual_parameters=[
         openapi.Parameter(name="show_inactive", in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN),
+        openapi.Parameter(name="for_dashboard", in_=openapi.IN_QUERY, type=openapi.TYPE_BOOLEAN),
     ])
     def get(self, request):
         serializer = self.get_serializer(self.get_queryset(), many=True)

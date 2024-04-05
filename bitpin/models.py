@@ -18,6 +18,7 @@ class BitPinNetwork(BaseModelWithDate):
 
 
 class BitPinCurrency(BaseModelWithDate):
+    show_in_dashboard = models.BooleanField(default=False)
     bitasia_active = models.BooleanField(_("Bitasia Active"), default=True)
     active = models.BooleanField(_("BitPin Active"), default=True)
     title = models.CharField(_("Title (English)"), max_length=255)
