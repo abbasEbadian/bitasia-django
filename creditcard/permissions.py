@@ -13,3 +13,14 @@ class IsCreditCardOwner(BasePermission):
         pk = view.kwargs.get('id')
         obj = get_object_or_404(CreditCard, pk=pk)
         return bool(request.user == obj.user_id)
+
+
+class CanViewCreditCard(BasePermission):
+    def has_permission(self, request, view):
+        print("CAME")
+        return request.user.has_perm('creditcard.view_creditcard')
+
+
+class CanCreateCreditCard(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.has_perm('creditcard.create_creditcard')

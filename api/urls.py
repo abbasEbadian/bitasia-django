@@ -9,5 +9,6 @@ urlpatterns = [
     path('transactions/rial/', include('zarinpal.urls'), name='rial-transactions'),
     path('transactions/crypto/', include('order.urls'), name='crypto-transactions'),
     path('wallets/', include('wallet.urls'), name='crypto-transactions'),
+    path('permissions/', include('permission.urls'), name='permissions'),
     # path('orders/', include('order.urls'), name='transactions'),
 ]

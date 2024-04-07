@@ -13,7 +13,6 @@ from creditcard.serializers import CreditCardCreateSerializer, CreditCardSeriali
 
 class CreditCardView(generics.ListCreateAPIView):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticated]
     lookup_field = "id"
     lookup_url_kwarg = "id"
 
