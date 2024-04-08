@@ -7,12 +7,13 @@ from pathlib import Path
 
 import environ
 import requests
-from authentication.exception import CustomError
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext as _
+
+from authentication.exception import CustomError
 from exchange.error_codes import ERRORS
 from exchange.models import BaseModelWithDate
 
@@ -229,7 +230,7 @@ class VerifyLine(BaseModelWithDate):
 def update_rial_withdraw(sender, instance, created, **kwargs):
     if created and not instance.factor_number and instance.pk:
         # RD : Rial Deposit
-        instance.factor_number = f"RW-{str(instance.pk).rjust(4, '0')}"
+        instance.factor_number = f"RW-{str(instance.pk).rjust(6, '0')}"
         instance.save()
 
 
@@ -240,7 +241,7 @@ post_save.connect(update_rial_withdraw, sender=RialWithdraw)
 def update_rial_deposit(sender, instance, created, **kwargs):
     if created and not instance.factor_number and instance.pk:
         # RD : Rial Deposit
-        instance.factor_number = f"RD-{str(instance.pk).rjust(4, '0')}"
+        instance.factor_number = f"RD-{str(instance.pk).rjust(6, '0')}"
         instance.save()
 
 

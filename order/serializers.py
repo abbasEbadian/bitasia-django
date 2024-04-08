@@ -49,7 +49,6 @@ class TransactionCreateSerializer(serializers.Serializer):
             user = self.context.get('user_id')
             amount = attrs.get('amount')
             wallet = user.get_wallet(currency.code)
-            print(wallet.balance, amount)
             if wallet.balance < amount:
                 raise CustomError(ERRORS.custom_message_error(_("Insufficient balance.")))
         attrs["currency"] = currency
@@ -75,7 +74,8 @@ class TransactionCreateSerializer(serializers.Serializer):
             "wallet_address": wallet_address,
             "currency_current_value": int(currency_id.price_info_price)
         })
-        tr.after_create_request()
+        if type == Transaction.Type.WITHDRAW:
+            tr.after_create_request()
         return tr
 
 
@@ -114,3 +114,58 @@ class TransactionUpdateSerializer(serializers.Serializer):
         elif action == "cancel":
             instance.cancel()
         return instance
+
+
+class OrderForAdminSerializer(serializers.ModelSerializer):
+    user_id = UserSerializer()
+    currency_id = CurrencySerializer()
+
+    class Meta:
+        model = Order
+        exclude = ["write_date"]
+        depth = 2
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        exclude = ["write_date", "user_id"]
+        depth = 1
+
+
+class OrderCreateSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(required=True, choices=Order.Type.choices)
+    currency_id = serializers.IntegerField(required=True)
+    amount = serializers.FloatField(required=True)
+
+    def validate(self, attrs, *args, **kwargs):
+        currency = get_object_or_404(BitPinCurrency, pk=attrs.get("currency_id"))
+        user = self.context.get('user_id')
+        amount = attrs.get('amount')
+        type = attrs.get('type')
+        wallet = user.get_wallet(currency.code)
+        if type == Order.Type.BUY:
+            amount *= currency.price_info_price
+            wallet = user.get_wallet("IRT")
+        if wallet.balance < amount:
+            raise CustomError(ERRORS.custom_message_error(_("Insufficient balance.")))
+        attrs["currency"] = currency
+        attrs["user"] = user
+        return attrs
+
+    def create(self, validated_data, *args, **kwargs):
+        currency_id = validated_data["currency"]
+        user_id = validated_data["user"]
+        amount = validated_data["amount"]
+        type = validated_data["type"]
+        order = Order.objects.create(**{
+            "currency_id": currency_id,
+            "user_id": user_id,
+            "amount": amount,
+            "status": Order.Status.PENDING,
+            "type": type,
+            "currency_current_value": int(currency_id.price_info_price)
+        })
+        order.after_create_request()
+        order.approve()
+        return order
