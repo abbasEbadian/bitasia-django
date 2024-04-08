@@ -15,9 +15,6 @@ class CurrencyView(generics.ListAPIView):
     permission_classes = []
     serializer_class = CurrencySerializer
 
-    def paginator(self):
-        return False
-
     def get_serializer_class(self):
         for_dashboard = self.request.GET.get("for_dashboard", False)
         if for_dashboard:

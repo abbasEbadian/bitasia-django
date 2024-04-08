@@ -80,8 +80,11 @@ class BitPinCurrency(BaseModelWithDate):
     def __str__(self):
         return f"{self.title} ({self.title_fa})"
 
+    def _has_network(self, network):
+        return network in self.network_ids.all()
+
     class Meta:
-        ordering = ("id",)
+        ordering = ("-show_in_dashboard", "-price_info_price")
         verbose_name = _('Currency')
         verbose_name_plural = _('Currencies')
 
@@ -95,7 +98,7 @@ class BitPinWalletAddress(BaseModelWithDate):
         return f"{self.address} / {self.currency_id.code} / {self.network_id.code}"
 
     def clean(self):
-        if self.network_id not in self.currency_id.network_ids.all():
+        if not self.currency_id._has_network(self.network_id):
             raise forms.ValidationError(_("Invalid network ID. Provided network must be present in currency networks."))
         if self._state.adding and BitPinWalletAddress.objects.filter(currency_id=self.currency_id,
                                                                      network_id=self.network_id).exists():
