@@ -7,15 +7,14 @@ from pathlib import Path
 
 import environ
 import requests
+from authentication.exception import CustomError
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext as _
-
-from authentication.exception import CustomError
-from authority.models import BaseModelWithDate
 from exchange.error_codes import ERRORS
+from exchange.models import BaseModelWithDate
 
 _logger = logging.getLogger(__name__)
 

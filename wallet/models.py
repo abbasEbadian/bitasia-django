@@ -1,11 +1,10 @@
+from authentication.exception import CustomError
+from bitpin.models import BitPinCurrency
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext as _
-
-from authentication.exception import CustomError
-from authority.models import BaseModelWithDate
-from bitpin.models import BitPinCurrency
 from exchange.error_codes import ERRORS
+from exchange.models import BaseModelWithDate
 
 User = get_user_model()
 

@@ -2,15 +2,9 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext as _
 
+from exchange.models import BaseModelWithDate
+
 User = get_user_model()
-
-
-class BaseModelWithDate(models.Model):
-    create_date = models.DateTimeField(auto_now_add=True)
-    write_date = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
 
 
 class AuthorityRuleOption(BaseModelWithDate):

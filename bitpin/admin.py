@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import BitPinCurrency, BitPinNetwork
+from .models import BitPinCurrency, BitPinNetwork, BitPinWalletAddress
 
 
 @admin.register(BitPinCurrency)
@@ -12,3 +12,8 @@ class BitPinCurrencyAdmin(admin.ModelAdmin):
 @admin.register(BitPinNetwork)
 class BitPinNetworkAdmin(admin.ModelAdmin):
     list_display = ("code", "title", "title_fa")
+
+
+@admin.register(BitPinWalletAddress)
+class BitPinWalletAddressAdmin(admin.ModelAdmin):
+    list_display = ("id", "currency_id", "network_id", "address")

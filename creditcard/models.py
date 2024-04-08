@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext as _
 
-from authority.models import BaseModelWithDate
+from exchange.models import BaseModelWithDate
 
 User = get_user_model()
 

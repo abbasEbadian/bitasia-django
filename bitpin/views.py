@@ -1,11 +1,13 @@
 from django.utils.translation import gettext as _
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from knox.auth import TokenAuthentication
 from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
-from bitpin.models import BitPinCurrency, BitPinNetwork
-from .serializers import CurrencySerializer, NetworkSerializer, CurrencyDashboardSerializer
+from bitpin.models import BitPinCurrency, BitPinNetwork, BitPinWalletAddress
+from .serializers import CurrencySerializer, NetworkSerializer, CurrencyDashboardSerializer, WalletAddressSerializer
 
 
 class CurrencyView(generics.ListAPIView):
@@ -79,3 +81,65 @@ class NetworkView(generics.ListAPIView):
             "result": "success",
             "objects": serializer.data
         }, status=status.HTTP_200_OK)
+
+
+class WalletAddressView(generics.ListAPIView):
+    authentication_classes = (TokenAuthentication,)
+    serializer_class = WalletAddressSerializer
+    queryset = BitPinWalletAddress.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        currency_code = self.request.GET.get("currency_code")
+        network_code = self.request.GET.get("network_code")
+        print(currency_code, network_code)
+        lookup = {}
+        if currency_code:
+            lookup.update({"currency_id__code": currency_code})
+        if network_code:
+            lookup.update({"network_id__code": network_code})
+
+        return self.queryset.filter(**lookup)
+
+    @swagger_auto_schema(operation_id=_("Get Wallet Address List"), manual_parameters=[
+        openapi.Parameter(name="currency_code", in_=openapi.IN_QUERY, type=openapi.TYPE_STRING),
+        openapi.Parameter(name="network_code", in_=openapi.IN_QUERY, type=openapi.TYPE_STRING),
+    ])
+    def get(self, request, *args, **kwargs):
+        return Response({
+            "result": "success",
+            "objects": self.get_serializer(self.get_queryset(), many=True).data
+        })
+
+
+class WalletAddressDetailView(generics.RetrieveUpdateAPIView):
+    authentication_classes = (TokenAuthentication,)
+    http_method_names = ["get", "patch"]
+    queryset = BitPinWalletAddress.objects.all()
+    serializer_class = WalletAddressSerializer
+    permission_classes = [IsAdminUser]
+    lookup_field = "id"
+
+    # @property
+    # def permission_classes(self):
+    #     if self.request.method.lower() == "get":
+    #         return [(IsAuthenticated & ~IsAdminUser) | (IsAdminUser & DjangoModelPermissions)]
+    #     return [IsAdminUser & DjangoModelPermissions]
+
+    @swagger_auto_schema(operation_id=_("Get Wallet Address Detail"))
+    def get(self, request, *args, **kwargs):
+        return Response({
+            "result": "success",
+            "objects": self.get_serializer(self.get_object()).data
+        })
+
+    @swagger_auto_schema(operation_id=_("Update Wallet Address"))
+    def patch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        serializer = self.get_serializer(obj, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({
+            "result": "success",
+            "object": serializer.data
+        })

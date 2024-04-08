@@ -1,7 +1,8 @@
 from django.db import models
+from django.forms import forms
 from django.utils.translation import gettext as _
 
-from authority.models import BaseModelWithDate
+from exchange.models import BaseModelWithDate
 
 
 class BitPinNetwork(BaseModelWithDate):
@@ -83,3 +84,24 @@ class BitPinCurrency(BaseModelWithDate):
         ordering = ("id",)
         verbose_name = _('Currency')
         verbose_name_plural = _('Currencies')
+
+
+class BitPinWalletAddress(BaseModelWithDate):
+    address = models.CharField(_("Address"), max_length=255)
+    currency_id = models.ForeignKey(BitPinCurrency, verbose_name=_("Currency"), on_delete=models.CASCADE)
+    network_id = models.ForeignKey(BitPinNetwork, verbose_name=_("Network"), on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.address} / {self.currency_id.code} / {self.network_id.code}"
+
+    def clean(self):
+        if self.network_id not in self.currency_id.network_ids.all():
+            raise forms.ValidationError(_("Invalid network ID. Provided network must be present in currency networks."))
+        if self._state.adding and BitPinWalletAddress.objects.filter(currency_id=self.currency_id,
+                                                                     network_id=self.network_id).exists():
+            raise forms.ValidationError(_("Already exists, Try to update."))
+        return super().clean()
+
+    class Meta:
+        verbose_name = _('BitPin Wallet Address')
+        verbose_name_plural = _('BitPin Wallet Addresses')
