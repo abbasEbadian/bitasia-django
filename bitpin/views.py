@@ -105,7 +105,6 @@ class WalletAddressView(generics.ListAPIView):
             lookup.update({"currency_id__code": currency_code})
         if network_code:
             lookup.update({"network_id__code": network_code})
-
         return self.queryset.filter(**lookup)
 
     @swagger_auto_schema(operation_id=_("Get Wallet Address List"), manual_parameters=[
@@ -118,6 +117,7 @@ class WalletAddressView(generics.ListAPIView):
             "objects": self.get_serializer(self.get_queryset(), many=True).data
         })
 
+    @swagger_auto_schema(operation_id=_("Create new Wallet Address"))
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
