@@ -1,6 +1,10 @@
+from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 
+from authentication.exception import CustomError
 from bitpin.models import BitPinCurrency, BitPinNetwork, BitPinWalletAddress
+from exchange.error_codes import ERRORS
 
 
 class NetworkSerializer(serializers.ModelSerializer):
@@ -43,3 +47,26 @@ class WalletAddressSerializer(serializers.ModelSerializer):
         instance.address = validated_data.get("address")
         instance.save()
         return instance
+
+
+class WalletAddressCreateSerializer(serializers.Serializer):
+    address = serializers.CharField(required=True)
+    currency_id = serializers.IntegerField(required=True)
+    network_id = serializers.IntegerField(required=True)
+
+    def validate(self, attrs):
+        currency = get_object_or_404(BitPinCurrency, pk=attrs.get("currency_id"))
+        network = get_object_or_404(BitPinNetwork, pk=attrs.get("network_id"))
+        if not currency._has_network(network):
+            raise CustomError(ERRORS.custom_message_error(
+                _("Invalid network ID. Provided network must be present in currency networks.")))
+        attrs["currency"] = currency
+        attrs["network"] = network
+        return attrs
+
+    def create(self, validated_data):
+        return BitPinWalletAddress.objects.create(**{
+            "currency_id": validated_data["currency"],
+            "network_id": validated_data["network"],
+            "address": validated_data["address"]
+        })

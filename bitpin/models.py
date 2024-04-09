@@ -81,7 +81,7 @@ class BitPinCurrency(BaseModelWithDate):
         return f"{self.title} ({self.title_fa})"
 
     def _has_network(self, network):
-        return network in self.network_ids.all()
+        return self.network_ids.all().contains(network)
 
     class Meta:
         ordering = ("-show_in_dashboard", "-price_info_price")

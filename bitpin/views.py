@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from bitpin.models import BitPinCurrency, BitPinNetwork, BitPinWalletAddress
-from .serializers import CurrencySerializer, NetworkSerializer, CurrencyDashboardSerializer, WalletAddressSerializer
+from .serializers import CurrencySerializer, NetworkSerializer, CurrencyDashboardSerializer, WalletAddressSerializer, \
+    WalletAddressCreateSerializer
 
 
 class CurrencyView(generics.ListAPIView):
@@ -82,14 +83,23 @@ class NetworkView(generics.ListAPIView):
 
 class WalletAddressView(generics.ListAPIView):
     authentication_classes = (TokenAuthentication,)
-    serializer_class = WalletAddressSerializer
     queryset = BitPinWalletAddress.objects.all()
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method.lower() == "get":
+            return WalletAddressSerializer
+        return WalletAddressCreateSerializer
+
+    @property
+    def permission_classes(self):
+        if self.request.method.lower() == "get":
+            return [IsAuthenticated]
+        return [IsAdminUser]
 
     def get_queryset(self):
         currency_code = self.request.GET.get("currency_code")
         network_code = self.request.GET.get("network_code")
-        print(currency_code, network_code)
         lookup = {}
         if currency_code:
             lookup.update({"currency_id__code": currency_code})
@@ -107,6 +117,15 @@ class WalletAddressView(generics.ListAPIView):
             "result": "success",
             "objects": self.get_serializer(self.get_queryset(), many=True).data
         })
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        newb = serializer.save()
+        return Response({
+            "result": "success",
+            "object": WalletAddressSerializer(newb).data
+        }, status=status.HTTP_201_CREATED)
 
 
 class WalletAddressDetailView(generics.RetrieveUpdateAPIView):
