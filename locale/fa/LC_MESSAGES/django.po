@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-22 20:47+0330\n"
+"POT-Creation-Date: 2024-04-09 20:21+0330\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,13 +44,13 @@ msgstr "با موفقیت ایجاد شد."
 msgid "Invalid data"
 msgstr "مقدار فیلد method نادرست است."
 
-#: authentication/schema.py:24 exchange/error_codes.py:63
+#: authentication/schema.py:24 exchange/error_codes.py:64
 #, fuzzy
 #| msgid "Invalid mobile"
 msgid "Invalid last name"
 msgstr "شماره تماس نامعتبر است."
 
-#: authentication/schema.py:25 exchange/error_codes.py:64
+#: authentication/schema.py:25 exchange/error_codes.py:65
 msgid "Last name must be at least 6 characters."
 msgstr "نام خانوادگی باید حداقل 6 حرف داشته باشد."
 
@@ -58,11 +58,11 @@ msgstr "نام خانوادگی باید حداقل 6 حرف داشته باشد
 msgid "This mobile already exists"
 msgstr "شماره تماس تکراری است."
 
-#: authentication/schema.py:34 exchange/error_codes.py:33
+#: authentication/schema.py:34 exchange/error_codes.py:34
 msgid "Mobile already exists."
 msgstr "شماره تماس تکراری است."
 
-#: authentication/schema.py:35 exchange/error_codes.py:34
+#: authentication/schema.py:35 exchange/error_codes.py:35
 msgid "There is an account registered with this mobile."
 msgstr "با این شماره تماس از قبل حساب ساخته شده است."
 
@@ -70,47 +70,45 @@ msgstr "با این شماره تماس از قبل حساب ساخته شده �
 msgid "OTP Created successfully"
 msgstr "کد اعتبارسنجی ارسال شد."
 
-#: authentication/schema.py:61 exchange/error_codes.py:20
+#: authentication/schema.py:61 exchange/error_codes.py:21
 msgid "Empty password."
 msgstr "رمز عبور الزامی است."
 
-#: authentication/schema.py:62 exchange/error_codes.py:21
+#: authentication/schema.py:62 exchange/error_codes.py:22
 msgid "Password can not be empty."
 msgstr "رمز عبور نمی تواند خالی باشد."
 
-#: authentication/schema.py:98 exchange/error_codes.py:51
+#: authentication/schema.py:98 exchange/error_codes.py:52
 msgid "Wrong OTP."
 msgstr "کد وارد شده نامعتبر است."
 
-#: authentication/schema.py:99 exchange/error_codes.py:52
+#: authentication/schema.py:99 exchange/error_codes.py:53
 msgid "Provided OTP is wrong."
 msgstr "کد وارد شده نامعتبر است."
 
 #: authentication/serializer.py:98
 msgid "Male"
-msgstr ""
+msgstr "آقا"
 
 #: authentication/serializer.py:98
 msgid "Female"
-msgstr ""
+msgstr "خانم"
 
 #: authentication/validator.py:14
 msgid "This value is invalid"
 msgstr "این مقدار نامعتبر است."
 
-#: authentication/views.py:47
+#: authentication/views.py:55
 msgid "Otp has been sent to your mobile."
 msgstr "کد اعتبارسنجی پیامک شد."
 
-#: authentication/views.py:64
+#: authentication/views.py:73
 msgid "Account has been created"
 msgstr "حساب کاربری با موفقیت ایجاد شد."
 
-#: authentication/views_verification.py:36
-#, fuzzy
-#| msgid "Created successfully"
-msgid "Updated successfully"
-msgstr "با موفقیت ایجاد شد."
+#: authentication/views_verification.py:42
+msgid "Updated successfully, Our team will check your information ASAP."
+msgstr "اطلاعات شما دریافت شد.تیم پشتیبانی در اولین فرصت بررسی خواهد کرد"
 
 #: authority/admin.py:11
 msgid "Options"
@@ -120,226 +118,693 @@ msgstr "فیلدها"
 msgid "Rules"
 msgstr "قوانین"
 
-#: authority/models.py:17 authority/models.py:36
+#: authority/models.py:11 authority/models.py:30
 msgid "title"
 msgstr "عنوان"
 
-#: authority/models.py:18
+#: authority/models.py:12
 msgid "field key"
 msgstr "کلید فیلد"
 
-#: authority/models.py:19
+#: authority/models.py:13
 msgid "field type"
 msgstr "نوع فیلد"
 
-#: authority/models.py:21
+#: authority/models.py:15
 msgid "type"
 msgstr "نوع"
 
-#: authority/models.py:21
+#: authority/models.py:15
 msgid "Range"
 msgstr "رنج"
 
-#: authority/models.py:21
+#: authority/models.py:15
 msgid "Defined"
 msgstr "تعریف شده یا نشده"
 
-#: authority/models.py:22
+#: authority/models.py:16
 msgid "Is form"
 msgstr "در وبسایت نمایش داده شود"
 
-#: authority/models.py:23
+#: authority/models.py:17
 msgid "min value"
 msgstr "حداقل"
 
-#: authority/models.py:24
+#: authority/models.py:18
 msgid "max value"
 msgstr "حداکثر"
 
-#: authority/models.py:25
+#: authority/models.py:19
 msgid "َApproximate processing time"
-msgstr ""
+msgstr "زمان تقریبی بررسی"
 
-#: authority/models.py:25
+#: authority/models.py:19
 msgid "1 Day, 2 Hours, ..."
 msgstr "۱روز ،‌ ۲ساعت ..."
 
-#: authority/models.py:28
+#: authority/models.py:22
 msgid "Authority rule option"
 msgstr "فیلد قانون احراز هویت"
 
-#: authority/models.py:29
+#: authority/models.py:23
 msgid "Authority rule options"
 msgstr "فیلدهای قانون احراز هویت"
 
-#: authority/models.py:38
+#: authority/models.py:32
 msgid "Priority"
 msgstr "اولویت"
 
-#: authority/models.py:42
+#: authority/models.py:36
 msgid "Authority rule"
 msgstr "قانون احراز هویت"
 
-#: authority/models.py:43
+#: authority/models.py:37
 msgid "Authority rules"
 msgstr "قوانین احراز هویت"
 
-#: authority/models.py:50
+#: authority/models.py:44
 msgid "Level"
 msgstr "سطح"
 
-#: authority/models.py:52
+#: authority/models.py:46
 msgid "daily Rial deposit limit"
 msgstr "محدودیت واریز ریالی روزانه"
 
-#: authority/models.py:53
+#: authority/models.py:47
 msgid "daily Rial deposit limit description"
 msgstr "توضیح محدودیت واریز ریالی روزانه"
 
-#: authority/models.py:54
+#: authority/models.py:48
 msgid "daily Rial withdraw limit"
 msgstr "محدودیت برداشت ریالی روزانه"
 
-#: authority/models.py:55
+#: authority/models.py:49
 msgid "daily Rial withdraw limit description"
 msgstr "توضیح محدودیت برداشت ریالی روزانه"
 
-#: authority/models.py:56
+#: authority/models.py:50
 msgid "daily Crypto deposit limit"
 msgstr "محدودیت واریز رمزارز روزانه"
 
-#: authority/models.py:57
+#: authority/models.py:51
 msgid "daily Crypto deposit limit description"
 msgstr " توضیح محدودیت واریز رمزارز روزانه"
 
-#: authority/models.py:58
+#: authority/models.py:52
 msgid "daily Crypto withdraw limit"
 msgstr "محدودیت برداشت رمزارز روزانه"
 
-#: authority/models.py:59
+#: authority/models.py:53
 msgid "daily Crypto withdraw limit description"
 msgstr "توضیح محدودیت برداشت رمزارز روزانه"
 
-#: authority/models.py:69
+#: authority/models.py:63
 msgid "Requesting user"
 msgstr "کاربر درخواست کننده"
 
-#: authority/models.py:70
+#: authority/models.py:64
 msgid "Rule ID"
 msgstr "شناسه قانون احراز هویت"
 
-#: authority/models.py:72
+#: authority/models.py:66
 msgid "Admin message"
-msgstr ""
+msgstr "پیام مدیر"
 
-#: authority/models.py:75
+#: authority/models.py:73
 msgid "Authority request"
 msgstr "درخواست احراز هویت"
 
-#: authority/models.py:76
+#: authority/models.py:74
 msgid "Authority requests"
 msgstr "درخواست های احراز هویت"
 
-#: exchange/error_codes.py:8
+#: bitpin/models.py:17 bitpin/models.py:95 order/models.py:33
+msgid "Network"
+msgstr "شبکه"
+
+#: bitpin/models.py:18
+msgid "Networks"
+msgstr "شبکه ها"
+
+#: bitpin/models.py:23
+msgid "Bitasia Active"
+msgstr "فعال (بیت آسیا)"
+
+#: bitpin/models.py:24
+msgid "BitPin Active"
+msgstr "فعال(بیت پین)"
+
+#: bitpin/models.py:25
+msgid "Title (English)"
+msgstr "عنوان انگلیسی"
+
+#: bitpin/models.py:26
+msgid "Title (فارسی)"
+msgstr "عنوان فارسی"
+
+#: bitpin/models.py:27
+msgid "Code"
+msgstr "کد"
+
+#: bitpin/models.py:28
+msgid "Image URL"
+msgstr "آذرس تصویر"
+
+#: bitpin/models.py:29
+msgid "Minimum Withdrawal"
+msgstr "حداقل برداشت"
+
+#: bitpin/models.py:31
+msgid "Color"
+msgstr "رنگ"
+
+#: bitpin/models.py:32
+msgid "Alias"
+msgstr "مستعار"
+
+#: bitpin/models.py:33
+msgid "Withdrawal Commission"
+msgstr "کارمزد برداشت"
+
+#: bitpin/models.py:35
+msgid "Withdrawal Commission Type"
+msgstr "نوع کارمزد برداشت"
+
+#: bitpin/models.py:36
+msgid "Maximum Withdrawal Commission"
+msgstr "حداکثر کارمزد برداشت"
+
+#: bitpin/models.py:38
+msgid "Tradable"
+msgstr "قابل معامله"
+
+#: bitpin/models.py:39
+msgid "For Test"
+msgstr "برای تست"
+
+#: bitpin/models.py:40
+msgid "Decimal Places"
+msgstr "رقم اعشار"
+
+#: bitpin/models.py:41
+msgid "Decimal Amount"
+msgstr "تعداد ارقام"
+
+#: bitpin/models.py:42
+msgid "Decimal (IRT)"
+msgstr "اعشار در تومان"
+
+#: bitpin/models.py:43
+msgid "High Risk"
+msgstr "ریسک بالا"
+
+#: bitpin/models.py:44
+msgid "Show High Risk"
+msgstr "نمایش ریسک بالا"
+
+#: bitpin/models.py:45
+msgid "Recommend for Deposit Weight"
+msgstr "توصیه برای وزن واریز"
+
+#: bitpin/models.py:46
+msgid "For Loan"
+msgstr "برای وام"
+
+#: bitpin/models.py:47
+msgid "For Stake"
+msgstr ""
+
+#: bitpin/models.py:49
+msgid "Price"
+msgstr "قیمت تومانی"
+
+#: bitpin/models.py:50
+msgid "Time"
+msgstr "زمان"
+
+#: bitpin/models.py:51
+#, fuzzy
+#| msgid "Range"
+msgid "Change"
+msgstr "تغییرات"
+
+#: bitpin/models.py:52
+msgid "Minimum"
+msgstr "حداقل"
+
+#: bitpin/models.py:53
+msgid "Maximum"
+msgstr "حداکثر"
+
+#: bitpin/models.py:54
+msgid "Mean"
+msgstr "میانگین"
+
+#: bitpin/models.py:55
+msgid "Market Value"
+msgstr "ارزش بازار"
+
+#: bitpin/models.py:58
+msgid "Market Amount"
+msgstr "مقدار بازار"
+
+#: bitpin/models.py:59
+msgid "Total Market Value"
+msgstr "ارزش کل بازار"
+
+#: bitpin/models.py:61
+msgid "Total Market Amount"
+msgstr "مقدار کل بازار"
+
+#: bitpin/models.py:63
+msgid "Price USDT"
+msgstr ""
+
+#: bitpin/models.py:64
+msgid "Time USDT"
+msgstr ""
+
+#: bitpin/models.py:65
+msgid "Change USDT"
+msgstr ""
+
+#: bitpin/models.py:67
+msgid "Minimum USDT"
+msgstr ""
+
+#: bitpin/models.py:68
+msgid "Maximum USDT"
+msgstr ""
+
+#: bitpin/models.py:69
+msgid "Mean USDT"
+msgstr ""
+
+#: bitpin/models.py:70
+msgid "Market Value USDT"
+msgstr ""
+
+#: bitpin/models.py:73
+msgid "Market Amount USDT"
+msgstr ""
+
+#: bitpin/models.py:75
+msgid "Total Market Value USDT"
+msgstr ""
+
+#: bitpin/models.py:77
+msgid "Total Market Amount USDT"
+msgstr ""
+
+#: bitpin/models.py:88 bitpin/models.py:94 order/models.py:29
+msgid "Currency"
+msgstr "ارز"
+
+#: bitpin/models.py:89
+msgid "Currencies"
+msgstr "ارزها"
+
+#: bitpin/models.py:93
+msgid "Address"
+msgstr "آدرس"
+
+#: bitpin/models.py:102
+msgid ""
+"Invalid network ID. Provided network must be present in currency networks."
+msgstr"شناسه شبکه نامعتبر است. شبکه ارائه شده باید در شبکه های ارز وجود داشته باشد."
+
+
+
+#: bitpin/models.py:105
+msgid "Already exists, Try to update."
+msgstr "رکورد تکراری است، لطفا بروزرسانی کنید."
+
+#: bitpin/models.py:109
+msgid "BitPin Wallet Address"
+msgstr "آدرس کیف پول"
+
+#: bitpin/models.py:110
+msgid "BitPin Wallet Addresses"
+msgstr "آدرس کیف پول ها"
+
+#: bitpin/views.py:35
+msgid "Get Currency List"
+msgstr "دریافت لیست ارزها"
+
+#: bitpin/views.py:54
+msgid "Get Currency Detail"
+msgstr "دریافت جزئیات ارز"
+
+#: bitpin/views.py:74
+msgid "Get Network List"
+msgstr "دریافت لیست شبکه ها"
+
+#: bitpin/views.py:101
+msgid "Get Wallet Address List"
+msgstr "دریافت آدرس کیف پول ها"
+
+#: bitpin/views.py:120
+msgid "Get Wallet Address Detail"
+msgstr "دریافت جزئیات کیف پول"
+
+#: bitpin/views.py:127
+msgid "Update Wallet Address"
+msgstr "بروزرسانی آدرس کیف پول"
+
+#: creditcard/models.py:11
+msgid "Credit card number"
+msgstr "شماره کارت"
+
+#: creditcard/models.py:12
+msgid "IBAN"
+msgstr "شبا"
+
+#: creditcard/models.py:13
+msgid "Approved"
+msgstr "تایید شده"
+
+#: creditcard/models.py:18
+msgid "Credit card"
+msgstr "کارت اعتباری"
+
+#: creditcard/models.py:19
+msgid "Credit cards"
+msgstr "کارتهای اعتباری"
+
+#: creditcard/schema.py:5
+msgid "Create credit card"
+msgstr "ایجاد کارت اعتباری"
+
+#: creditcard/views.py:31
+msgid "Get credit cards of current user"
+msgstr "دریافت کارت های کاربر"
+
+#: creditcard/views.py:80
+msgid "Successfully updated credit card  "
+msgstr "کارت اعتباری با موفقیت بروزرسانی شد."
+
+#: creditcard/views.py:88
+msgid "Successfully deleted credit card"
+msgstr "کارت اعتباری با موفقیت حذف شد."
+
+#: exchange/error_codes.py:9
 #, fuzzy
 #| msgid "Invalid mobile"
 msgid "Invalid mobile."
 msgstr "شماره تماس نامعتبر است"
 
-#: exchange/error_codes.py:9
+#: exchange/error_codes.py:10
 msgid "Provided mobile should contain exactly 11 DIGITS and start with 09"
 msgstr "شماره تماس باید ۱۱ عدد داشته باشد و با 09 شروع شود"
 
-#: exchange/error_codes.py:14
+#: exchange/error_codes.py:15
 msgid "Invalid password pattern."
 msgstr "رمز عبور وارد شده ضعیف است"
 
-#: exchange/error_codes.py:15
-msgid ""
-"Provided password should contain at least 1 uppercase, 1 lowercase and 8 "
-"digits"
+#: exchange/error_codes.py:16
+#, fuzzy
+#| msgid ""
+#| "Provided password should contain at least 1 uppercase, 1 lowercase and 8 "
+#| "digits"
+msgid "Provided password should contain at least 6 characters"
 msgstr ""
 "رمز عبور وارد شده باید از یک حرف بزرگ یک حرف کوچک و 8 عدد تشکیل شده باشد."
 
-#: exchange/error_codes.py:26
+#: exchange/error_codes.py:27
 msgid "Wrong password."
 msgstr "رمز عبور اشتباه است."
 
-#: exchange/error_codes.py:27
+#: exchange/error_codes.py:28
 msgid "Provided password is wrong."
 msgstr "رمز عبور اشتباه است."
 
-#: exchange/error_codes.py:39
+#: exchange/error_codes.py:40
 msgid "User does not exist"
 msgstr "کاربر یافت نشد."
 
-#: exchange/error_codes.py:40
+#: exchange/error_codes.py:41
 msgid "There is not any account registered with this mobile."
 msgstr "با این شماره تماس، ‌حسابی ایجاد نشده است."
 
-#: exchange/error_codes.py:45
+#: exchange/error_codes.py:46
 msgid "Empty OTP."
 msgstr "کد اعتبار سنجی الزامیست."
 
-#: exchange/error_codes.py:46
+#: exchange/error_codes.py:47
 msgid "OTP must be 4 digits."
 msgstr "کد اعتبارسنجی باید 4 رقمی باشد."
 
-#: exchange/error_codes.py:57
+#: exchange/error_codes.py:58
 #, fuzzy
 #| msgid "Invalid mobile"
 msgid "Invalid first name"
 msgstr "شماره تماس نامعتبر است."
 
-#: exchange/error_codes.py:58
+#: exchange/error_codes.py:59
 msgid "First name must be at least 3 characters."
 msgstr "نام باید حداقل ۳ کاراکتر باشد."
 
-#: exchange/error_codes.py:69
+#: exchange/error_codes.py:70
 #, fuzzy
 #| msgid "Invalid method"
 msgid "Invalid birthdate"
 msgstr "مقدار فیلد method نادرست است."
 
-#: exchange/error_codes.py:70
+#: exchange/error_codes.py:71
 msgid "birthdate must follow format: YYYY-MM-DD"
 msgstr "تاریخ تولد باید مشابه : 1380-08-11 باشد"
 
-#: exchange/error_codes.py:75
+#: exchange/error_codes.py:76
 #, fuzzy
 #| msgid "Invalid method"
 msgid "Invalid gender"
 msgstr "مقدار فیلد method نادرست است."
 
-#: exchange/error_codes.py:76
+#: exchange/error_codes.py:77
 msgid "gender must be provided (male or female)"
 msgstr "جنسیت باید ارسال شود."
 
-#: exchange/error_codes.py:81 exchange/error_codes.py:82
+#: exchange/error_codes.py:82 exchange/error_codes.py:83
 #, fuzzy
 #| msgid "Invalid mobile"
 msgid "Invalid rule id"
 msgstr "شناسه قانون نامعتبر است"
 
-#: exchange/error_codes.py:87
+#: exchange/error_codes.py:88
 #, fuzzy
 #| msgid "Invalid password pattern."
 msgid "invalid parameters"
 msgstr "رمز عبور وارد شده ضعیف است"
 
-#: exchange/error_codes.py:88
+#: exchange/error_codes.py:89
 msgid "Provided values are not satisfying"
 msgstr "مقادیر ارسالی صحیح نمی باشد"
 
-#: exchange/error_codes.py:97
+#: exchange/error_codes.py:94 exchange/error_codes.py:95
+msgid "Credit card or IBAN already exists."
+msgstr "شماره کارت یا IBAN تکراری است"
+
+#: exchange/error_codes.py:104
 msgid "Failed to send sms."
 msgstr "خطا در ارسال پیامک."
 
-#: exchange/error_codes.py:98 exchange/error_codes.py:99
+#: exchange/error_codes.py:105 exchange/error_codes.py:106
 #, fuzzy
 #| msgid "Cant connect to sms provider"
 msgid "Cant connect to SMS provider."
 msgstr "خطا در اتصال به قاصدک"
+
+#: exchange/error_codes.py:113
+#, fuzzy
+#| msgid "Invalid method"
+msgid "Invalid amount"
+msgstr "مقدار فیلد method نادرست است."
+
+#: exchange/error_codes.py:114
+msgid "Amount must be greater than 10000 R"
+msgstr "مبلغ باید از ۱۰ هزار ریال بیشتر باشد"
+
+#: exchange/error_codes.py:119
+#, fuzzy
+#| msgid "Invalid method"
+msgid "Invalid card"
+msgstr "مقدار فیلد method نادرست است."
+
+#: exchange/error_codes.py:120
+msgid "Provided card is not valid or is not approved"
+msgstr "کارت ارائه شده نامعتبر است یا تایید نشده است"
+
+#: exchange/error_codes.py:125
+msgid "Gateway error"
+msgstr "خطا در اتصال به درگاه"
+
+#: exchange/error_codes.py:126
+msgid "Some error occurred while connecting to payment gateway"
+msgstr "خطا در اتصال به درگاه"
+
+#: exchange/error_codes.py:156
+#, python-format
+msgid "%(f)s must have %(mn)d to %(mx)d digits"
+msgstr ""
+
+#: exchange/error_codes.py:158
+#, fuzzy, python-format
+#| msgid "OTP must be 4 digits."
+msgid "%(f)s must have %(mn)d digits"
+msgstr "کد اعتبارسنجی باید 4 رقمی باشد."
+
+#: exchange/utils.py:29
+msgid "Something went wrong in server. Contact admin."
+msgstr "خطا در سرور"
+
+#: order/models.py:17
+msgid "Deposit"
+msgstr "واریز"
+
+#: order/models.py:18
+msgid "Withdraw"
+msgstr "برداشت"
+
+#: order/models.py:21 order/models.py:88 zarinpal/models.py:45
+#: zarinpal/models.py:165
+msgid "Pending"
+msgstr "در انتظار"
+
+#: order/models.py:22 order/models.py:89 zarinpal/serializers.py:61
+msgid "Approve"
+msgstr "تایید"
+
+#: order/models.py:23 order/models.py:90 order/serializers.py:86
+#: zarinpal/models.py:47 zarinpal/models.py:167
+msgid "Cancel"
+msgstr "لغو"
+
+
+#: order/models.py:26 order/models.py:93
+#, fuzzy
+#| msgid "Make a Transaction"
+msgid "Transaction Type"
+msgstr "ایجاد تراکنش"
+
+#: order/models.py:27 order/models.py:98 zarinpal/models.py:50
+#: zarinpal/models.py:170
+msgid "Amount"
+msgstr "مقدار"
+
+#: order/models.py:28
+msgid "Wallet Address"
+msgstr "آدرس کیف پول"
+
+#: order/models.py:31 order/models.py:101
+msgid "The irt price at the time of placing the ordering."
+msgstr "قیمت تومان در زمان ثبت سفارش"
+
+#: order/models.py:34
+msgid "User"
+msgstr "کاربر"
+
+#: order/models.py:36
+#, fuzzy
+#| msgid "Make a Transaction"
+msgid "Transaction ID"
+msgstr "ایجاد تراکنش"
+
+#: order/models.py:37 order/models.py:99
+msgid "Submit Date"
+msgstr "تاریخ تایید"
+
+#: order/models.py:38 order/models.py:103
+msgid "Factor Number"
+msgstr "شماره فاکتور"
+
+#: order/models.py:45
+#, fuzzy
+#| msgid "Make a Transaction"
+msgid "Crypto Transaction"
+msgstr "ایجاد تراکنش"
+
+#: order/models.py:46
+#, fuzzy
+#| msgid "Make a Transaction"
+msgid "Crypto Transactions"
+msgstr "ایجاد تراکنش"
+
+#: order/models.py:84
+msgid "Buy"
+msgstr "خرید"
+
+#: order/models.py:85
+msgid "Sell"
+msgstr "فروش"
+
+#: order/models.py:111
+msgid "Order"
+msgstr "سفارش"
+
+#: order/models.py:112
+msgid "Orders"
+msgstr "سفارش ها"
+
+#: order/serializers.py:42
+#, python-format
+msgid "Provided network %s not present in currency networks."
+msgstr "شبکه ارائه شده (%s) در شبکه های ارز وجود ندارد."
+
+#: order/serializers.py:46
+msgid "tx_id is required for deposit. "
+msgstr "برای واریز، شناسه تراکنش (tx_id) الزامی است. "
+
+#: order/serializers.py:53 order/serializers.py:151 wallet/models.py:31
+msgid "Insufficient balance."
+msgstr "موجودی ناکافی است."
+
+#: order/serializers.py:84
+msgid "Accept"
+msgstr "تایید"
+
+#: order/serializers.py:85 zarinpal/serializers.py:61
+msgid "Reject"
+msgstr "رد"
+
+#: order/serializers.py:93
+msgid "Cannot update transaction which is not in pending status."
+msgstr "به روز رسانی تراکنشی که در وضعیت انتظار نیست، امکان پذیر نمی باشد"
+
+#: order/serializers.py:102
+msgid "Provide a tx_id for your transaction"
+msgstr "شناسه تراکنش (tx_id) الزامی است. "
+
+#: order/views.py:37
+#, fuzzy
+#| msgid "Make a Transaction"
+msgid "Get Transaction List"
+msgstr "ایجاد تراکنش"
+
+#: order/views.py:45
+#, fuzzy
+#| msgid "Make a Transaction"
+msgid "Book a new Transaction"
+msgstr "ایجاد تراکنش"
+
+#: order/views.py:109
+msgid "Get Order List"
+msgstr ""
+
+#: order/views.py:117
+msgid "Book a new Order"
+msgstr ""
+
+#: permission/serializers.py:43
+#, fuzzy
+#| msgid "Password can not be empty."
+msgid "Permission IDs must not be empty."
+msgstr "رمز عبور نمی تواند خالی باشد."
+
+#: permission/serializers.py:46
+#, fuzzy
+#| msgid "This mobile already exists"
+msgid "Group with this name already exists."
+msgstr "شماره تماس تکراری است."
 
 #: users/schema.py:33
 #, fuzzy
@@ -347,11 +812,206 @@ msgstr "خطا در اتصال به قاصدک"
 msgid "Invalid Mobile"
 msgstr "شماره تماس نامعتبر است"
 
-#: users/serializer.py:34
+#: users/serializer.py:66
 #, fuzzy
 #| msgid "Must provide mobile"
 msgid "Must provide mobile number."
 msgstr "موبایل نمی تواند خالی باشد"
+
+#: wallet/models.py:15
+msgid "Balance"
+msgstr "موجودی"
+
+#: wallet/models.py:22
+msgid "Wallet"
+msgstr "کیف پول"
+
+#: wallet/models.py:23
+msgid "Wallets"
+msgstr "کیف پول ها"
+
+#: wallet/views.py:31
+msgid "Get Wallet List"
+msgstr ""
+
+#: wallet/views.py:38
+msgid "Generate new wallet"
+msgstr ""
+
+#: wallet/views.py:57
+msgid "Get Wallet Detail"
+msgstr ""
+
+#: zarinpal/models.py:46 zarinpal/models.py:166
+msgid "Success"
+msgstr ""
+
+#: zarinpal/models.py:51 zarinpal/models.py:171
+msgid "Factor number"
+msgstr "شماره فاکتور"
+
+#: zarinpal/models.py:52
+msgid "Gateway Token"
+msgstr ""
+
+#: zarinpal/models.py:53
+msgid "Gateway Status"
+msgstr ""
+
+#: zarinpal/models.py:54
+msgid "Gateway Fee"
+msgstr ""
+
+#: zarinpal/models.py:55
+msgid "Gateway Fee Type"
+msgstr ""
+
+#: zarinpal/models.py:56
+msgid "Gateway Message"
+msgstr ""
+
+#: zarinpal/models.py:58
+msgid "Card Number"
+msgstr ""
+
+#: zarinpal/models.py:59 zarinpal/models.py:174
+msgid "Status"
+msgstr ""
+
+#: zarinpal/models.py:73
+#, fuzzy
+#| msgid "daily Rial deposit limit"
+msgid "Rial deposit"
+msgstr "محدودیت واریز ریالی روزانه"
+
+#: zarinpal/models.py:74
+#, fuzzy
+#| msgid "daily Rial deposit limit"
+msgid "Rial deposits"
+msgstr "محدودیت واریز ریالی روزانه"
+
+#: zarinpal/models.py:173
+msgid "Sheba Number"
+msgstr ""
+
+#: zarinpal/models.py:182
+#, fuzzy
+#| msgid "daily Rial withdraw limit"
+msgid "Rial withdraw"
+msgstr "محدودیت برداشت ریالی روزانه"
+
+#: zarinpal/models.py:183
+#, fuzzy
+#| msgid "daily Rial withdraw limit"
+msgid "Rial withdraws"
+msgstr "محدودیت برداشت ریالی روزانه"
+
+#: zarinpal/models.py:215
+msgid "Verify Ref ID"
+msgstr ""
+
+#: zarinpal/models.py:216
+msgid "Verify message"
+msgstr ""
+
+#: zarinpal/models.py:217
+msgid "Verify status"
+msgstr ""
+
+#: zarinpal/models.py:218
+msgid "Result"
+msgstr ""
+
+#: zarinpal/models.py:219
+msgid "Card"
+msgstr ""
+
+#: zarinpal/models.py:220
+msgid "Card Hash"
+msgstr ""
+
+#: zarinpal/models.py:221
+msgid "Fee Type"
+msgstr ""
+
+#: zarinpal/models.py:222
+msgid "Fee"
+msgstr ""
+
+#: zarinpal/models.py:225
+msgid "Verify Deposit Attempt"
+msgstr ""
+
+#: zarinpal/models.py:226
+msgid "Verify Deposit Attempts"
+msgstr ""
+
+#: zarinpal/serializers.py:36
+#, fuzzy
+#| msgid "Invalid method"
+msgid "Invalid sheba number"
+msgstr "مقدار فیلد method نادرست است."
+
+#: zarinpal/serializers.py:38
+msgid "Sheba not approved."
+msgstr "شماره شبا تایید نشده است."
+
+#: zarinpal/serializers.py:67
+msgid "Withdraw is not in pending state."
+msgstr "درخواست برداشت در وضعیت انتظار نیست."
+
+#: zarinpal/views.py:37
+#, fuzzy
+#| msgid "daily Rial withdraw limit"
+msgid "Get Rial withdraw list"
+msgstr "محدودیت برداشت ریالی روزانه"
+
+#: zarinpal/views.py:45
+msgid "Create new withdraw"
+msgstr ""
+
+#: zarinpal/views.py:64
+msgid "Approve or reject withdraw"
+msgstr ""
+
+#: zarinpal/views.py:71
+#, fuzzy
+#| msgid "Created successfully"
+msgid "Submitted successfully"
+msgstr "با موفقیت ایجاد شد."
+
+#: zarinpal/views.py:92
+#, fuzzy
+#| msgid "daily Rial deposit limit"
+msgid "Get Rial deposit list"
+msgstr "محدودیت واریز ریالی روزانه"
+
+#: zarinpal/views.py:148
+msgid "Transaction not found"
+msgstr "تراکنش یافت نشد"
+
+#: zarinpal/views.py:152
+#, fuzzy
+#| msgid "Account has been created"
+msgid "Transaction has been already checked"
+msgstr "حساب کاربری با موفقیت ایجاد شد."
+
+#: zarinpal/views.py:156 zarinpal/views.py:164
+#, fuzzy
+#| msgid "Make a Transaction"
+msgid "Transaction Failed"
+msgstr "ایجاد تراکنش"
+
+#: zarinpal/views.py:167
+#, fuzzy
+#| msgid "Created successfully"
+msgid "Transaction successful"
+msgstr "با موفقیت ایجاد شد."
+
+#, fuzzy
+#~| msgid "Created successfully"
+#~ msgid "Updated successfully"
+#~ msgstr "با موفقیت ایجاد شد."
 
 #, fuzzy
 #~| msgid "Cant connect to sms provider"

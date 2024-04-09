@@ -21,7 +21,7 @@ class Transaction(BaseModelWithDate):
         PENDING = 'pending', _("Pending")
         APPROVE = 'approve', _("Approve")
         CANCEL = 'cancel', _("Cancel")
-        REJECT = 'reject', _("REJECT")
+        REJECT = 'reject', _("Reject")
 
     type = models.CharField(verbose_name=_("Transaction Type"), max_length=8, choices=Type.choices)
     amount = models.DecimalField(verbose_name=_("Amount"), max_digits=20, decimal_places=8)

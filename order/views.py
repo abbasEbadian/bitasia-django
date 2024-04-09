@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
@@ -43,9 +44,10 @@ class TransactionView(generics.ListCreateAPIView):
 
     @swagger_auto_schema(operation_id=_("Book a new Transaction"), tags=CRYPTO_TRANSACTION_TAGS)
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={"user_id": self.request.user})
-        serializer.is_valid(raise_exception=True)
-        newb = serializer.save()
+        with transaction.atomic():
+            serializer = self.get_serializer(data=request.data, context={"user_id": self.request.user})
+            serializer.is_valid(raise_exception=True)
+            newb = serializer.save()
         return Response({
             "result": "success",
             "object": TransactionSerializer(newb).data
@@ -76,9 +78,10 @@ class TransactionDetailView(generics.RetrieveUpdateAPIView):
     @swagger_auto_schema(operation_id="Accept/Reject/Cancel Transaction", tags=CRYPTO_TRANSACTION_TAGS)
     def patch(self, request, *args, **kwargs):
         obj = self.get_object()
-        serializer = self.get_serializer(obj, data=request.data, partial=True, context={"user_id": request.user})
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        with transaction.atomic():
+            serializer = self.get_serializer(obj, data=request.data, partial=True, context={"user_id": request.user})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
         return Response({
             "result": "success",
             "object": TransactionSerializer(obj).data
@@ -114,9 +117,10 @@ class OrderView(generics.ListCreateAPIView):
 
     @swagger_auto_schema(operation_id=_("Book a new Order"), tags=ORDER_TAGS)
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={"user_id": self.request.user})
-        serializer.is_valid(raise_exception=True)
-        newb = serializer.save()
+        with transaction.atomic():
+            serializer = self.get_serializer(data=request.data, context={"user_id": self.request.user})
+            serializer.is_valid(raise_exception=True)
+            newb = serializer.save()
         return Response({
             "result": "success",
             "object": OrderSerializer(newb).data

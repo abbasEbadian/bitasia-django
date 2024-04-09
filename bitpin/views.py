@@ -117,12 +117,6 @@ class WalletAddressDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAdminUser]
     lookup_field = "id"
 
-    # @property
-    # def permission_classes(self):
-    #     if self.request.method.lower() == "get":
-    #         return [(IsAuthenticated & ~IsAdminUser) | (IsAdminUser & DjangoModelPermissions)]
-    #     return [IsAdminUser & DjangoModelPermissions]
-
     @swagger_auto_schema(operation_id=_("Get Wallet Address Detail"))
     def get(self, request, *args, **kwargs):
         return Response({
