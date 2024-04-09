@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.db import models
 from django.forms import forms
 from django.utils.translation import gettext as _
@@ -82,6 +83,28 @@ class BitPinCurrency(BaseModelWithDate):
 
     def _has_network(self, network):
         return self.network_ids.all().contains(network)
+
+    def _get_bitpin_commission(self, amount):
+        WithdrawCommission = apps.get_model('commission', 'WithdrawCommission')
+
+        if self.withdraw_commission_type == WithdrawCommission.CommissionType.VALUE:
+            return self.withdraw_commission
+        return amount * self.withdraw_commission
+
+    def _get_bitasia_commission(self, amount, network):
+        WithdrawCommission = apps.get_model('commission', 'WithdrawCommission')
+
+        comm = self.withdrawcommission_set.filter(network_id=network.id).first()
+
+        if comm.type == WithdrawCommission.CommissionType.VALUE:
+            return comm.amount
+        return amount * comm.amount
+
+    def calculate_amount_after_commission(self, amount, network):
+        c1 = self._get_bitpin_commission(amount)
+        c2 = self._get_bitasia_commission(amount, network)
+        print(f"karmozd: \n{c1=} \n{c2=}")
+        return amount - (c1 + c2)
 
     class Meta:
         ordering = ("-show_in_dashboard", "-price_info_price")

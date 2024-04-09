@@ -2,38 +2,36 @@ from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
+from api.permissions import IsOwner
 from creditcard.models import CreditCard
-from creditcard.permissions import IsCreditCardOwner
 from creditcard.schema import creditcard_create_schema
 from creditcard.serializers import CreditCardCreateSerializer, CreditCardSerializer
 
 
 class CreditCardView(generics.ListCreateAPIView):
     authentication_classes = (TokenAuthentication,)
+    permission_classes = [IsAuthenticated, IsOwner | IsAdminUser]
     lookup_field = "id"
-    lookup_url_kwarg = "id"
 
     def get_serializer_class(self):
         if self.request.method.lower() == 'get':
             return CreditCardSerializer
         return CreditCardCreateSerializer
 
-    def paginator(self):
-        return False
-
     def get_queryset(self):
-        user = self.request.user
-        return CreditCard.objects.filter(user_id=user)
+        if self.request.user.is_staff:
+            return CreditCard.objects.all()
+        return CreditCard.objects.filter(user_id=self.request.user.id)
 
-    @swagger_auto_schema(operation_id=_("Get credit cards of current user"), security=[{"Token": []}])
+    @swagger_auto_schema(operation_id=_("Get credit cards of current user"))
     def get(self, request):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
+        objects = self.get_serializer(self.get_queryset(), many=True).data
         return Response({
             "result": "success",
-            "objects": serializer.data
+            "objects": objects
         }, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**creditcard_create_schema)
@@ -51,15 +49,17 @@ class CreditCardView(generics.ListCreateAPIView):
 
 class CreditCardDeleteUpdateView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticated, IsCreditCardOwner]
+    permission_classes = [IsAuthenticated, IsOwner | IsAdminUser]
     http_method_names = ["patch", "delete", "get"]
     queryset = CreditCard.objects.all()
     lookup_field = "id"
-    lookup_url_kwarg = "id"
 
-    @swagger_auto_schema(operation_id="Get credit card by id", security=[{"Token": []}])
+    @swagger_auto_schema(operation_id="Get credit card detail")
     def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+        return Response({
+            "result": "success",
+            "object": self.get_serializer(self.get_object()).data
+        })
 
     def get_serializer_class(self):
         if self.request.method.lower() == 'get':

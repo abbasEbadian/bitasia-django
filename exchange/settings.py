@@ -43,7 +43,8 @@ APPS = [
     "bitpin",
     "order",
     "zarinpal",
-    "permission"
+    "permission",
+    "commission"
 ]
 LIBS = [
     "rest_framework",

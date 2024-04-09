@@ -1,12 +1,18 @@
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from api.permissions import IsOwner
+from authentication.exception import CustomError
+from bitpin.models import BitPinCurrency, BitPinNetwork
+from exchange.error_codes import ERRORS
 from order.models import Transaction, Order
 from order.serializers import TransactionSerializer, TransactionForAdminSerializer, TransactionCreateSerializer, \
     TransactionUpdateSerializer, OrderForAdminSerializer, OrderCreateSerializer, OrderSerializer
@@ -86,6 +92,43 @@ class TransactionDetailView(generics.RetrieveUpdateAPIView):
             "result": "success",
             "object": TransactionSerializer(obj).data
         })
+
+
+class CalculateWithdrawCommissionView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    @swagger_auto_schema(operation_id="Calculate Withdraw Commission",
+                         request_body=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                     required=["currency_code", 'network_code', 'amount'],
+                                                     properties={
+                                                         "currency_code": openapi.Schema(type=openapi.TYPE_STRING,
+                                                                                         title='Currency code'),
+                                                         "network_code": openapi.Schema(type=openapi.TYPE_STRING,
+                                                                                        title='Network code'),
+                                                         "amount": openapi.Schema(type=openapi.TYPE_NUMBER,
+                                                                                  title='Amount'),
+                                                     }))
+    def post(self, request, *args, **kwargs):
+        currency = get_object_or_404(BitPinCurrency, code=request.data.get("currency_code"))
+        network = get_object_or_404(BitPinNetwork, code=request.data.get("network_code"))
+        amount = request.data.get("amount")
+
+        print(currency, network, amount)
+        if not currency._has_network(network):
+            raise CustomError(ERRORS.custom_message_error(
+                _("Invalid network ID. Provided network must be present in currency networks.")))
+
+        amount_after_commission = currency.calculate_amount_after_commission(amount, network)
+        return Response({
+            "result": "success",
+            "amount": amount,
+            "amount_after_commission": amount_after_commission,
+            "commission": amount - amount_after_commission,
+        })
+
+
+calculate_commission = CalculateWithdrawCommissionView.as_view()
 
 
 class OrderView(generics.ListCreateAPIView):
