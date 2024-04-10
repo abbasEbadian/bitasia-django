@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.db import models
+from django.db.models.signals import post_save
 from django.forms import forms
 from django.utils.translation import gettext as _
 
@@ -78,8 +79,19 @@ class BitPinCurrency(BaseModelWithDate):
     price_info_usdt_market_amount = models.FloatField(_("Total Market Amount USDT"),
                                                       null=True, blank=True)
 
+    price = models.FloatField(_("Sales Price"), default=0)
+    markup_percent = models.FloatField(_("Sales Markup Percent"), default=0)
+
     def __str__(self):
         return f"{self.title} ({self.title_fa})"
+
+    @staticmethod
+    def post_save(sender, instance, created, **kwargs):
+        instance.price = instance.get_price()
+        instance.save()
+
+    def get_price(self):
+        return self.price_info_price + (self.price_info_price * self.markup_percent)
 
     def _has_network(self, network):
         return self.network_ids.all().contains(network)
@@ -131,3 +143,6 @@ class BitPinWalletAddress(BaseModelWithDate):
     class Meta:
         verbose_name = _('BitPin Wallet Address')
         verbose_name_plural = _('BitPin Wallet Addresses')
+
+
+post_save.connect(BitPinCurrency.post_save, sender=BitPinCurrency)

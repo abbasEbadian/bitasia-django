@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from authentication.exception import CustomError
 from bitpin.models import BitPinCurrency, BitPinNetwork, BitPinWalletAddress
@@ -18,7 +19,7 @@ class CurrencySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BitPinCurrency
-        exclude = ["create_date", "write_date", "network_ids"]
+        exclude = ["create_date", "write_date", "network_ids", "price_info_price", "markup_percent"]
         depth = 2
 
 
@@ -26,6 +27,10 @@ class CurrencyDashboardSerializer(serializers.ModelSerializer):
     class Meta:
         model = BitPinCurrency
         fields = ["id", "title", "title_fa", "code", "image", "price_info_price", "price_info_change"]
+
+
+class CurrencyUpdateSerializer(serializers.Serializer):
+    percent = serializers.FloatField(required=True, min_value=0, max_value=1)
 
 
 class WalletAddressSerializer(serializers.ModelSerializer):
@@ -53,6 +58,14 @@ class WalletAddressCreateSerializer(serializers.Serializer):
     address = serializers.CharField(required=True)
     currency_id = serializers.IntegerField(required=True)
     network_id = serializers.IntegerField(required=True)
+
+    class Meta:
+        validators = [
+            UniqueTogetherValidator(
+                queryset=BitPinWalletAddress.objects.all(),
+                fields=['currency_id', 'network_id']
+            )
+        ]
 
     def validate(self, attrs):
         currency = get_object_or_404(BitPinCurrency, pk=attrs.get("currency_id"))

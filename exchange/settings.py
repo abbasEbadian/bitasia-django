@@ -51,7 +51,8 @@ LIBS = [
     "drf_yasg",
     "knox",
     "corsheaders",
-    "django_crontab"
+    "django_crontab",
+    "ModelTracker"
 ]
 
 INSTALLED_APPS = [
@@ -79,6 +80,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "ModelTracker.middleware.ModelTrackerMiddleware"
 ]
 
 ROOT_URLCONF = "exchange.urls"

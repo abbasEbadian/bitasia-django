@@ -1,3 +1,4 @@
+from ModelTracker.Tracker import TrackerAdmin
 from django.contrib import admin
 from django.utils.translation import gettext as _
 
@@ -5,7 +6,7 @@ from .models import AuthorityRuleOption, AuthorityRule, AuthorityLevel, Authorit
 
 
 @admin.register(AuthorityRule)
-class AuthorityRuleAdmin(admin.ModelAdmin):
+class AuthorityRuleAdmin(TrackerAdmin):
     list_display = ('title', "options")
 
     @admin.display(description=_("Options"))
@@ -15,12 +16,12 @@ class AuthorityRuleAdmin(admin.ModelAdmin):
 
 
 @admin.register(AuthorityRuleOption)
-class AuthorityRuleOptionAdmin(admin.ModelAdmin):
+class AuthorityRuleOptionAdmin(TrackerAdmin):
     list_display = ('title', "field_key", "field_type", "type", "process_time", "min_value", "max_value", "is_form")
 
 
 @admin.register(AuthorityLevel)
-class AuthorityLevelAdmin(admin.ModelAdmin):
+class AuthorityLevelAdmin(TrackerAdmin):
     list_display = ('level', "rules", "deposit_ir_limit", "deposit_ir_limit_text",
                     "withdraw_ir_limit", "withdraw_ir_limit_text",
                     "deposit_crypto_limit", "deposit_crypto_limit_text",
@@ -33,5 +34,5 @@ class AuthorityLevelAdmin(admin.ModelAdmin):
 
 
 @admin.register(AuthorityRequest)
-class AuthorityRequestAdmin(admin.ModelAdmin):
+class AuthorityRequestAdmin(TrackerAdmin):
     list_display = ('user_id', "rule_id", "approved", "admin_message")
