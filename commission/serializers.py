@@ -1,10 +1,10 @@
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from authentication.exception import CustomError
 from bitpin.models import BitPinCurrency, BitPinNetwork
+from bitpin.serializers import CurrencySimplifiedSerializer
 from commission.models import WithdrawCommission
 from exchange.error_codes import ERRORS
 
@@ -15,6 +15,8 @@ COMM_TYPES = [
 
 
 class WithdrawCommissionSerializer(serializers.ModelSerializer):
+    currency_id = CurrencySimplifiedSerializer()
+
     class Meta:
         model = WithdrawCommission
         fields = '__all__'
@@ -27,17 +29,12 @@ class WithdrawCommissionCreateSerializer(serializers.Serializer):
     amount = serializers.FloatField(required=True)
     type = serializers.ChoiceField(required=True, choices=COMM_TYPES)
 
-    class Meta:
-        validators = [
-            UniqueTogetherValidator(
-                queryset=WithdrawCommission.objects.all(),
-                fields=['currency_id', 'network_id']
-            )
-        ]
-
     def validate(self, attrs):
         currency = get_object_or_404(BitPinCurrency, code=attrs.get('currency_code'))
         network = get_object_or_404(BitPinNetwork, code=attrs.get('network_code'))
+        if WithdrawCommission.objects.filter(currency_id=currency, network_id=network).exists():
+            raise CustomError(ERRORS.custom_message_error(
+                _("Already Exists.")))
         if not currency._has_network(network):
             raise CustomError(ERRORS.custom_message_error(
                 _("Invalid network ID. Provided network must be present in currency networks.")))

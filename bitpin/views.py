@@ -8,20 +8,15 @@ from rest_framework.response import Response
 
 from api.mixins import IsAdminRequestMixin
 from bitpin.models import BitPinCurrency, BitPinNetwork, BitPinWalletAddress
-from .serializers import CurrencySerializer, NetworkSerializer, CurrencyDashboardSerializer, WalletAddressSerializer, \
+from .permissions import BitPinCurrencyPermission
+from .serializers import CurrencySerializer, NetworkSerializer, WalletAddressSerializer, \
     WalletAddressCreateSerializer
 
 
 class CurrencyView(generics.ListAPIView):
     authentication_classes = ()
-    permission_classes = []
+    permission_classes = [BitPinCurrencyPermission]
     serializer_class = CurrencySerializer
-
-    def get_serializer_class(self):
-        for_dashboard = self.request.GET.get("for_dashboard", False)
-        if for_dashboard:
-            return CurrencyDashboardSerializer
-        return CurrencySerializer
 
     def get_queryset(self):
         request = self.request

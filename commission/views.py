@@ -3,40 +3,35 @@ from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.permissions import IsAdminUser
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
+from api.permissions import IsSuperUser
 from bitpin.models import BitPinCurrency
 from commission.models import WithdrawCommission
-from commission.serializers import WithdrawCommissionSerializer, WithdrawCommissionCreateSerializer, \
-    WithdrawCommissionUpdateSerializer
+from commission.permissions import CommissionPermission
+from commission.serializers import WithdrawCommissionSerializer, WithdrawCommissionUpdateSerializer, \
+    WithdrawCommissionCreateSerializer
 
 
 class WithdrawCommissionView(generics.ListCreateAPIView):
     queryset = WithdrawCommission.objects.all()
+    permission_classes = [CommissionPermission]
+    pagination_class = LimitOffsetPagination
+    default_limit = 50
 
     @property
     def authentication_classes(self):
-        if self.request.method == 'GET':
-            return []
-        return [TokenAuthentication]
-
-    @property
-    def permission_classes(self):
-        if self.request.method == 'GET':
-            return []
-        return [IsAdminUser]
+        return [] if self.request.method == 'GET' else [TokenAuthentication]
 
     def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return WithdrawCommissionSerializer
-        return WithdrawCommissionCreateSerializer
+        return WithdrawCommissionSerializer if self.request.method == 'GET' else WithdrawCommissionCreateSerializer
 
     @swagger_auto_schema(operation_id=_("Get Withdraw commission list"))
     def get(self, request, *args, **kwargs):
         return Response({
             "result": "success",
-            "objects": self.get_serializer(self.queryset).data
+            "objects": self.get_serializer(self.get_queryset(), many=True).data
         })
 
     @swagger_auto_schema(operation_id=_("Create new  Withdraw commission"))
@@ -54,18 +49,11 @@ class WithdrawCommissionDetailView(generics.RetrieveUpdateAPIView):
     queryset = WithdrawCommission.objects.all()
     lookup_field = "id"
     http_method_names = ["get", "patch"]
+    permission_classes = [CommissionPermission]
 
     @property
     def authentication_classes(self):
-        if self.request.method == 'GET':
-            return []
-        return [TokenAuthentication]
-
-    @property
-    def permission_classes(self):
-        if self.request.method == 'GET':
-            return []
-        return [IsAdminUser]
+        return [] if self.request.method == 'GET' else [TokenAuthentication]
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -92,7 +80,7 @@ class WithdrawCommissionDetailView(generics.RetrieveUpdateAPIView):
 
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
-@permission_classes([IsAdminUser])
+@permission_classes([IsSuperUser])
 @swagger_auto_schema(operation_id="Generate withdraw commissions for each currency")
 def generate_all_commissions(request):
     for curr in BitPinCurrency.objects.all().only("id"):

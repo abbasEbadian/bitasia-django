@@ -1,4 +1,3 @@
-from ModelTracker.Tracker import TrackerAdmin
 from django.contrib import admin
 
 from .models import RialDeposit, VerifyLine, RialWithdraw
@@ -11,15 +10,15 @@ def sep_amount(obj):
 
 # Register your models here.
 @admin.register(RialDeposit)
-class ModelNameAdmin(TrackerAdmin):
+class ModelNameAdmin(admin.ModelAdmin):
     list_display = ["factor_number", "user_id", sep_amount, "card_number", "status"]
 
 
 @admin.register(RialWithdraw)
-class ModelNameAdmin(TrackerAdmin):
+class ModelNameAdmin(admin.ModelAdmin):
     list_display = ["factor_number", "user_id", sep_amount, "sheba_number", "status"]
 
 
 @admin.register(VerifyLine)
-class ModelNameAdmin(TrackerAdmin):
+class ModelNameAdmin(admin.ModelAdmin):
     list_display = ["deposit_id", "ref_id", "message", "status", "result"]

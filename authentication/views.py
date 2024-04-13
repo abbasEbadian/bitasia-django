@@ -29,8 +29,8 @@ class LoginView(KnoxLoginView):
         user = serializer.validated_data['user']
         rule_id = AuthorityRule.objects.filter(pk=MOBILE_AUTHORITY).first()
 
-        req, created = AuthorityRequest.objects.get_or_create(rule_id=rule_id, user_id=user,
-                                                              defaults={"approved": True})
+        req, _ = AuthorityRequest.objects.get_or_create(rule_id=rule_id, user_id=user,
+                                                        defaults={"approved": True})
         user.get_wallet("IRT")
         req.approve()
         login(request, user)
@@ -72,5 +72,5 @@ class RegisterView(generics.CreateAPIView):
             return Response(
                 {"result": "success", "message": _('Account has been created')},
                 status=status.HTTP_201_CREATED)
-        except Exception as e:
+        except Exception:
             raise CustomError(ERRORS.ERROR_INVALID_MOBILE)

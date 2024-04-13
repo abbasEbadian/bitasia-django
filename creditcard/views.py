@@ -2,7 +2,7 @@ from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, DjangoModelPermissions
 from rest_framework.response import Response
 
 from api.permissions import IsOwner
@@ -49,7 +49,7 @@ class CreditCardView(generics.ListCreateAPIView):
 
 class CreditCardDeleteUpdateView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticated, IsOwner | IsAdminUser]
+    permission_classes = [IsAuthenticated, IsOwner | IsAdminUser, DjangoModelPermissions]
     http_method_names = ["patch", "delete", "get"]
     queryset = CreditCard.objects.all()
     lookup_field = "id"

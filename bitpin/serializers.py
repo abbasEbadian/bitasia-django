@@ -14,8 +14,25 @@ class NetworkSerializer(serializers.ModelSerializer):
         exclude = ["create_date", "write_date"]
 
 
+class CurrencySimplifiedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BitPinCurrency
+        fields = ["id", "code", "title"]
+
+
 class CurrencySerializer(serializers.ModelSerializer):
     networks = NetworkSerializer(many=True, source='network_ids')
+
+    def __init__(self, *arg, **kwargs):
+        fields = ["id", "title", "title_fa", "code", "image", "price", "price_info_change"]
+        super().__init__(*arg, **kwargs)
+
+        request = self.context.get("request")
+        if fields and request and request.GET.get("for_dashboard"):
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
 
     class Meta:
         model = BitPinCurrency
@@ -23,14 +40,13 @@ class CurrencySerializer(serializers.ModelSerializer):
         depth = 2
 
 
-class CurrencyDashboardSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BitPinCurrency
-        fields = ["id", "title", "title_fa", "code", "image", "price_info_price", "price_info_change"]
-
-
 class CurrencyUpdateSerializer(serializers.Serializer):
     percent = serializers.FloatField(required=True, min_value=0, max_value=1)
+
+    def update(self, instance, validated_data):
+        instance.percent = validated_data.get("percent", instance.percent)
+        instance.save()
+        return instance
 
 
 class WalletAddressSerializer(serializers.ModelSerializer):

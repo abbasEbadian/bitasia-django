@@ -22,3 +22,7 @@ class WithdrawCommission(BaseModelWithDate):
     class Meta:
         verbose_name = _("Withdraw Commission")
         verbose_name_plural = _("Withdraw Commissions")
+
+        constraints = [
+            models.UniqueConstraint(fields=['currency_id', 'network_id'], name='currency_network_id')
+        ]
