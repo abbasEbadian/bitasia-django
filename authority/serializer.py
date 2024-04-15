@@ -34,4 +34,5 @@ class AuthorityLevelSerializer(serializers.ModelSerializer):
 class AuthorityRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthorityRequest
-        exclude = ('create_date', 'write_date')
+        fields = "__all__"
+        depth = 1

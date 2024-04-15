@@ -1,18 +1,23 @@
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics
+from knox.auth import TokenAuthentication
+from rest_framework import generics, permissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from authority.models import AuthorityLevel, AuthorityRule
-from authority.serializer import AuthorityLevelSerializer, AuthorityRuleWithOptionSerializer
+from api.mixins import IsModeratorMixin
+from api.permissions import IsModerator
+from authority.models import AuthorityLevel, AuthorityRule, AuthorityRuleOption, AuthorityRequest
+from authority.permissions import AuthorityLevelPermission, AuthorityRulePermission, AuthorityRuleOptionPermission, \
+    AuthorityRequestPermission
+from authority.serializer import AuthorityLevelSerializer, AuthorityRuleWithOptionSerializer, AuthorityRequestSerializer
 
 
-class AuthorityLevelView(generics.GenericAPIView):
+class AuthorityLevelView(generics.ListAPIView):
     serializer_class = AuthorityLevelSerializer
-    permission_classes = [IsAuthenticated]
     queryset = AuthorityLevel.objects.all()
+    permission_classes = [(IsModerator & AuthorityLevelPermission) | permissions.IsAuthenticatedOrReadOnly]
 
-    @swagger_auto_schema(operation_id="Get authority levels", tags=["authority"])
+    @swagger_auto_schema(operation_id="Get authority levels", tags=["Authority"])
     def get(self, request, *args, **kwargs):
         return Response(AuthorityLevelSerializer(self.get_queryset(), many=True).data)
 
@@ -21,11 +26,11 @@ class AuthorityLevelView(generics.GenericAPIView):
 
 
 class AuthorityRulesView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [(IsModerator & AuthorityRulePermission) | permissions.IsAuthenticatedOrReadOnly]
     serializer_class = AuthorityRuleWithOptionSerializer
     queryset = AuthorityRule.objects.all()
 
-    @swagger_auto_schema(operation_id="Get authority rules", tags=["authority"])
+    @swagger_auto_schema(operation_id="Get authority rules", tags=["Authority"])
     def get(self, request, *args, **kwargs):
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response({
@@ -33,8 +38,19 @@ class AuthorityRulesView(generics.ListAPIView):
             "objects": serializer.data
         })
 
-    def paginator(self):
-        return False
+
+class AuthorityRuleOptionsView(generics.ListAPIView):
+    permission_classes = [(IsModerator & AuthorityRuleOptionPermission) | permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = AuthorityRuleWithOptionSerializer
+    queryset = AuthorityRuleOption.objects.all()
+
+    @swagger_auto_schema(operation_id="Get authority rule options", tags=["Authority"])
+    def get(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response({
+            "result": "success",
+            "objects": serializer.data
+        })
 
 
 class AuthorityRuleView(generics.RetrieveAPIView):
@@ -42,7 +58,7 @@ class AuthorityRuleView(generics.RetrieveAPIView):
     serializer_class = AuthorityRuleWithOptionSerializer
     queryset = AuthorityRule.objects.all()
 
-    @swagger_auto_schema(operation_id="Get single authority rule", tags=["authority"])
+    @swagger_auto_schema(operation_id="Get single authority rule", tags=["Authority"])
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -51,5 +67,44 @@ class AuthorityRuleView(generics.RetrieveAPIView):
             "object": serializer.data
         })
 
-    def paginator(self):
-        return False
+
+class AuthorityRequestView(generics.ListAPIView, IsModeratorMixin):
+    permission_classes = [(IsAuthenticated & ~IsModerator) | (IsModerator & AuthorityRequestPermission)]
+    serializer_class = AuthorityRuleWithOptionSerializer
+    queryset = AuthorityRule.objects.all()
+
+    def get_queryset(self):
+        if self.is_moderator(self.request):
+            return AuthorityRequest.objects.all()
+        return AuthorityRequest.objects.select_related("user_id").filter(user_id=self.request.user)
+
+    @swagger_auto_schema(operation_id="Get single authority rule", tags=["Authority"])
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response({
+            "result": "success",
+            "object": serializer.data
+        })
+
+
+class AuthorityRequestDetailView(generics.RetrieveAPIView, IsModeratorMixin):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [(IsAuthenticated & ~IsModerator) | (IsModerator & AuthorityRequestPermission)]
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return AuthorityRequestSerializer
+
+    def get_queryset(self):
+        if self.is_moderator(self.request):
+            return AuthorityRequest.objects.all()
+        return AuthorityRequest.objects.select_related("user_id").filter(user_id=self.request.user)
+
+    @swagger_auto_schema(operation_id="Get single authority rule", tags=["Authority"])
+    def get(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object())
+        return Response({
+            "result": "success",
+            "object": serializer.data
+        })
