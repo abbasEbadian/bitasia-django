@@ -2,17 +2,19 @@ from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from api.mixins import IsModeratorMixin
+from api.permissions import IsModerator
 from wallet.models import Wallet
+from wallet.permissions import WalletPermission
 from wallet.serializers import WalletSerializer, WalletCreateSerializer
 
 
-class WalletView(generics.ListCreateAPIView):
+class WalletView(generics.ListCreateAPIView, IsModeratorMixin):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticated]
-    serializer_class = WalletSerializer
+    permission_classes = [(IsAuthenticated & ~IsModerator) | (IsModerator & WalletPermission)]
     queryset = Wallet.objects.all()
 
     def paginator(self):
@@ -24,7 +26,7 @@ class WalletView(generics.ListCreateAPIView):
         return WalletCreateSerializer
 
     def get_queryset(self):
-        if self.request.user.is_staff:
+        if self.is_moderator(self.request):
             return Wallet.objects.all()
         return Wallet.objects.filter(user_id=self.request.user)
 
@@ -47,12 +49,16 @@ class WalletView(generics.ListCreateAPIView):
         })
 
 
-class WalletDetailView(generics.RetrieveAPIView):
+class WalletDetailView(generics.RetrieveAPIView, IsModeratorMixin):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdminUser]
+    permission_classes = [(IsAuthenticated & ~IsModerator) | (IsModerator & WalletPermission)]
     serializer_class = WalletSerializer
     lookup_field = "id"
-    queryset = Wallet.objects.all()
+
+    def get_queryset(self):
+        if self.is_moderator(self.request):
+            return Wallet.objects.all()
+        return Wallet.objects.filter(user_id=self.request.user)
 
     @swagger_auto_schema(operation_id=_("Get Wallet Detail"))
     def get(self, request, *args, **kwargs):
