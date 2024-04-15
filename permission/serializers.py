@@ -32,7 +32,7 @@ class GroupSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class GroupCreateSerializer(serializers.Serializer):
+class GroupUpdateCreateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
     permission_ids = serializers.CharField(max_length=255)
 
@@ -46,6 +46,20 @@ class GroupCreateSerializer(serializers.Serializer):
             return CustomError(ERRORS.custom_message_error(_("Group with this name already exists.")))
 
         permission_ids = Permission.objects.filter(id__in=permission_ids)
+        attrs["permission_ids"] = permission_ids
+        return attrs
+
+    def create(self, validated_data):
+        permission_ids = validated_data.get("permission_ids")
+        name = validated_data.get("name")
         group = Group.objects.create(name=name)
         group.permissions.set(permission_ids)
-        return attrs
+        return group
+
+    def update(self, instance, validated_data):
+        permission_ids = validated_data.get("permission_ids")
+        name = validated_data.get("name")
+        instance.permissions.set(permission_ids)
+        instance.name = name
+        instance.save(update_fields=["name", "permission_ids"])
+        return instance

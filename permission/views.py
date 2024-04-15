@@ -5,15 +5,15 @@ from knox.auth import TokenAuthentication
 from rest_framework import generics
 from rest_framework.response import Response
 
-from api.permissions import IsSuperUser
-from permission.serializers import PermissionSerializer, GroupSerializer, GroupCreateSerializer
+from api.permissions import IsModerator
+from permission.serializers import PermissionSerializer, GroupSerializer, GroupUpdateCreateSerializer
 
 EXCLUDED_MODELS = ["logentry", "contenttype", "authtoken", "session", "currency"]
 
 
 class PermissionView(generics.ListAPIView):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsSuperUser]
+    permission_classes = [IsModerator]
     serializer_class = PermissionSerializer
 
     def paginator(self):
@@ -32,7 +32,7 @@ class PermissionView(generics.ListAPIView):
 
 class GroupView(generics.ListCreateAPIView):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsSuperUser]
+    permission_classes = [IsModerator]
     serializer_class = GroupSerializer
     queryset = Group.objects.all()
 
@@ -42,7 +42,7 @@ class GroupView(generics.ListCreateAPIView):
     def get_serializer_class(self):
         if self.request.method.lower() == "get":
             return GroupSerializer
-        return GroupCreateSerializer
+        return GroupUpdateCreateSerializer
 
     @swagger_auto_schema(operation_id="Get Group List", tags=["Permissions"])
     def get(self, request, *args, **kwargs):
@@ -55,8 +55,41 @@ class GroupView(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        instance = serializer.save()
         return Response({
             "result": "success",
-            "object": serializer.data
+            "object": GroupSerializer(instance).data
+        })
+
+
+class GroupDetailView(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [IsModerator]
+    serializer_class = GroupSerializer
+    queryset = Group.objects.all()
+    http_method_names = ["get", "patch", "delete"]
+
+    def paginator(self):
+        return False
+
+    def get_serializer_class(self):
+        if self.request.method.lower() == "get":
+            return GroupSerializer
+        return GroupUpdateCreateSerializer
+
+    @swagger_auto_schema(operation_id="Get Group List", tags=["Permissions"])
+    def get(self, request, *args, **kwargs):
+        return Response({
+            "result": "success",
+            "objects": self.get_serializer(self.get_queryset(), many=True).data
+        })
+
+    @swagger_auto_schema(operation_id="Create New Group", tags=["Permissions"])
+    def patch(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object())
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        return Response({
+            "result": "success",
+            "object": GroupSerializer(instance).data
         })
