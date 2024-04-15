@@ -4,32 +4,35 @@ from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from api.mixins import IsModeratorMixin
+from api.permissions import IsModerator
 from api.schema import create_payment_schema
 from authentication.exception import CustomError
 from exchange.error_codes import ERRORS
 from .models import RialDeposit, RialWithdraw
+from .permissions import RialWithdrawPermission, RialDepositPermission
 from .serializers import RialDepositAdminSerializer, RialDepositSerializer, RialWithdrawCreateSerializer, \
     RialWithdrawAdminSerializer, RialWithdrawSerializer, ConfirmRialWithdrawSerializer
 
 
-class RialWithdrawView(generics.ListCreateAPIView):
+class RialWithdrawView(generics.ListCreateAPIView, IsModeratorMixin):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [(~IsModerator & IsAuthenticated) | (IsModerator & RialWithdrawPermission)]
 
     def paginator(self):
         return False
 
     def get_queryset(self):
-        if self.request.user.is_staff:
+        if self.is_moderator(self.request):
             return RialWithdraw.objects.all()
         return RialWithdraw.objects.filter(user_id=self.request.user)
 
     def get_serializer_class(self):
         if self.request.method.lower() == 'get':
-            if self.request.user.is_staff:
+            if self.is_moderator(self.request):
                 return RialWithdrawAdminSerializer
             return RialWithdrawSerializer
         return RialWithdrawCreateSerializer
@@ -57,7 +60,7 @@ class RialWithdrawView(generics.ListCreateAPIView):
 
 class RialWithdrawConfirmView(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsModerator]
     serializer_class = ConfirmRialWithdrawSerializer
     http_method_names = ["patch"]
 
@@ -72,20 +75,20 @@ class RialWithdrawConfirmView(generics.UpdateAPIView):
         })
 
 
-class RialDepositView(generics.ListAPIView):
+class RialDepositView(generics.ListAPIView, IsModeratorMixin):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [(IsAuthenticated & ~IsModerator) | (IsModerator & RialDepositPermission)]
 
     def paginator(self):
         return False
 
     def get_queryset(self):
-        if self.request.user.is_staff:
+        if self.is_moderator(self.request):
             return RialDeposit.objects.all()
         return RialDeposit.objects.filter(user_id=self.request.user)
 
     def get_serializer_class(self):
-        if self.request.user.is_staff:
+        if self.is_moderator(self.request):
             return RialDepositAdminSerializer
         return RialDepositSerializer
 

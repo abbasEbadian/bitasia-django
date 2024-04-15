@@ -5,7 +5,7 @@ from knox.auth import TokenAuthentication
 from rest_framework import generics
 from rest_framework.response import Response
 
-from permission.permissions import IsSuperUser
+from api.permissions import IsSuperUser
 from permission.serializers import PermissionSerializer, GroupSerializer, GroupCreateSerializer
 
 EXCLUDED_MODELS = ["logentry", "contenttype", "authtoken", "session", "currency"]
