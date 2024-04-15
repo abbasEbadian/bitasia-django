@@ -21,6 +21,11 @@ def custom_exception_handler(exc, context):
                     if "description_en" in q:
                         del q["description_en"]
                     d["error"] = q
+                else:
+                    value = isinstance(value, list) and value[0] or value
+                    print(value)
+                    d["error"]["status_code"] = 400
+                    d["error"]["message"] = f"{key}: {value}"
         print(f"{exc=} {exc.detail}")
     else:
         status = drf_status.HTTP_500_INTERNAL_SERVER_ERROR

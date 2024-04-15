@@ -9,6 +9,12 @@ from wallet.serializers import WalletSerializer
 User = get_user_model()
 
 
+class UserSimplifiedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ['password', 'is_superuser', 'is_staff', 'is_active', 'groups', 'user_permissions']
+
+
 class UserSerializer(serializers.ModelSerializer):
     user_level = serializers.SerializerMethodField('_get_user_level')
     approved_rule_ids = serializers.SerializerMethodField('_approved_rule_ids')

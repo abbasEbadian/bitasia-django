@@ -1,7 +1,25 @@
-from creditcard import permissions
+from rest_framework.permissions import DjangoModelPermissions
 
 
-class CanConfirmPurchase(permissions.BasePermission):
+class OrderPermission(DjangoModelPermissions):
+    authenticated_users_only = True
 
-    def has_permission(self, request, view):
-        return request.user.is_staff
+    perms_map = {
+        'GET': [],
+        'OPTIONS': [],
+        'HEAD': [],
+        'POST': ['%(app_label)s.add_%(model_name)s'],
+        'PATCH': ['%(app_label)s.change_%(model_name)s'],
+    }
+
+
+class TransactionPermission(DjangoModelPermissions):
+    authenticated_users_only = True
+
+    perms_map = {
+        'GET': [],
+        'OPTIONS': [],
+        'HEAD': [],
+        'POST': ['%(app_label)s.add_%(model_name)s'],
+        'PATCH': ['%(app_label)s.change_%(model_name)s'],
+    }

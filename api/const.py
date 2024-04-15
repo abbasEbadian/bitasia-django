@@ -1,0 +1,2 @@
+MODERATOR_FIELD = 'X-Role'
+MODERATOR_VALUE = 'moderator'

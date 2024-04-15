@@ -1,15 +1,17 @@
 from django.contrib.auth import get_user_model
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import DjangoModelPermissions
 
 User = get_user_model()
 
 
-class CanViewCreditCard(BasePermission):
-    def has_permission(self, request, view):
-        print("CAME")
-        return request.user.has_perm('creditcard.view_creditcard')
+class CreditCardPermission(DjangoModelPermissions):
+    authenticated_users_only = True
 
-
-class CanCreateCreditCard(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.has_perm('creditcard.create_creditcard')
+    perms_map = {
+        'GET': [],
+        'OPTIONS': [],
+        'HEAD': [],
+        'POST': ['%(app_label)s.add_%(model_name)s'],
+        'PATCH': ['%(app_label)s.change_%(model_name)s'],
+        'DELETE': ['%(app_label)s.delete_%(model_name)s'],
+    }

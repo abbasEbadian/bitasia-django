@@ -5,15 +5,18 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from api.mixins import IsModeratorMixin
 from api.permissions import IsOwner
 from authentication.exception import CustomError
 from bitpin.models import BitPinCurrency, BitPinNetwork
 from exchange.error_codes import ERRORS
 from order.models import Transaction, Order
+from order.permissions import TransactionPermission
 from order.serializers import TransactionSerializer, TransactionForAdminSerializer, TransactionCreateSerializer, \
     TransactionUpdateSerializer, OrderForAdminSerializer, OrderCreateSerializer, OrderSerializer
 
@@ -21,21 +24,20 @@ CRYPTO_TRANSACTION_TAGS = ["Transactions - Crypto"]
 ORDER_TAGS = ["Orders"]
 
 
-class TransactionView(generics.ListCreateAPIView):
+class TransactionView(generics.ListCreateAPIView, IsModeratorMixin):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticated]
-
-    def paginator(self):
-        return False
+    permission_classes = [TransactionPermission]
+    pagination_class = LimitOffsetPagination
+    default_limit = 50
 
     def get_queryset(self):
-        if self.request.user.is_staff:
+        if self.is_moderator(self.request):
             return Transaction.objects.all()
         return Transaction.objects.filter(user_id=self.request.user)
 
     def get_serializer_class(self):
         if self.request.method.lower() == 'get':
-            if self.request.user.is_staff:
+            if self.is_moderator(self.request):
                 return TransactionForAdminSerializer
             return TransactionSerializer
         return TransactionCreateSerializer

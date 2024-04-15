@@ -3,14 +3,16 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
-from api.mixins import IsAdminRequestMixin
+from api.mixins import IsModeratorMixin
+from api.permissions import IsModerator
+from authentication.exception import CustomError
 from bitpin.models import BitPinCurrency, BitPinNetwork, BitPinWalletAddress
-from .permissions import BitPinCurrencyPermission
+from exchange.error_codes import ERRORS
+from .permissions import BitPinCurrencyPermission, WalletAddressPermission, BitPinNetworkPermission
 from .serializers import CurrencySerializer, NetworkSerializer, WalletAddressSerializer, \
-    WalletAddressCreateSerializer
+    WalletAddressCreateSerializer, CurrencyUpdateSerializer
 
 
 class CurrencyView(generics.ListAPIView):
@@ -20,6 +22,7 @@ class CurrencyView(generics.ListAPIView):
 
     def get_queryset(self):
         request = self.request
+        print("request.is_moderator", request.is_moderator)
         show_inactive = request.GET.get("show_inactive", False)
         for_dashboard = request.GET.get("for_dashboard", False)
         activity_filters = {"bitasia_active": True, "price_info_price__gt": 0}
@@ -43,29 +46,21 @@ class CurrencyView(generics.ListAPIView):
         }, status=status.HTTP_200_OK)
 
 
-class CurrencyDetailView(generics.RetrieveUpdateAPIView, IsAdminRequestMixin):
+class CurrencyDetailView(generics.RetrieveUpdateAPIView):
     lookup_field = "id"
     queryset = BitPinCurrency.objects.all()
     http_method_names = ["get", "patch"]
+    permission_classes = [BitPinCurrencyPermission
+                          ]
 
     @property
     def authentication_classes(self):
-        if self.request.method == "GET":
-            return []
-        return [TokenAuthentication]
-
-    @property
-    def permission_classes(self):
-        if self.request.method == "GET":
-            return []
-        if self.has_admin_header(self.request.META):
-            return [IsAdminUser]
+        return [] if self.request.method == "GET" else [TokenAuthentication]
 
     def get_serializer_class(self):
         if self.request.method == "GET":
             return CurrencySerializer
-        # TODO Implement CurrencyUpdateSerializer
-        return CurrencySerializer  # CurrencyUpdateSerializer
+        return CurrencyUpdateSerializer  # CurrencyUpdateSerializer
 
     @swagger_auto_schema(operation_id=_("Get Currency Detail"))
     def get(self, request, *args, **kwargs):
@@ -87,54 +82,46 @@ class CurrencyDetailView(generics.RetrieveUpdateAPIView, IsAdminRequestMixin):
 
 
 class NetworkView(generics.ListAPIView):
-    authentication_classes = ()
-    permission_classes = []
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [IsModerator, BitPinNetworkPermission]
     serializer_class = NetworkSerializer
-
-    def paginator(self):
-        return False
 
     def get_queryset(self):
         return BitPinNetwork.objects.all()
 
     @swagger_auto_schema(operation_id=_("Get Network List"))
     def get(self, request):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
+        serializer = self.get_serializer(self.get_queryset(), many=True).data
         return Response({
             "result": "success",
-            "objects": serializer.data
+            "objects": serializer
         }, status=status.HTTP_200_OK)
 
 
-class WalletAddressView(generics.ListAPIView, IsAdminRequestMixin):
+class WalletAddressView(generics.ListAPIView, IsModeratorMixin):
     authentication_classes = (TokenAuthentication,)
     queryset = BitPinWalletAddress.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [WalletAddressPermission]
 
     def get_serializer_class(self):
         if self.request.method.lower() == "get":
             return WalletAddressSerializer
         return WalletAddressCreateSerializer
 
-    @property
-    def permission_classes(self):
-        if self.request.method.lower() == "get":
-            return [IsAuthenticated]
-        return [IsAdminUser]
-
     def get_queryset(self):
+        is_moderator = self.is_moderator(self.request)
         currency_code = self.request.GET.get("currency_code")
         network_code = self.request.GET.get("network_code")
+        if not is_moderator and not currency_code and not network_code:
+            raise CustomError(ERRORS.custom_message_error(_("currency_code and network_code are required.")))
         lookup = {}
         if currency_code:
             lookup.update({"currency_id__code__exact": currency_code})
         if network_code:
             lookup.update({"network_id__code__exact": network_code})
         q = self.queryset.filter(**lookup)
-        print(currency_code, network_code)
-        print(len(q), self.has_admin_header(self.request.META))
-        if len(q) > 1 and not self.has_admin_header(self.request.META):
-            return self.queryset.none()
+        if q.count() > 1 and not is_moderator:
+            raise PermissionError()
         return q
 
     @swagger_auto_schema(operation_id=_("Get Wallet Address List"), manual_parameters=[
@@ -163,7 +150,7 @@ class WalletAddressDetailView(generics.RetrieveUpdateAPIView):
     http_method_names = ["get", "patch"]
     queryset = BitPinWalletAddress.objects.all()
     serializer_class = WalletAddressSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsModerator, WalletAddressPermission]
     lookup_field = "id"
 
     @swagger_auto_schema(operation_id=_("Get Wallet Address Detail"))

@@ -4,12 +4,16 @@ from rest_framework import serializers
 from authentication.exception import CustomError
 from creditcard.models import CreditCard
 from exchange.error_codes import ERRORS
+from users.serializer import UserSimplifiedSerializer
 
 
 class CreditCardSerializer(serializers.ModelSerializer):
+    user_id = UserSimplifiedSerializer()
+
     class Meta:
         model = CreditCard
-        exclude = ('user_id',)
+        fields = "__all__"
+        depth = 1
 
 
 class CreditCardCreateSerializer(serializers.Serializer):
@@ -41,3 +45,19 @@ class CreditCardCreateSerializer(serializers.Serializer):
             raise CustomError(ERRORS.length_error("iban", 26, 26))
 
         return attrs
+
+
+class CreditCardUpdateSerializer(serializers.ModelSerializer):
+    card_number = serializers.CharField(min_length=16, max_length=16)
+    iban = serializers.CharField(min_length=26, max_length=26)
+
+    class Meta:
+        model = CreditCard
+        fields = ['card_number', 'iban']
+
+    def update(self, instance, validated_data):
+        instance.card_number = validated_data.get('card_number', instance.card_number)
+        instance.iban = validated_data.get('iban', instance.iban)
+        instance.approved = False
+        instance.save()
+        return instance

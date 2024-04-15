@@ -166,7 +166,9 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ("knox.auth.TokenAuthentication",),
     "EXCEPTION_HANDLER": "exchange.utils.custom_exception_handler"
 }
-
+REST_KNOX = {
+    "AUTH_HEADER_PREFIX": "Bearer"
+}
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {
         "Basic": {
