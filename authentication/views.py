@@ -29,6 +29,7 @@ class LoginView(KnoxLoginView):
             serializer = VerifyOtpSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             user = serializer.validated_data['user']
+            # TODO: more dynamic pls!!
             rule_id = AuthorityRule.objects.filter(pk=MOBILE_AUTHORITY).first()
 
             req, _ = AuthorityRequest.objects.get_or_create(rule_id=rule_id, user_id=user,

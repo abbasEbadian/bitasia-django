@@ -49,9 +49,10 @@ class VerifyOtpSerializer(serializers.Serializer):
             raise CustomError(ERRORS.ERROR_INVALID_OTP)
         if not User.objects.filter(mobile=mobile).exists():
             raise CustomError(ERRORS.ERROR_USER_DOES_NOT_EXIST)
+        _user = User.objects.filter(mobile=mobile).first()
         user = authenticate(request=self.context.get('request'), otp=otp, mobile=mobile)
         if not user:
-            user.log_login(successful=False, ip=self.context.get("request").META.get('REMOTE_ADDR', "0.0.0.0"))
+            _user.log_login(successful=False, ip=self.context.get("request").META.get('REMOTE_ADDR', "0.0.0.0"))
             raise CustomError(ERRORS.ERROR_WRONG_OTP)
 
         attrs['user'] = user
