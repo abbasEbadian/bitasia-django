@@ -25,9 +25,9 @@ class LoginView(KnoxLoginView):
 
     @swagger_auto_schema(**atuh_schema.verify_otp_schema)
     def post(self, request, format=None):
+        serializer = VerifyOtpSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
         with atomic():
-            serializer = VerifyOtpSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
             user = serializer.validated_data['user']
             # TODO: more dynamic pls!!
             rule_id = AuthorityRule.objects.filter(pk=MOBILE_AUTHORITY).first()
@@ -48,7 +48,7 @@ class CreateOTPView(generics.CreateAPIView):
 
     @swagger_auto_schema(**atuh_schema.create_otp_schema_dict)
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         sent = user.send_otp()

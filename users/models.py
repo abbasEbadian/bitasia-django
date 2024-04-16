@@ -106,21 +106,27 @@ class CustomUser(AbstractUser):
 
         return wallet
 
-    def log_login(self, successful, ip):
-        self.loginhistory_set.create(successful=successful, ip=ip)
+    def log_login(self, successful, ip, reason=None):
+        return self.loginhistory_set.create(successful=successful, ip=ip, reason=reason)
 
 
 class LoginHistoryQuerySet(models.QuerySet):
     def for_user(self, user):
         return self.filter(user_id=user)
 
+    def objects(self):
+        return self.all()
+
 
 class LoginHistory(BaseModelWithDate):
+    class Reason(models.TextChoices):
+        INVALID_OTP = "invalid_otp", _("Invalid OTP")
+        INVALID_PASSWORD = "invalid_password", _("Invalid Password")
+
     user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     successful = models.BooleanField(default=False)
     ip = models.CharField(default="0.0.0.0", max_length=15)
-
-    object = LoginHistoryQuerySet.as_manager()
+    reason = models.CharField(max_length=16, choices=Reason.choices, null=True, blank=True)
 
     class Meta:
         verbose_name = _("Login history")

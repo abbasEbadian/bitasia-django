@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from authority.models import AuthorityRule
 from exchange.error_codes import ERRORS
+from users.models import LoginHistory
 from .exception import CustomError
 from .utils import check_mobile
 
@@ -31,6 +32,8 @@ class OtpSerializer(serializers.Serializer):
         if not user:
             raise CustomError(ERRORS.ERROR_USER_DOES_NOT_EXIST)
         if not user.check_password(password):
+            user.log_login(successful=False, ip=self.context.get("request").META.get('REMOTE_ADDR', "0.0.0.0"),
+                           reason=LoginHistory.Reason.INVALID_PASSWORD)
             raise CustomError(ERRORS.ERROR_WRONG_PASSWORD)
         attrs['user'] = user
         return attrs
@@ -52,7 +55,8 @@ class VerifyOtpSerializer(serializers.Serializer):
         _user = User.objects.filter(mobile=mobile).first()
         user = authenticate(request=self.context.get('request'), otp=otp, mobile=mobile)
         if not user:
-            _user.log_login(successful=False, ip=self.context.get("request").META.get('REMOTE_ADDR', "0.0.0.0"))
+            _user.log_login(successful=False, ip=self.context.get("request").META.get('REMOTE_ADDR', "0.0.0.0"),
+                            reason=LoginHistory.Reason.INVALID_OTP)
             raise CustomError(ERRORS.ERROR_WRONG_OTP)
 
         attrs['user'] = user

@@ -106,4 +106,4 @@ class LoginHistoryView(generics.ListAPIView, IsModeratorMixin):
     def get_queryset(self):
         if self.is_moderator(self.request):
             return LoginHistory.objects.all()
-        return LoginHistory.object.for_user(self.request.user)
+        return LoginHistory.objects.filter(user_id=self.request.user)
