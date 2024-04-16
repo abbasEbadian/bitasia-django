@@ -5,6 +5,8 @@ from rest_framework import serializers
 
 from authentication.exception import CustomError
 from exchange.error_codes import ERRORS
+from users.models import LoginHistory
+from users.serializer import UserSimplifiedSerializer
 
 
 class ContentTypeSerializer(serializers.ModelSerializer):
@@ -63,3 +65,12 @@ class GroupUpdateCreateSerializer(serializers.Serializer):
         instance.name = name
         instance.save(update_fields=["name", "permission_ids"])
         return instance
+
+
+class LoginHistorySerializer(serializers.ModelSerializer):
+    user_id = UserSimplifiedSerializer()
+
+    class Meta:
+        model = LoginHistory
+        fields = "__all__"
+        depth = 1

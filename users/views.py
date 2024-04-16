@@ -7,6 +7,11 @@ from rest_framework import status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
+from api.mixins import IsModeratorMixin
+from api.permissions import IsModerator
+from permission.serializers import LoginHistorySerializer
+from .models import LoginHistory
+from .permission import LoginHistoryPermissions
 from .schema import create_user_schema, list_user_schema
 from .serializer import UserSerializer, UserUpdateSerializer, UserCreateSerializer
 
@@ -91,3 +96,14 @@ class UserDeleteView(generics.DestroyAPIView):
 
     serializer_class = UserSerializer
     queryset = User.objects.all()
+
+
+class LoginHistoryView(generics.ListAPIView, IsModeratorMixin):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [(~IsModerator & IsAuthenticated) | (IsModerator & LoginHistoryPermissions)]
+    serializer_class = LoginHistorySerializer
+
+    def get_queryset(self):
+        if self.is_moderator(self.request):
+            return LoginHistory.objects.all()
+        return LoginHistory.object.for_user(self.request.user)

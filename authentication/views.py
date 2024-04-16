@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login
+from django.db.transaction import atomic
 from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 from knox.views import LoginView as KnoxLoginView
@@ -24,17 +25,19 @@ class LoginView(KnoxLoginView):
 
     @swagger_auto_schema(**atuh_schema.verify_otp_schema)
     def post(self, request, format=None):
-        serializer = VerifyOtpSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        rule_id = AuthorityRule.objects.filter(pk=MOBILE_AUTHORITY).first()
+        with atomic():
+            serializer = VerifyOtpSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.validated_data['user']
+            rule_id = AuthorityRule.objects.filter(pk=MOBILE_AUTHORITY).first()
 
-        req, _ = AuthorityRequest.objects.get_or_create(rule_id=rule_id, user_id=user,
-                                                        defaults={"approved": True})
-        user.get_wallet("IRT")
-        req.approve()
-        login(request, user)
-        return super(LoginView, self).post(request, format=None)
+            req, _ = AuthorityRequest.objects.get_or_create(rule_id=rule_id, user_id=user,
+                                                            defaults={"approved": True})
+            user.get_wallet("IRT")
+            req.approve()
+            login(request, user)
+            user.log_login(successful=True, ip=request.META.get('REMOTE_ADDR', "0.0.0.0"))
+            return super(LoginView, self).post(request, format=None)
 
 
 class CreateOTPView(generics.CreateAPIView):

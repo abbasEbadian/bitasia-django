@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
 User = get_user_model()
 
@@ -11,3 +11,9 @@ class IsOwner(BasePermission):
         return bool(request.user.id == pk)
 
 
+class LoginHistoryPermissions(DjangoModelPermissions):
+    perms_map = {
+        'GET': ['%(app_label)s.view_%(model_name)s'],
+        'OPTIONS': [],
+        'HEAD': [],
+    }

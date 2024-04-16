@@ -1,9 +1,11 @@
 from django.urls import path
 
-from .views import UserListView, UserDetailView, UserUpdateView, UserDeleteView, UserCreateView, UserDetailAdminView
+from .views import UserListView, UserDetailView, UserUpdateView, UserDeleteView, UserCreateView, UserDetailAdminView, \
+    LoginHistoryView
 
 urlpatterns = [
     path("", UserListView.as_view(), name="user-list"),
+    path("history/", LoginHistoryView.as_view(), name="login-history-list"),
     path("<int:pk>/", UserDetailAdminView.as_view(), name="user-detail-admin"),
     path("detail/", UserDetailView.as_view(), name="user-detail"),
     path("delete/<int:pk>/", UserDeleteView.as_view(), name="user-delete"),

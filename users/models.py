@@ -4,9 +4,11 @@ import uuid
 from django.apps import apps
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext as _
 
 from authentication import vars
 from authentication.utils import send_otp_sms
+from exchange.models import BaseModelWithDate
 
 auth_status = [
     ('unauthorized', 'احراز نشده'),
@@ -68,15 +70,15 @@ class CustomUser(AbstractUser):
 
     @property
     def has_national_card_image(self):
-        return not not self.national_card_image
+        return bool(self.national_card_image)
 
     @property
     def has_birth_card_image(self):
-        return not not self.birth_card_image
+        return bool(self.birth_card_image)
 
     @property
     def has_avatar_image(self):
-        return not not self.avatar_image
+        return bool(not not self.avatar_image)
 
     def send_otp(self, type=vars.OTP_TYPE_LOGIN):
         code, success = send_otp_sms(self.mobile)
@@ -94,7 +96,7 @@ class CustomUser(AbstractUser):
             currency = Currency.objects.get(code=code)
             wallet = self.wallet_set.create(currency_id=currency)
             return wallet
-        except Exception as e:
+        except Exception as _:
             return None
 
     def get_wallet(self, code):
@@ -103,3 +105,23 @@ class CustomUser(AbstractUser):
             wallet = self.create_wallet(code)
 
         return wallet
+
+    def log_login(self, successful, ip):
+        self.loginhistory_set.create(successful=successful, ip=ip)
+
+
+class LoginHistoryQuerySet(models.QuerySet):
+    def for_user(self, user):
+        return self.filter(user_id=user)
+
+
+class LoginHistory(BaseModelWithDate):
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    successful = models.BooleanField(default=False)
+    ip = models.CharField(default="0.0.0.0", max_length=15)
+
+    object = LoginHistoryQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("Login history")
+        verbose_name_plural = _("Login histories")
