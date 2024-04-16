@@ -10,4 +10,4 @@ class CurrencyAdmin(admin.ModelAdmin):
 
 @admin.register(LoginHistory)
 class LoginHistoryAdmin(admin.ModelAdmin):
-    list_display = ("user_id", "successful", "ip", "create_date")
+    list_display = ("user_id", "successful", "create_date")
