@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -167,7 +168,8 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "exchange.utils.custom_exception_handler"
 }
 REST_KNOX = {
-    "AUTH_HEADER_PREFIX": "Bearer"
+    "AUTH_HEADER_PREFIX": "Bearer",
+    "TOKEN_TTL": timedelta(hours=72),
 }
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {
