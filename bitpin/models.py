@@ -87,7 +87,7 @@ class BitPinCurrency(BaseModelWithDate):
 
     @staticmethod
     def post_save(sender, instance, created, **kwargs):
-        instance.price = instance.get_price()
+        BitPinCurrency.objects.filter(pk=instance.pk).update({"price": instance.get_price()})
 
     def get_price(self):
         return self.price_info_price + (self.price_info_price * self.markup_percent)
