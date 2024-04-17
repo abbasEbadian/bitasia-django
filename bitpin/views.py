@@ -3,6 +3,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.mixins import IsModeratorMixin
@@ -100,7 +101,7 @@ class NetworkView(generics.ListAPIView):
 class WalletAddressView(generics.ListAPIView, IsModeratorMixin):
     authentication_classes = (TokenAuthentication,)
     queryset = BitPinWalletAddress.objects.all()
-    permission_classes = [WalletAddressPermission]
+    permission_classes = [(~IsModerator & IsAuthenticated) | (IsModerator & WalletAddressPermission)]
 
     def get_serializer_class(self):
         if self.request.method.lower() == "get":
