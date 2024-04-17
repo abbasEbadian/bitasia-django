@@ -41,7 +41,7 @@ class Transaction(BaseModelWithDate):
         return f"{self.type} / {self.amount} {self.currency_id.code} / {self.user_id.username}"
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('-submit_date', '-create_date',)
         verbose_name = _("Crypto Transaction")
         verbose_name_plural = _("Crypto Transactions")
 
@@ -107,7 +107,7 @@ class Order(BaseModelWithDate):
         return f"{type} / {self.amount} {self.currency_id.code} / {self.user_id.username}"
 
     class Meta:
-        ordering = ('-id',)
+        ordering = ('-submit_date', '-create_date',)
         verbose_name = _("Order")
         verbose_name_plural = _("Orders")
 
