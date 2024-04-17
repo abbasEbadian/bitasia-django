@@ -1,12 +1,13 @@
+from django.db.transaction import atomic
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from authentication.exception import CustomError
-from bitpin.serializers import CurrencySerializer
+from bitpin.serializers import CurrencySerializer, CurrencySimplifiedSerializer
 from exchange.error_codes import ERRORS
 from order.models import *
-from users.serializer import UserSerializer
+from users.serializer import UserSerializer, UserSimplifiedSerializer
 
 
 class TransactionForAdminSerializer(serializers.ModelSerializer):
@@ -177,3 +178,59 @@ class OrderCreateSerializer(serializers.Serializer):
         order.after_create_request()
         order.approve()
         return order
+
+
+class TransferSerializer(serializers.ModelSerializer):
+    currency_id = CurrencySimplifiedSerializer()
+    user_id = UserSimplifiedSerializer()
+
+    class Meta:
+        model = Transfer
+        fields = "__all__"
+        depth = 1
+
+
+class TransferCreateSerializer(serializers.Serializer):
+    currency_code = serializers.CharField(required=True)
+    amount = serializers.FloatField(required=True, min_value=0)
+    mobile = serializers.CharField(required=True, min_length=11, max_length=11)
+
+    def validate(self, attrs, *args, **kwargs):
+        currency = get_object_or_404(BitPinCurrency, code=attrs.get("currency_code"))
+        mobile = attrs.get("mobile")
+        amount = attrs.get("amount")
+        user = self.context.get('request').user
+
+        wallet = user.has_wallet(currency.code)
+        if not wallet or user.get_wallet(currency.code).balance < amount:
+            raise CustomError(ERRORS.custom_message_error(_("Insufficient balance.")))
+
+        dest_user = User.objects.filter(mobile=mobile).first()
+        if not dest_user:
+            raise CustomError(ERRORS.custom_message_error(_("Destination user does not exist.")))
+        attrs["currency_id"] = currency
+        attrs["user_id"] = user
+        attrs["dest_user_id"] = dest_user
+        return attrs
+
+    def create(self, validated_data, *args, **kwargs):
+        currency_id = validated_data["currency_id"]
+        mobile = validated_data["mobile"]
+        amount = validated_data["amount"]
+        user = validated_data["user_id"]
+        dest_user = validated_data["dest_user_id"]
+        with atomic():
+            wallet_1 = user.get_wallet(currency_id.code)
+            wallet_2 = dest_user.get_wallet(currency_id.code)
+            new_transfer = Transfer.objects.create(**{
+                "currency_id": currency_id,
+                "user_id": user,
+                "destination_mobile": mobile,
+                "amount": amount,
+                "successful": False
+            })
+            wallet_1.charge(-1 * amount)
+            wallet_2.charge(amount)
+            new_transfer.successful = True
+            new_transfer.save()
+            return new_transfer

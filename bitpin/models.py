@@ -114,7 +114,6 @@ class BitPinCurrency(BaseModelWithDate):
     def calculate_amount_after_commission(self, amount, network):
         c1 = self._get_bitpin_commission(amount)
         c2 = self._get_bitasia_commission(amount, network)
-        print(f"karmozd: \n{c1=} \n{c2=}")
         return amount - (c1 + c2)
 
     class Meta:

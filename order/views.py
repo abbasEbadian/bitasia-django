@@ -15,13 +15,15 @@ from api.permissions import IsModerator
 from authentication.exception import CustomError
 from bitpin.models import BitPinCurrency, BitPinNetwork
 from exchange.error_codes import ERRORS
-from order.models import Transaction, Order
+from order.models import Transaction, Order, Transfer
 from order.permissions import TransactionPermission, OrderPermission
 from order.serializers import TransactionSerializer, TransactionForAdminSerializer, TransactionCreateSerializer, \
-    TransactionUpdateSerializer, OrderForAdminSerializer, OrderCreateSerializer, OrderSerializer
+    TransactionUpdateSerializer, OrderForAdminSerializer, OrderCreateSerializer, OrderSerializer, TransferSerializer, \
+    TransferCreateSerializer
 
 CRYPTO_TRANSACTION_TAGS = ["Transactions - Crypto"]
 ORDER_TAGS = ["Orders"]
+TRANSFER_TAGS = ["Transfers"]
 
 
 class TransactionView(generics.ListCreateAPIView, IsModeratorMixin):
@@ -116,7 +118,6 @@ class CalculateWithdrawCommissionView(APIView):
         network = get_object_or_404(BitPinNetwork, code=request.data.get("network_code"))
         amount = request.data.get("amount")
 
-        print(currency, network, amount)
         if not currency._has_network(network):
             raise CustomError(ERRORS.custom_message_error(
                 _("Invalid network ID. Provided network must be present in currency networks.")))
@@ -188,4 +189,36 @@ class OrderDetailView(generics.RetrieveAPIView, IsModeratorMixin):
         return Response({
             "result": "success",
             "object": self.get_serializer(self.get_object()).data
+        })
+
+
+class TransferView(generics.ListCreateAPIView, IsModeratorMixin):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = [(IsAuthenticated & ~IsModerator) | (IsModerator & OrderPermission)]
+
+    def get_queryset(self):
+        if self.is_moderator(self.request):
+            return Transfer.objects.all()
+        return Transfer.objects.filter(user_id=self.request.user)
+
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return TransferSerializer
+        return TransferCreateSerializer
+
+    @swagger_auto_schema(operation_id=_("Get Transfer List "), tags=TRANSFER_TAGS)
+    def get(self, request, *args, **kwargs):
+        return Response({
+            "result": "success",
+            "objects": self.get_serializer(self.get_queryset(), many=True).data
+        })
+
+    @swagger_auto_schema(operation_id=_("Create new Transfer "), tags=TRANSFER_TAGS)
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        return Response({
+            "result": "success",
+            "object": TransferSerializer(instance).data
         })

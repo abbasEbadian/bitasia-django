@@ -11,5 +11,6 @@ urlpatterns = [
     path('wallets/', include('wallet.urls'), name='crypto-transactions'),
     path('permissions/', include('permission.urls'), name='permissions'),
     path('orders/', include('order.order_urls'), name='orders'),
+    path('transfers/', include('order.transfer_urls'), name='transfers'),
     path('commisions/', include('commission.urls'), name='commissions'),
 ]

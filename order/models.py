@@ -149,6 +149,19 @@ class Order(BaseModelWithDate):
         return True
 
 
+class Transfer(BaseModelWithDate):
+    user_id = models.ForeignKey(User, on_delete=models.RESTRICT)
+    currency_id = models.ForeignKey(BitPinCurrency, on_delete=models.RESTRICT)
+    amount = models.FloatField()
+    successful = models.BooleanField()
+    destination_mobile = models.CharField(max_length=11)
+
+    class Meta:
+        ordering = ('-create_date',)
+        verbose_name = _("Transfer")
+        verbose_name_plural = _("Transfers")
+
+
 @receiver(post_save, sender=Transaction, dispatch_uid="update_transaction")
 def update_transaction_factor(sender, instance, created, **kwargs):
     if created and not instance.factor_number and instance.pk:

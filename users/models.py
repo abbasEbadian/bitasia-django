@@ -107,6 +107,9 @@ class CustomUser(AbstractUser):
 
         return wallet
 
+    def has_wallet(self, code):
+        return self.wallet_set.filter(currency_id__code=code).exists()
+
     def log_login(self, successful, ip, reason=None):
         return self.loginhistory_set.create(successful=successful, ip=ip, reason=reason)
 
