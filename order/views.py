@@ -6,17 +6,17 @@ from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.mixins import IsModeratorMixin
-from api.permissions import IsOwner
+from api.permissions import IsModerator
 from authentication.exception import CustomError
 from bitpin.models import BitPinCurrency, BitPinNetwork
 from exchange.error_codes import ERRORS
 from order.models import Transaction, Order
-from order.permissions import TransactionPermission
+from order.permissions import TransactionPermission, OrderPermission
 from order.serializers import TransactionSerializer, TransactionForAdminSerializer, TransactionCreateSerializer, \
     TransactionUpdateSerializer, OrderForAdminSerializer, OrderCreateSerializer, OrderSerializer
 
@@ -26,7 +26,7 @@ ORDER_TAGS = ["Orders"]
 
 class TransactionView(generics.ListCreateAPIView, IsModeratorMixin):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [TransactionPermission]
+    permission_classes = [(~IsModerator & IsAuthenticated) | (IsModerator & TransactionPermission)]
     pagination_class = LimitOffsetPagination
     default_limit = 50
 
@@ -62,16 +62,16 @@ class TransactionView(generics.ListCreateAPIView, IsModeratorMixin):
         }, status=status.HTTP_201_CREATED)
 
 
-class TransactionDetailView(generics.RetrieveUpdateAPIView):
+class TransactionDetailView(generics.RetrieveUpdateAPIView, IsModeratorMixin):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsOwner | IsAdminUser]
+    permission_classes = [(~IsModerator & IsAuthenticated) | (IsModerator & TransactionPermission)]
     queryset = Transaction.objects.all()
     lookup_field = "id"
     http_method_names = ["get", "patch"]
 
     def get_serializer_class(self):
         if self.request.method.lower() == 'get':
-            if self.request.user.is_staff:
+            if self.is_moderator(self.request):
                 return TransactionForAdminSerializer
             return TransactionSerializer
         return TransactionUpdateSerializer
@@ -133,9 +133,9 @@ class CalculateWithdrawCommissionView(APIView):
 calculate_commission = CalculateWithdrawCommissionView.as_view()
 
 
-class OrderView(generics.ListCreateAPIView):
+class OrderView(generics.ListCreateAPIView, IsModeratorMixin):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsAuthenticated]
+    permission_classes = [(~IsModerator & IsAuthenticated) | (IsModerator & OrderPermission)]
 
     def paginator(self):
         return False
@@ -147,7 +147,7 @@ class OrderView(generics.ListCreateAPIView):
 
     def get_serializer_class(self):
         if self.request.method.lower() == 'get':
-            if self.request.user.is_staff:
+            if self.is_moderator(self.request):
                 return OrderForAdminSerializer
             return OrderSerializer
         return OrderCreateSerializer
@@ -172,14 +172,14 @@ class OrderView(generics.ListCreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
-class OrderDetailView(generics.RetrieveAPIView):
+class OrderDetailView(generics.RetrieveAPIView, IsModeratorMixin):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [IsOwner | IsAdminUser]
+    permission_classes = [(~IsModerator & IsAuthenticated) | (IsModerator & OrderPermission)]
     queryset = Order.objects.all()
     lookup_field = "id"
 
     def get_serializer_class(self):
-        if self.request.user.is_staff:
+        if self.is_moderator(self.request):
             return OrderForAdminSerializer
         return OrderSerializer
 
