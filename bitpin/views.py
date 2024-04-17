@@ -22,7 +22,6 @@ class CurrencyView(generics.ListAPIView):
 
     def get_queryset(self):
         request = self.request
-        print("request.is_moderator", request.is_moderator)
         show_inactive = request.GET.get("show_inactive", False)
         for_dashboard = request.GET.get("for_dashboard", False)
         activity_filters = {"bitasia_active": True, "price_info_price__gt": 0}
