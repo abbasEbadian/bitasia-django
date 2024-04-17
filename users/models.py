@@ -38,7 +38,7 @@ def get_file_path_for_avatar(instance, filename):
 
 
 class CustomUser(AbstractUser):
-    uid = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="شناسه")
+    uid = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="شناسه", )
     mobile = models.CharField(max_length=11, verbose_name="شماره همراه")
     authentication_status = models.CharField(
         max_length=20, choices=auth_status, verbose_name="وضعیت احراز هویت", default="unauthorized")
@@ -60,6 +60,7 @@ class CustomUser(AbstractUser):
         return self.first_name and (self.first_name + " " + self.last_name + "(" + self.username + ")") or self.username
 
     class Meta:
+        ordering = ("-id",)
         app_label = "users"
         verbose_name = "کاربر"
         verbose_name_plural = "کاربرها"

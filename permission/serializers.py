@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
@@ -18,16 +19,19 @@ class ContentTypeSerializer(serializers.ModelSerializer):
 class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
-        fields = ["id", "name", "codename", "content_type_id"]
+        fields = ["name", "content_type_id"]
+        depth = 1
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data["category"] = ContentType.objects.get(id=data["content_type_id"]).model
-        del data["content_type_id"]
+        cid = data.pop("content_type_id")
+        data["category"] = ContentType.objects.get(pk=cid).model
         return data
 
 
 class GroupSerializer(serializers.ModelSerializer):
+    permissions = PermissionSerializer(many=True)
+
     class Meta:
         model = Group
         fields = ["id", "name", "permissions"]
@@ -36,19 +40,22 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class GroupUpdateCreateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
-    permission_ids = serializers.CharField(max_length=255)
+    permission_codes = serializers.CharField(max_length=255)
 
     def validate(self, attrs):
-        permission_ids = [str(x).strip() for x in attrs.get("permission_ids", "").split(",")]
+        permission_codes = [str(x).strip() for x in attrs.get("permission_codes", "").split(",")]
         name = attrs.get("name")
-        if not permission_ids:
-            return CustomError(ERRORS.custom_message_error(_("Permission IDs must not be empty.")))
+        if not permission_codes:
+            raise CustomError(ERRORS.custom_message_error(_("Permission IDs must not be empty.")))
 
-        if Group.objects.filter(name=name):
-            return CustomError(ERRORS.custom_message_error(_("Group with this name already exists.")))
-
-        permission_ids = Permission.objects.filter(id__in=permission_ids)
-        attrs["permission_ids"] = permission_ids
+        if Group.objects.filter(name=name).exists():
+            raise CustomError(ERRORS.custom_message_error(_("Group with this name already exists.")))
+        perms = Permission.objects.all()
+        new_perms = perms.none()
+        for code in permission_codes:
+            new_perms |= perms.filter(Q(codename__endswith=code) & ~Q(codename__startswith="delete"))
+        # complement_permission_ids = Permission.objects.filter(model)
+        attrs["permission_ids"] = new_perms
         return attrs
 
     def create(self, validated_data):
