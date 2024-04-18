@@ -38,6 +38,11 @@ CORS_ALLOW_HEADERS = [
     "x-role",
     "X-Role"
 ]
+CORS_EXPOSE_HEADERS = [
+    "x-role",
+    "X-Role"
+]
+
 APPS = [
     "users",
     "authority",
