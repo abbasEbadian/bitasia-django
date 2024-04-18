@@ -45,8 +45,8 @@ WITHDRAW = "withdraw"
 def get_otp_template(otp_type):
     temp_map = {
         "login": 'generate0otp0code',
-        "reset_password": 'generate0otp0code',
-        "forget_password": 'generate0otp0code',
+        "reset_password": 'operation0password0otp',
+        "forget_password": 'operation0password0otp',
         "transfer": 'operation0transfer0otp',
         "withdraw": 'operation0withdraw0otp',
     }
