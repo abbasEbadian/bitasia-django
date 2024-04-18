@@ -113,7 +113,7 @@ class LoginHistoryView(generics.ListAPIView, IsModeratorMixin):
 
 @swagger_auto_schema(operation_id=_("Forget password"), tags=["User - Forget password"], method="POST",
                      request_body=openapi.Schema(type=openapi.TYPE_OBJECT,
-                                                 required=["password_1", "password_2", "otp"],
+                                                 required=["password_1", "password_2", "otp", "mobile"],
                                                  properties={
                                                      "password_1": openapi.Schema(type=openapi.TYPE_STRING),
                                                      "password_2": openapi.Schema(type=openapi.TYPE_STRING),
