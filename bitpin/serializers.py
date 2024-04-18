@@ -17,7 +17,7 @@ class NetworkSerializer(serializers.ModelSerializer):
 class CurrencySimplifiedSerializer(serializers.ModelSerializer):
     class Meta:
         model = BitPinCurrency
-        fields = ["id", "code", "title"]
+        fields = ["id", "code", "title", "title_fa", "image"]
 
 
 class CurrencySerializer(serializers.ModelSerializer):
