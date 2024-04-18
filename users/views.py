@@ -117,6 +117,7 @@ class LoginHistoryView(generics.ListAPIView, IsModeratorMixin):
                                                  properties={
                                                      "password_1": openapi.Schema(type=openapi.TYPE_STRING),
                                                      "password_2": openapi.Schema(type=openapi.TYPE_STRING),
+                                                     "mobile": openapi.Schema(type=openapi.TYPE_STRING),
                                                      "otp": openapi.Schema(type=openapi.TYPE_STRING),
                                                  }))
 @api_view(['POST'])
