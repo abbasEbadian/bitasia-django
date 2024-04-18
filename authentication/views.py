@@ -2,16 +2,20 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import login
 from django.db.transaction import atomic
 from django.utils.translation import gettext as _
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from knox.views import LoginView as KnoxLoginView
 from rest_framework import permissions, generics
 from rest_framework import status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 
 from authority.models import AuthorityRequest, AuthorityRule
 from exchange.error_codes import ERRORS
+from users.serializer import ForgetPasswordSerializer
 from . import schema as atuh_schema
 from .exception import CustomError
+from .models import OTP
 from .serializer import RegisterSerializer, OtpSerializer, VerifyOtpSerializer
 
 User = get_user_model()
@@ -24,20 +28,20 @@ class LoginView(KnoxLoginView):
     serializer_class = VerifyOtpSerializer
 
     @swagger_auto_schema(**atuh_schema.verify_otp_schema)
-    def post(self, request, format=None):
+    def post(self, request):
         serializer = VerifyOtpSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
-        with atomic():
+        with (atomic()):
             user = serializer.validated_data['user']
             # TODO: more dynamic pls!!
             rule_id = AuthorityRule.objects.filter(pk=MOBILE_AUTHORITY).first()
-
             req, _ = AuthorityRequest.objects.get_or_create(rule_id=rule_id, user_id=user,
                                                             defaults={"approved": True})
-            user.get_wallet("IRT")
             req.approve()
+            user.get_wallet("IRT")
             login(request, user)
             user.log_login(successful=True, ip=request.META.get('REMOTE_ADDR', "0.0.0.0"))
+            OTP.objects.filter(user_id=user, code=request.data.get('otp'), type=OTP.Type.LOGIN).first().consume()
             return super(LoginView, self).post(request, format=None)
 
 
@@ -51,7 +55,7 @@ class CreateOTPView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        sent = user.send_otp()
+        sent = user.send_otp(OTP.Type.LOGIN)
         if not sent:
             raise CustomError(ERRORS.ERROR_FAIL_TO_SEND_SMS)
         return Response({
@@ -78,3 +82,22 @@ class RegisterView(generics.CreateAPIView):
                 status=status.HTTP_201_CREATED)
         except Exception:
             raise CustomError(ERRORS.ERROR_INVALID_MOBILE)
+
+
+@swagger_auto_schema(operation_id=_("Send OTP for forget password"), tags=["User - Forget password"], method="POST",
+                     request_body=openapi.Schema(type=openapi.TYPE_OBJECT,
+                                                 required=["mobile"],
+                                                 properties={
+                                                     "mobile": openapi.Schema(type=openapi.TYPE_STRING),
+                                                 }))
+@api_view(['POST'])
+@authentication_classes([])
+@permission_classes([])
+def forget_password_view(request):
+    serializer = ForgetPasswordSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response({
+        "result": "success",
+        "message": _('Verification code has been sent to your mobile.')
+    })

@@ -58,7 +58,6 @@ class VerifyOtpSerializer(serializers.Serializer):
             _user.log_login(successful=False, ip=self.context.get("request").META.get('REMOTE_ADDR', "0.0.0.0"),
                             reason=LoginHistory.Reason.INVALID_OTP)
             raise CustomError(ERRORS.ERROR_WRONG_OTP)
-
         attrs['user'] = user
         return attrs
 

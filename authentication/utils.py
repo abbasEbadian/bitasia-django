@@ -6,13 +6,15 @@ import string
 import environ
 import ghasedakpack
 from django.conf import settings
+from django.utils.translation import gettext as _
+
+from authentication.exception import CustomError
+from exchange.error_codes import ERRORS
 
 BASE_DIR = settings.BASE_DIR
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 sms = ghasedakpack.Ghasedak(env("SMS_API_KEY"))
-
-otp_template_id = 'generate0otp0code'
 
 
 def check_mobile(mobile=''):
@@ -27,17 +29,35 @@ def check_email(email=''):
     return not not pattern.match(email)
 
 
-def generate_otp(length=4):
+def generate_otp(length=5):
     characters = string.digits.replace('0', '')
     otp = ''.join(random.choice(characters) for _ in range(length))
     return otp
 
 
-def send_otp_sms(mobile):
+LOGIN = "login"
+RESET = "reset_password"
+FORGET = "forget_password"
+TRANSFER = "transfer"
+WITHDRAW = "withdraw"
+
+
+def get_otp_template(otp_type):
+    temp_map = {
+        "login": 'generate0otp0code',
+        "reset_password": 'generate0otp0code',
+        "forget_password": 'generate0otp0code',
+        "transfer": 'operation0transfer0otp',
+        "withdraw": 'operation0withdraw0otp',
+    }
+    return temp_map[otp_type]
+
+
+def send_otp_sms(mobile, otp_type=LOGIN):
     otp = generate_otp()
+    template = get_otp_template(otp_type=otp_type)
     try:
-        res = sms.verification({'receptor': mobile, 'type': '1', 'template': otp_template_id, 'param1': otp})
+        res = sms.verification({'receptor': mobile, 'type': '1', 'template': template, 'param1': otp})
     except Exception as e:
-        print(e)
-        res = False
+        raise CustomError(ERRORS.custom_message_error(_("Cant connect to sms provider.")))
     return [otp, res]

@@ -165,7 +165,11 @@ AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend",
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": ("knox.auth.TokenAuthentication",),
-    "EXCEPTION_HANDLER": "exchange.utils.custom_exception_handler"
+    "EXCEPTION_HANDLER": "exchange.utils.custom_exception_handler",
+    'DEFAULT_THROTTLE_RATES': {
+        'forget-password': '60/hour',
+        'forget-password-apply': '2/day'
+    }
 }
 REST_KNOX = {
     "AUTH_HEADER_PREFIX": "Bearer",
@@ -183,6 +187,9 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+OTP_EXPIRE_MINUTES = 30
 
 CRONJOBS = [
-    ("* * * * *", "bitpin.crons.get_bitpin_currencies_cron", ">> /srv/bitasia-django/log.log")]
+    ("* * * * *", "bitpin.crons.get_bitpin_currencies_cron", ">> /srv/bitasia-django/log.log"),
+    ("* * * * *", "authentication.crons.check_otp_expiration", ">> /srv/bitasia-django/otp/log.log")
+]

@@ -6,7 +6,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext as _
 
-from authentication import vars
 from authentication.utils import send_otp_sms
 from exchange.models import BaseModelWithDate
 
@@ -81,15 +80,11 @@ class CustomUser(AbstractUser):
     def has_avatar_image(self):
         return bool(not not self.avatar_image)
 
-    def send_otp(self, type=vars.OTP_TYPE_LOGIN):
-        code, success = send_otp_sms(self.mobile)
+    def send_otp(self, otp_type):
+        code, success = send_otp_sms(self.mobile, otp_type)
         if success:
-            self.otp_set.create(code=code, type=type)
-            return True
+            return self.otp_set.create(code=code, type=otp_type)
         return False
-
-    def validate_otp(self, code, type=vars.OTP_TYPE_LOGIN):
-        return not not self.otp_set.filter(code=code, type=type)
 
     def create_wallet(self, code):
         Currency = apps.get_model('bitpin', 'BitPinCurrency')
