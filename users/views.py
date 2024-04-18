@@ -1,11 +1,9 @@
 from django.contrib.auth import get_user_model
-from django.utils.translation import gettext as _
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, permissions
 from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
@@ -15,7 +13,7 @@ from permission.serializers import LoginHistorySerializer
 from .models import LoginHistory
 from .permission import LoginHistoryPermissions
 from .schema import create_user_schema, list_user_schema
-from .serializer import UserSerializer, UserUpdateSerializer, UserCreateSerializer, VerifyForgetPasswordSerializer
+from .serializer import UserSerializer, UserUpdateSerializer, UserCreateSerializer
 
 User = get_user_model()
 
@@ -109,25 +107,3 @@ class LoginHistoryView(generics.ListAPIView, IsModeratorMixin):
         if self.is_moderator(self.request):
             return LoginHistory.objects.all()
         return LoginHistory.objects.filter(user_id=self.request.user)
-
-
-@swagger_auto_schema(operation_id=_("Forget password"), tags=["User - Forget password"], method="POST",
-                     request_body=openapi.Schema(type=openapi.TYPE_OBJECT,
-                                                 required=["password_1", "password_2", "otp", "mobile"],
-                                                 properties={
-                                                     "password_1": openapi.Schema(type=openapi.TYPE_STRING),
-                                                     "password_2": openapi.Schema(type=openapi.TYPE_STRING),
-                                                     "mobile": openapi.Schema(type=openapi.TYPE_STRING),
-                                                     "otp": openapi.Schema(type=openapi.TYPE_STRING),
-                                                 }))
-@api_view(['POST'])
-@authentication_classes([])
-@permission_classes([])
-def forget_password_change_view(request):
-    serializer = VerifyForgetPasswordSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-    return Response({
-        "result": "success",
-        "message": _('Password changed successfully')
-    })

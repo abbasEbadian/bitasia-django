@@ -4,15 +4,17 @@ from django.db.transaction import atomic
 from django.utils.translation import gettext as _
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from knox.auth import TokenAuthentication
 from knox.views import LoginView as KnoxLoginView
 from rest_framework import permissions, generics
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from authority.models import AuthorityRequest, AuthorityRule
 from exchange.error_codes import ERRORS
-from users.serializer import ForgetPasswordSerializer
+from users.serializers_password import ForgetPasswordSerializer
 from . import schema as atuh_schema
 from .exception import CustomError
 from .models import OTP
@@ -97,6 +99,19 @@ def forget_password_view(request):
     serializer = ForgetPasswordSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
+    return Response({
+        "result": "success",
+        "message": _('Verification code has been sent to your mobile.')
+    })
+
+
+@swagger_auto_schema(operation_id=_("Send OTP for reset password"), tags=["User - Reset password"], method="GET")
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication, ])
+@permission_classes([IsAuthenticated])
+def reset_password_view(request):
+    user = request.user
+    user.send_otp(otp_type=OTP.Type.RESET_PASSWORD)
     return Response({
         "result": "success",
         "message": _('Verification code has been sent to your mobile.')

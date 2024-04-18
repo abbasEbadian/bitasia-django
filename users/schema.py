@@ -37,3 +37,30 @@ create_user_schema = {
         **common_responses
     }
 }
+
+forget_password_change_view_schema = {
+    "operation_id": _("Forget password"),
+    "tags": ["User - Forget password"],
+    "method": "POST",
+    "request_body": openapi.Schema(type=openapi.TYPE_OBJECT,
+                                   required=["password_1", "password_2", "otp", "mobile"],
+                                   properties={
+                                       "password_1": openapi.Schema(type=openapi.TYPE_STRING),
+                                       "password_2": openapi.Schema(type=openapi.TYPE_STRING),
+                                       "mobile": openapi.Schema(type=openapi.TYPE_STRING),
+                                       "otp": openapi.Schema(type=openapi.TYPE_STRING),
+                                   })
+}
+
+reset_password_change_view_schema = {
+    "operation_id": _("Reset password"),
+    "tags": ["User - Reset password"],
+    "method": "POST",
+    "request_body": openapi.Schema(type=openapi.TYPE_OBJECT,
+                                   required=["password_1", "password_2", "otp"],
+                                   properties={
+                                       "password_1": openapi.Schema(type=openapi.TYPE_STRING),
+                                       "password_2": openapi.Schema(type=openapi.TYPE_STRING),
+                                       "otp": openapi.Schema(type=openapi.TYPE_STRING),
+                                   })
+}
