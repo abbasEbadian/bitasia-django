@@ -35,7 +35,8 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 USE_X_FORWARDED_HOST = True
 CORS_ALLOW_HEADERS = [
-    "x-role"
+    "x-role",
+    "X-Role"
 ]
 APPS = [
     "users",
