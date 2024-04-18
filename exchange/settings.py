@@ -15,6 +15,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import environ
+from corsheaders.defaults import default_headers
 from rest_framework import authentication
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,10 +36,12 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 USE_X_FORWARDED_HOST = True
 CORS_ALLOW_HEADERS = [
+    *default_headers,
     "x-role",
     "X-Role"
 ]
 CORS_EXPOSE_HEADERS = [
+    *default_headers,
     "x-role",
     "X-Role"
 ]
