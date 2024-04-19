@@ -26,6 +26,7 @@ class PermissionSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         cid = data.pop("content_type_id")
         data["category"] = ContentType.objects.get(pk=cid).model
+        data["type"] = instance.codename.split("_")[0]
         return data
 
 
