@@ -24,7 +24,7 @@ class Transaction(BaseModelWithDate):
         REJECT = 'reject', _("Reject")
 
     type = models.CharField(verbose_name=_("Transaction Type"), max_length=8, choices=Type.choices)
-    amount = models.DecimalField(verbose_name=_("Amount"), max_digits=20, decimal_places=8)
+    amount = models.DecimalField(verbose_name=_("Amount"), max_digits=20, decimal_places=9)
     wallet_address = models.CharField(verbose_name=_("Wallet Address"), max_length=255)
     currency_id = models.ForeignKey(BitPinCurrency, verbose_name=_("Currency"), on_delete=models.RESTRICT)
     currency_current_value = models.PositiveBigIntegerField(
@@ -36,6 +36,10 @@ class Transaction(BaseModelWithDate):
     tx_id = models.CharField(max_length=255, verbose_name=_("Transaction ID"))
     submit_date = models.DateTimeField(verbose_name=_("Submit Date"), blank=True, null=True)
     factor_number = models.CharField(max_length=255, verbose_name=_("Factor Number"))
+    amount_after_commission = models.DecimalField(verbose_name=_("Amount after commission"), max_digits=20,
+                                                  decimal_places=8, null=True, blank=True)
+    applied_commission_amount = models.DecimalField(verbose_name=_("Commission in request time"), max_digits=20,
+                                                    decimal_places=8, null=True, blank=True)
 
     def __str__(self):
         return f"{self.type} / {self.amount} {self.currency_id.code} / {self.user_id.username}"
@@ -57,24 +61,28 @@ class Transaction(BaseModelWithDate):
 
     def after_create_request(self):
         wallet = self.user_id.get_wallet(self.currency_id.code)
+        amount_after_commission = self.currency_id.calculate_amount_after_withdraw_commission(self.amount,
+                                                                                              self.network_id)
+        self.amount_after_commission = amount_after_commission
+        self.applied_commission_amount = self.currency_id.calculate_withdraw_commission(self.amount, self.network_id)
         wallet.charge(-1 * self.amount)
         wallet.save()
         return True
 
     def reject(self):
         self.rollback_wallet()
-        self.submit_date = datetime.datetime.now()
+        self.submit_date = datetime.datetime.now(tz=datetime.timezone.utc)
         self.change_state(self.Status.REJECT)
         return True
 
     def cancel(self):
         self.rollback_wallet()
-        self.submit_date = datetime.datetime.now()
+        self.submit_date = datetime.datetime.now(tz=datetime.timezone.utc)
         self.change_state(self.Status.CANCEL)
         return True
 
     def approve(self):
-        self.submit_date = datetime.datetime.now()
+        self.submit_date = datetime.datetime.now(tz=datetime.timezone.utc)
         self.change_state(self.Status.APPROVE)
         return True
 
@@ -95,7 +103,7 @@ class Order(BaseModelWithDate):
 
     user_id = models.ForeignKey(User, on_delete=models.RESTRICT)
     currency_id = models.ForeignKey(BitPinCurrency, on_delete=models.RESTRICT)
-    amount = models.DecimalField(max_digits=20, decimal_places=8, verbose_name=_("Amount"))
+    amount = models.DecimalField(max_digits=20, decimal_places=9, verbose_name=_("Amount"))
     submit_date = models.DateTimeField(verbose_name=_("Submit Date"), blank=True, null=True)
     currency_current_value = models.PositiveBigIntegerField(
         verbose_name=_("The irt price at the time of placing the ordering."),
@@ -128,11 +136,11 @@ class Order(BaseModelWithDate):
     def get_amount_for_decrease(self):
         if self.type == self.Type.SELL:
             return self.amount
-        return self.amount * self.currency_id.price_info_price
+        return self.amount * self.currency_id.get_price()
 
     def get_amount_for_increase(self):
         if self.type == self.Type.SELL:
-            return self.amount * self.currency_id.price_info_price
+            return self.amount * self.currency_id.get_price()
         return self.amount
 
     def after_create_request(self):
@@ -144,7 +152,7 @@ class Order(BaseModelWithDate):
     def approve(self):
         wallet = self.user_id.get_wallet(self.get_wallet_code_for_increase())
         wallet.charge(self.get_amount_for_increase())
-        self.submit_date = datetime.datetime.now()
+        self.submit_date = datetime.datetime.now(tz=datetime.timezone.utc)
         self.change_state(self.Status.APPROVE)
         return True
 

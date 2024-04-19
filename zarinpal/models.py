@@ -190,7 +190,7 @@ class RialWithdraw(BaseModelWithDate):
 
     def cancel(self):
         self.status = self.Status.CANCEL
-        self.submit_date = datetime.datetime.now()
+        self.submit_date = datetime.datetime.now(tz=datetime.timezone.utc)
         self._rollback()
         self.save()
 
@@ -205,7 +205,7 @@ class RialWithdraw(BaseModelWithDate):
 
     def confirm(self):
         self.status = self.Status.SUCCESS
-        self.submit_date = datetime.datetime.now()
+        self.submit_date = datetime.datetime.now(tz=datetime.timezone.utc)
         self.save()
         return True
 

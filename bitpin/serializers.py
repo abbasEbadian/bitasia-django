@@ -3,6 +3,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
+from api.serializers import CustomModelSerializer
 from authentication.exception import CustomError
 from bitpin.models import BitPinCurrency, BitPinNetwork, BitPinWalletAddress
 from exchange.error_codes import ERRORS
@@ -20,7 +21,7 @@ class CurrencySimplifiedSerializer(serializers.ModelSerializer):
         fields = ["id", "code", "title", "title_fa", "image"]
 
 
-class CurrencySerializer(serializers.ModelSerializer):
+class CurrencySerializer(CustomModelSerializer):
     networks = NetworkSerializer(many=True, source='network_ids')
 
     def __init__(self, *arg, **kwargs):
@@ -28,7 +29,7 @@ class CurrencySerializer(serializers.ModelSerializer):
         super().__init__(*arg, **kwargs)
 
         request = self.context.get("request")
-        if fields and request and request.GET.get("for_dashboard"):
+        if fields and request and request.GET.get("for_dashboard") != 'false':
             allowed = set(fields)
             existing = set(self.fields)
             for field_name in existing - allowed:
@@ -41,7 +42,7 @@ class CurrencySerializer(serializers.ModelSerializer):
 
 
 class CurrencyUpdateSerializer(serializers.Serializer):
-    percent = serializers.FloatField(required=True, min_value=0, max_value=1)
+    percent = serializers.DecimalField(required=True, min_value=0, max_value=1, max_digits=10, decimal_places=5)
 
     def update(self, instance, validated_data):
         instance.percent = validated_data.get("percent", instance.percent)

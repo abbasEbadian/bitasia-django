@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
+from api.serializers import CustomModelSerializer
 from authentication.exception import CustomError
 from bitpin.serializers import CurrencySerializer, CurrencySimplifiedSerializer
 from exchange.error_codes import ERRORS
@@ -10,7 +11,7 @@ from order.models import *
 from users.serializer import UserSerializer, UserSimplifiedSerializer
 
 
-class TransactionForAdminSerializer(serializers.ModelSerializer):
+class TransactionForAdminSerializer(CustomModelSerializer):
     user_id = UserSerializer()
     currency_id = CurrencySerializer()
 
@@ -20,7 +21,7 @@ class TransactionForAdminSerializer(serializers.ModelSerializer):
         depth = 2
 
 
-class TransactionSerializer(serializers.ModelSerializer):
+class TransactionSerializer(CustomModelSerializer):
     class Meta:
         model = Transaction
         exclude = ["write_date", "user_id"]
@@ -32,7 +33,7 @@ class TransactionCreateSerializer(serializers.Serializer):
     wallet_address = serializers.CharField(required=True, max_length=255)
     currency_id = serializers.IntegerField(required=True)
     network_id = serializers.IntegerField(required=True)
-    amount = serializers.FloatField(required=True, min_value=0)
+    amount = serializers.DecimalField(required=True, min_value=0, decimal_places=9, max_digits=20)
     tx_id = serializers.CharField(required=False)
 
     def validate(self, attrs, *args, **kwargs):
@@ -40,13 +41,13 @@ class TransactionCreateSerializer(serializers.Serializer):
         network = get_object_or_404(BitPinNetwork, pk=attrs.get("network_id"))
         amount = attrs.get("amount")
 
+        print(amount, currency.min_withdraw)
         if amount < currency.min_withdraw:
-            raise CustomError(ERRORS.custom_message_error("Min withdraw is %d." % currency.min_withdraw))
+            raise CustomError(ERRORS.custom_message_error("Min withdraw is %f." % currency.min_withdraw))
+
         if not currency._has_network(network):
             raise CustomError(
                 ERRORS.custom_message_error(_("Provided network %s not present in currency networks.") % network.title))
-
-        amount_after_commission = currency.calculate_amount_after_commission(amount=amount, network=network)
 
         type = attrs.get('type')
         tx_id = attrs.get('tx_id')
@@ -55,7 +56,6 @@ class TransactionCreateSerializer(serializers.Serializer):
 
         if type == Transaction.Type.WITHDRAW:
             user = self.context.get('user_id')
-            amount = amount_after_commission
             wallet = user.get_wallet(currency.code)
             if wallet.balance < amount:
                 raise CustomError(ERRORS.custom_message_error(_("Insufficient balance.")))
@@ -71,17 +71,16 @@ class TransactionCreateSerializer(serializers.Serializer):
         type = validated_data["type"]
         tx_id = validated_data["tx_id"] if type == Transaction.Type.DEPOSIT else ""
         wallet_address = validated_data["wallet_address"]
-        amount_after_commission = currency_id.calculate_amount_after_commission(amount=amount, network=network_id)
         tr = Transaction.objects.create(**{
             "currency_id": currency_id,
             "network_id": network_id,
             "user_id": user_id,
             "tx_id": tx_id,
-            "amount": amount_after_commission,
+            "amount": amount,
             "status": Transaction.Status.PENDING,
             "type": type,
             "wallet_address": wallet_address,
-            "currency_current_value": int(currency_id.price_info_price)
+            "currency_current_value": int(currency_id.price)
         })
         if type == Transaction.Type.WITHDRAW:
             tr.after_create_request()
@@ -102,6 +101,7 @@ class TransactionUpdateSerializer(serializers.Serializer):
                 ERRORS.custom_message_error(_("Cannot update transaction which is not in pending status.")))
         action = attrs.get('action')
         user = self.context.get("user_id")
+        is_moderator = self.context.get("is_moderator")
 
         if action != "cancel":
             if not user.is_staff:
@@ -125,7 +125,7 @@ class TransactionUpdateSerializer(serializers.Serializer):
         return instance
 
 
-class OrderForAdminSerializer(serializers.ModelSerializer):
+class OrderForAdminSerializer(CustomModelSerializer):
     user_id = UserSerializer()
     currency_id = CurrencySerializer()
 
@@ -135,7 +135,7 @@ class OrderForAdminSerializer(serializers.ModelSerializer):
         depth = 2
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderSerializer(CustomModelSerializer):
     class Meta:
         model = Order
         exclude = ["write_date", "user_id"]
@@ -145,7 +145,7 @@ class OrderSerializer(serializers.ModelSerializer):
 class OrderCreateSerializer(serializers.Serializer):
     type = serializers.ChoiceField(required=True, choices=Order.Type.choices)
     currency_id = serializers.IntegerField(required=True)
-    amount = serializers.FloatField(required=True)
+    amount = serializers.DecimalField(required=True, max_digits=20, decimal_places=9)
 
     def validate(self, attrs, *args, **kwargs):
         currency = get_object_or_404(BitPinCurrency, pk=attrs.get("currency_id"))
@@ -154,7 +154,7 @@ class OrderCreateSerializer(serializers.Serializer):
         type = attrs.get('type')
         wallet = user.get_wallet(currency.code)
         if type == Order.Type.BUY:
-            amount *= currency.price_info_price
+            amount *= currency.price
             wallet = user.get_wallet("IRT")
         if wallet.balance < amount:
             raise CustomError(ERRORS.custom_message_error(_("Insufficient balance.")))
@@ -173,14 +173,14 @@ class OrderCreateSerializer(serializers.Serializer):
             "amount": amount,
             "status": Order.Status.PENDING,
             "type": type,
-            "currency_current_value": int(currency_id.price_info_price)
+            "currency_current_value": int(currency_id.price)
         })
         order.after_create_request()
         order.approve()
         return order
 
 
-class TransferSerializer(serializers.ModelSerializer):
+class TransferSerializer(CustomModelSerializer):
     currency_id = CurrencySimplifiedSerializer()
     user_id = UserSimplifiedSerializer()
 
@@ -192,7 +192,7 @@ class TransferSerializer(serializers.ModelSerializer):
 
 class TransferCreateSerializer(serializers.Serializer):
     currency_code = serializers.CharField(required=True)
-    amount = serializers.FloatField(required=True, min_value=0)
+    amount = serializers.DecimalField(required=True, min_value=0, max_digits=20, decimal_places=9)
     mobile = serializers.CharField(required=True, min_length=11, max_length=11)
 
     def validate(self, attrs, *args, **kwargs):

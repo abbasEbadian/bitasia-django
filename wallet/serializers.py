@@ -1,12 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
+from api.serializers import CustomModelSerializer
 from bitpin.models import BitPinCurrency
 from bitpin.serializers import CurrencySerializer
 from wallet.models import Wallet
 
 
-class WalletSerializer(serializers.ModelSerializer):
+class WalletSerializer(CustomModelSerializer):
     currency_id = CurrencySerializer()
 
     class Meta:

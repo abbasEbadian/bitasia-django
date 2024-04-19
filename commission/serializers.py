@@ -26,7 +26,7 @@ class WithdrawCommissionSerializer(serializers.ModelSerializer):
 class WithdrawCommissionCreateSerializer(serializers.Serializer):
     currency_code = serializers.CharField(required=True)
     network_code = serializers.CharField(required=True)
-    amount = serializers.FloatField(required=True)
+    amount = serializers.DecimalField(required=True, max_digits=6, decimal_places=5)
     type = serializers.ChoiceField(required=True, choices=COMM_TYPES)
 
     def validate(self, attrs):
@@ -48,7 +48,7 @@ class WithdrawCommissionCreateSerializer(serializers.Serializer):
 
 
 class WithdrawCommissionUpdateSerializer(serializers.Serializer):
-    amount = serializers.FloatField(required=True, min_value=0)
+    amount = serializers.DecimalField(required=True, min_value=0, decimal_places=5, max_digits=6)
     type = serializers.ChoiceField(required=True, choices=COMM_TYPES)
 
     def update(self, instance, validated_data):

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.apps import apps
 from django.db import models
 from django.db.models.signals import post_save
@@ -28,15 +30,18 @@ class BitPinCurrency(BaseModelWithDate):
     title_fa = models.CharField(_("Title (فارسی)"), max_length=255, blank=True)
     code = models.CharField(_("Code"), max_length=10)
     image = models.URLField(_("Image URL"), null=True, blank=True)
-    min_withdraw = models.FloatField(_("Minimum Withdrawal"), blank=True,
-                                     null=True)
+    min_withdraw = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Minimum Withdrawal"),
+                                       blank=True,
+                                       null=True)
     color = models.CharField(_("Color"), max_length=6)
     alias = models.CharField(_("Alias"), max_length=255, blank=True)
-    withdraw_commission = models.FloatField(_("Withdrawal Commission"), blank=True,
-                                            null=True)
+    withdraw_commission = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Withdrawal Commission"),
+                                              blank=True,
+                                              null=True)
     withdraw_commission_type = models.CharField(_("Withdrawal Commission Type"), max_length=10, blank=True, null=True)
-    max_withdraw_commission = models.FloatField(_("Maximum Withdrawal Commission"),
-                                                blank=True, null=True)
+    max_withdraw_commission = models.DecimalField(max_digits=24, decimal_places=9,
+                                                  verbose_name=_("Maximum Withdrawal Commission"),
+                                                  blank=True, null=True)
     tradable = models.BooleanField(_("Tradable"), default=False)
     for_test = models.BooleanField(_("For Test"), default=False)
     decimal = models.IntegerField(_("Decimal Places"), default=0)
@@ -48,39 +53,45 @@ class BitPinCurrency(BaseModelWithDate):
     for_loan = models.BooleanField(_("For Loan"), default=False)
     for_stake = models.BooleanField(_("For Stake"), default=False)
     network_ids = models.ManyToManyField(BitPinNetwork, blank=True)
-    price_info_price = models.FloatField(_("Price"), null=True, blank=True)
+    price_info_price = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Price"), default=0.0)
     price_info_time = models.DateTimeField(_("Time"), null=True, blank=True)
-    price_info_change = models.FloatField(_("Change"), null=True, blank=True)
-    price_info_min = models.FloatField(_("Minimum"), null=True, blank=True)
-    price_info_max = models.FloatField(_("Maximum"), null=True, blank=True)
-    price_info_mean = models.FloatField(_("Mean"), null=True, blank=True)
-    price_info_value = models.FloatField(_("Market Value"),
-                                         null=True,
-                                         blank=True)  # Assuming value refers to market value
-    price_info_amount = models.FloatField(_("Market Amount"), null=True, blank=True)
-    price_info_market_value = models.FloatField(_("Total Market Value"),
-                                                null=True, blank=True)
-    price_info_market_amount = models.FloatField(_("Total Market Amount"),
-                                                 null=True, blank=True)
-    price_info_usdt_price = models.FloatField(_("Price USDT"), null=True, blank=True)
+    price_info_change = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Change"), default=0.0)
+    price_info_min = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Minimum"), default=0.0)
+    price_info_max = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Maximum"), default=0.0)
+    price_info_mean = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Mean"), default=0.0)
+    price_info_value = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Market Value"),
+                                           default=0.0)  # Assuming value refers to market value
+    price_info_amount = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Market Amount"),
+                                            default=0.0)
+    price_info_market_value = models.DecimalField(max_digits=24, decimal_places=9,
+                                                  verbose_name=_("Total Market Value"),
+                                                  default=0.0)
+    price_info_market_amount = models.DecimalField(max_digits=24, decimal_places=9,
+                                                   verbose_name=_("Total Market Amount"),
+                                                   default=0.0)
+    price_info_usdt_price = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Price USDT"),
+                                                default=0.0)
     price_info_usdt_time = models.DateTimeField(_("Time USDT"), null=True, blank=True)
-    price_info_usdt_change = models.FloatField(_("Change USDT"), null=True,
-                                               blank=True)
-    price_info_usdt_min = models.FloatField(_("Minimum USDT"), null=True, blank=True)
-    price_info_usdt_max = models.FloatField(_("Maximum USDT"), null=True, blank=True)
-    price_info_usdt_mean = models.FloatField(_("Mean USDT"), null=True, blank=True)
-    price_info_usdt_value = models.FloatField(_("Market Value USDT"),
+    price_info_usdt_change = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Change USDT"),
+                                                 default=0.0)
+    price_info_usdt_min = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Minimum USDT"),
+                                              default=0.0)
+    price_info_usdt_max = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Maximum USDT"),
+                                              default=0.0)
+    price_info_usdt_mean = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Mean USDT"),
+                                               default=0.0)
+    price_info_usdt_value = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Market Value USDT"),
+                                                default=0.0)  # Assuming value refers to market value
+    price_info_usdt_amount = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Market Amount USDT"),
+                                                 default=0.0)
+    price_info_usdt_market_value = models.DecimalField(max_digits=24, decimal_places=9,
+                                                       verbose_name=_("Total Market Value USDT"), default=0.0)
+    price_info_usdt_market_amount = models.DecimalField(max_digits=24, decimal_places=9,
+                                                        verbose_name=_("Total Market Amount USDT"), default=0.0)
 
-                                              null=True, blank=True)  # Assuming value refers to market value
-    price_info_usdt_amount = models.FloatField(_("Market Amount USDT"),
-                                               null=True, blank=True)
-    price_info_usdt_market_value = models.FloatField(_("Total Market Value USDT"),
-                                                     null=True, blank=True)
-    price_info_usdt_market_amount = models.FloatField(_("Total Market Amount USDT"),
-                                                      null=True, blank=True)
-
-    price = models.FloatField(_("Sales Price"), default=0)
-    markup_percent = models.FloatField(_("Sales Markup Percent"), default=0)
+    price = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Sales Price"), default=0)
+    markup_percent = models.DecimalField(max_digits=10, decimal_places=5, verbose_name=_("Sales Markup Percent"),
+                                         default=0.001)
 
     def __str__(self):
         return f"{self.title} ({self.title_fa})"
@@ -90,31 +101,44 @@ class BitPinCurrency(BaseModelWithDate):
         BitPinCurrency.objects.filter(pk=instance.pk).update(price=instance.get_price())
 
     def get_price(self):
+        print("get_price")
         return self.price_info_price + (self.price_info_price * self.markup_percent)
 
     def _has_network(self, network):
         return self.network_ids.all().contains(network)
 
-    def _get_bitpin_commission(self, amount):
-        WithdrawCommission = apps.get_model('commission', 'WithdrawCommission')
+    def get_withdraw_commission_obj(self, network):
+        print("get_withdraw_commission_obj")
+        return self.withdrawcommission_set.filter(network_id=network.id).first()
 
-        if self.withdraw_commission_type == WithdrawCommission.CommissionType.VALUE:
+    def _get_bitpin_commission(self, amount):
+        print("_get_bitpin_commission")
+        withdraw_commission_klass = apps.get_model('commission', 'WithdrawCommission')
+        if self.withdraw_commission_type == withdraw_commission_klass.CommissionType.VALUE:
             return self.withdraw_commission
         return amount * self.withdraw_commission
 
     def _get_bitasia_commission(self, amount, network):
-        WithdrawCommission = apps.get_model('commission', 'WithdrawCommission')
-
-        comm = self.withdrawcommission_set.filter(network_id=network.id).first()
-
-        if comm.type == WithdrawCommission.CommissionType.VALUE:
-            return comm.amount
-        return amount * comm.amount
+        print("_get_bitasia_commission")
+        withdraw_commission_klass = apps.get_model('commission', 'WithdrawCommission')
+        comm = self.get_withdraw_commission_obj(network)
+        if comm.type == withdraw_commission_klass.CommissionType.VALUE:
+            return Decimal(comm.amount)
+        return Decimal(amount * comm.amount)
 
     def calculate_amount_after_commission(self, amount, network):
+        print("calculate_amount_after_commission")
         c1 = self._get_bitpin_commission(amount)
         c2 = self._get_bitasia_commission(amount, network)
         return amount - (c1 + c2)
+
+    def calculate_withdraw_commission(self, amount, network):
+        print("calculate_withdraw_commission")
+        return self._get_bitasia_commission(amount, network)
+
+    def calculate_amount_after_withdraw_commission(self, amount, network):
+        print("calculate_amount_after_withdraw_commission")
+        return amount - self.calculate_withdraw_commission(amount, network)
 
     class Meta:
         ordering = ("-show_in_dashboard", "-price_info_price")

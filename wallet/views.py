@@ -17,9 +17,6 @@ class WalletView(generics.ListCreateAPIView, IsModeratorMixin):
     permission_classes = [(IsAuthenticated & ~IsModerator) | (IsModerator & WalletPermission)]
     queryset = Wallet.objects.all()
 
-    def paginator(self):
-        return False
-
     def get_serializer_class(self):
         if self.request.method.lower() == 'get':
             return WalletSerializer

@@ -41,7 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
             if wallet.currency_id.code == "IRT":
                 total += wallet.balance
             else:
-                total += wallet.currency_id.price_info_price * wallet.balance
+                total += wallet.currency_id.price * wallet.balance
 
         return total
 

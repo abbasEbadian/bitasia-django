@@ -66,7 +66,7 @@ class TransactionView(generics.ListCreateAPIView, IsModeratorMixin):
 
 class TransactionDetailView(generics.RetrieveUpdateAPIView, IsModeratorMixin):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [(~IsModerator & IsAuthenticated) | (IsModerator & TransactionPermission)]
+    # permission_classes = [(~IsModerator & IsAuthenticated) | (IsModerator & TransactionPermission)]
     queryset = Transaction.objects.all()
     lookup_field = "id"
     http_method_names = ["get", "patch"]
@@ -77,6 +77,11 @@ class TransactionDetailView(generics.RetrieveUpdateAPIView, IsModeratorMixin):
                 return TransactionForAdminSerializer
             return TransactionSerializer
         return TransactionUpdateSerializer
+
+    def get_queryset(self):
+        if self.is_moderator(self.request):
+            return self.queryset
+        return self.queryset.filter(user_id=self.request.user)
 
     @swagger_auto_schema(operation_id="Get Transaction Detail", tags=CRYPTO_TRANSACTION_TAGS)
     def get(self, request, *args, **kwargs):
@@ -89,7 +94,9 @@ class TransactionDetailView(generics.RetrieveUpdateAPIView, IsModeratorMixin):
     def patch(self, request, *args, **kwargs):
         obj = self.get_object()
         with transaction.atomic():
-            serializer = self.get_serializer(obj, data=request.data, partial=True, context={"user_id": request.user})
+            serializer = self.get_serializer(obj, data=request.data, partial=True, context={"user_id": request.user,
+                                                                                            "is_moderator": self.is_moderator(
+                                                                                                self.request)})
             serializer.is_valid(raise_exception=True)
             serializer.save()
         return Response({
@@ -121,13 +128,14 @@ class CalculateWithdrawCommissionView(APIView):
         if not currency._has_network(network):
             raise CustomError(ERRORS.custom_message_error(
                 _("Invalid network ID. Provided network must be present in currency networks.")))
-
-        amount_after_commission = currency.calculate_amount_after_commission(amount, network)
+        commission = currency.get_withdraw_commission_obj(network)
+        amount_after_commission = currency.calculate_amount_after_withdraw_commission(amount, network)
         return Response({
             "result": "success",
             "amount": amount,
             "amount_after_commission": amount_after_commission,
-            "commission": amount - amount_after_commission,
+            "commission": commission.amount,
+            "commission_irt": commission.amount * currency.get_price(),
         })
 
 
