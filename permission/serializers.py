@@ -26,17 +26,19 @@ class PermissionSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         cid = data.pop("content_type_id")
         data["category"] = ContentType.objects.get(pk=cid).model
-        data["type"] = instance.codename.split("_")[0]
         return data
 
 
 class GroupSerializer(serializers.ModelSerializer):
-    permissions = PermissionSerializer(many=True)
+    permissions = serializers.SerializerMethodField("get_permissions")
 
     class Meta:
         model = Group
         fields = ["id", "name", "permissions"]
         depth = 1
+
+    def get_permissions(self, instance):
+        return PermissionSerializer(instance.permissions.filter(codename__startswith="view"), many=True).data
 
 
 class GroupUpdateCreateSerializer(serializers.Serializer):
