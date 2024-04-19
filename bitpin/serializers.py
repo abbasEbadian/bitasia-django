@@ -29,7 +29,7 @@ class CurrencySerializer(CustomModelSerializer):
         super().__init__(*arg, **kwargs)
 
         request = self.context.get("request")
-        if fields and request and request.GET.get("for_dashboard") != 'false':
+        if fields and request and request.GET.get("for_dashboard") == 'true':
             allowed = set(fields)
             existing = set(self.fields)
             for field_name in existing - allowed:
