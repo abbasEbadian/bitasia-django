@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
-from api.permissions import IsSuperUser
+from api.permissions import IsSuperUser, IsModerator
 from bitpin.models import BitPinCurrency
 from commission.models import WithdrawCommission
 from commission.permissions import CommissionPermission
@@ -45,11 +45,11 @@ class WithdrawCommissionView(generics.ListCreateAPIView):
         })
 
 
-class WithdrawCommissionDetailView(generics.RetrieveUpdateAPIView):
+class WithdrawCommissionDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = WithdrawCommission.objects.all()
     lookup_field = "id"
-    http_method_names = ["get", "patch"]
-    permission_classes = [CommissionPermission]
+    http_method_names = ["get", "patch", "delete"]
+    permission_classes = [IsModerator, CommissionPermission]
 
     @property
     def authentication_classes(self):
