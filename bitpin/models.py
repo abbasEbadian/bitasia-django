@@ -23,6 +23,10 @@ class BitPinNetwork(BaseModelWithDate):
 
 
 class BitPinCurrency(BaseModelWithDate):
+    class CommissionType(models.TextChoices):
+        VALUE = 'value', _('Value')
+        PERCENT = 'percent', _('Percent')
+
     show_in_dashboard = models.BooleanField(default=False)
     bitasia_active = models.BooleanField(_("Bitasia Active"), default=True)
     active = models.BooleanField(_("BitPin Active"), default=True)
@@ -92,6 +96,10 @@ class BitPinCurrency(BaseModelWithDate):
     price = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Sales Price"), default=0)
     markup_percent = models.DecimalField(max_digits=10, decimal_places=5, verbose_name=_("Sales Markup Percent"),
                                          default=0.001)
+    buy_sell_commission = models.DecimalField(max_digits=10, decimal_places=5, verbose_name=_("Buy Sell Commission"),
+                                              default=0.001)
+    buy_sell_commission_type = models.CharField(_("Buy Sell Commission Type"), max_length=10,
+                                                choices=CommissionType.choices, default=CommissionType.PERCENT)
 
     def __str__(self):
         return f"{self.title} ({self.title_fa})"
@@ -101,25 +109,21 @@ class BitPinCurrency(BaseModelWithDate):
         BitPinCurrency.objects.filter(pk=instance.pk).update(price=instance.get_price())
 
     def get_price(self):
-        print("get_price")
         return self.price_info_price + (self.price_info_price * self.markup_percent)
 
     def _has_network(self, network):
         return self.network_ids.all().contains(network)
 
     def get_withdraw_commission_obj(self, network):
-        print("get_withdraw_commission_obj")
         return self.withdrawcommission_set.filter(network_id=network.id).first()
 
     def _get_bitpin_commission(self, amount):
-        print("_get_bitpin_commission")
         withdraw_commission_klass = apps.get_model('commission', 'WithdrawCommission')
         if self.withdraw_commission_type == withdraw_commission_klass.CommissionType.VALUE:
             return self.withdraw_commission
         return amount * self.withdraw_commission
 
     def _get_bitasia_commission(self, amount, network):
-        print("_get_bitasia_commission")
         withdraw_commission_klass = apps.get_model('commission', 'WithdrawCommission')
         comm = self.get_withdraw_commission_obj(network)
         if comm.type == withdraw_commission_klass.CommissionType.VALUE:
@@ -127,17 +131,14 @@ class BitPinCurrency(BaseModelWithDate):
         return Decimal(amount * comm.amount)
 
     def calculate_amount_after_commission(self, amount, network):
-        print("calculate_amount_after_commission")
         c1 = self._get_bitpin_commission(amount)
         c2 = self._get_bitasia_commission(amount, network)
         return amount - (c1 + c2)
 
     def calculate_withdraw_commission(self, amount, network):
-        print("calculate_withdraw_commission")
         return self._get_bitasia_commission(amount, network)
 
     def calculate_amount_after_withdraw_commission(self, amount, network):
-        print("calculate_amount_after_withdraw_commission")
         return amount - self.calculate_withdraw_commission(amount, network)
 
     class Meta:

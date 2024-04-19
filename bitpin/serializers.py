@@ -37,14 +37,14 @@ class CurrencySerializer(CustomModelSerializer):
 
     class Meta:
         model = BitPinCurrency
-        exclude = ["create_date", "write_date", "network_ids", "price_info_price", "markup_percent"]
+        exclude = ["create_date", "write_date", "network_ids", "price_info_price"]
         depth = 2
 
 
 class CurrencyUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = BitPinCurrency
-        fields = ["markup_percent", "bitasia_active"]
+        fields = ["markup_percent", "bitasia_active", "buy_sell_commission", "buy_sell_commission_type"]
 
 
 class WalletAddressSerializer(serializers.ModelSerializer):
