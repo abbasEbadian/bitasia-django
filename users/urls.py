@@ -1,6 +1,6 @@
 from django.urls import path
 
-from authentication.views import forget_password_view, reset_password_view
+from authentication.views import forget_password_view
 from .views import UserListView, UserDetailView, UserUpdateView, UserDeleteView, UserCreateView, UserDetailAdminView, \
     LoginHistoryView
 from .views_password import forget_password_change_view, reset_password_change_view
@@ -15,6 +15,5 @@ urlpatterns = [
     path("create/", UserCreateView.as_view(), name="user-create"),
     path("forget-password/otp/", forget_password_view, name="forget-password-otp"),
     path("forget-password/", forget_password_change_view, name="forget-password-save"),
-    path("reset-password/otp/", reset_password_view, name="reset-password-otp"),
     path("reset-password/", reset_password_change_view, name="reset-password-save"),
 ]

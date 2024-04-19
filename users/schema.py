@@ -57,10 +57,10 @@ reset_password_change_view_schema = {
     "tags": ["User - Reset password"],
     "method": "POST",
     "request_body": openapi.Schema(type=openapi.TYPE_OBJECT,
-                                   required=["password_1", "password_2", "otp"],
+                                   required=["password_1", "password_2", "old_password"],
                                    properties={
+                                       "old_password": openapi.Schema(type=openapi.TYPE_STRING),
                                        "password_1": openapi.Schema(type=openapi.TYPE_STRING),
-                                       "password_2": openapi.Schema(type=openapi.TYPE_STRING),
-                                       "otp": openapi.Schema(type=openapi.TYPE_STRING),
+                                       "password_2": openapi.Schema(type=openapi.TYPE_STRING)
                                    })
 }
