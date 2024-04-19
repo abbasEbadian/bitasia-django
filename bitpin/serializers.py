@@ -41,13 +41,10 @@ class CurrencySerializer(CustomModelSerializer):
         depth = 2
 
 
-class CurrencyUpdateSerializer(serializers.Serializer):
-    percent = serializers.DecimalField(required=True, min_value=0, max_value=1, max_digits=10, decimal_places=5)
-
-    def update(self, instance, validated_data):
-        instance.percent = validated_data.get("percent", instance.percent)
-        instance.save()
-        return instance
+class CurrencyUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BitPinCurrency
+        fields = ["markup_percent", "bitasia_active"]
 
 
 class WalletAddressSerializer(serializers.ModelSerializer):

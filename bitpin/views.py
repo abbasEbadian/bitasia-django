@@ -72,7 +72,7 @@ class CurrencyDetailView(generics.RetrieveUpdateAPIView):
 
     @swagger_auto_schema(operation_id=_("Update Currency Markup Percent"))
     def patch(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_object(), data=request.data)
+        serializer = self.get_serializer(self.get_object(), data=request.data, context={"partial": True})
         serializer.is_valid(raise_exception=True)
         updated_instance = serializer.save()
         return Response({
