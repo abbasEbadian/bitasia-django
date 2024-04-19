@@ -234,3 +234,9 @@ class TransferCreateSerializer(serializers.Serializer):
             new_transfer.successful = True
             new_transfer.save()
             return new_transfer
+
+
+class CalculateOrderCommissionSerializer(serializers.Serializer):
+    currency_code = serializers.CharField(required=True)
+    amount = serializers.DecimalField(required=True, max_digits=20, decimal_places=9)
+    type = serializers.ChoiceField(required=True, choices=Order.Type.choices)

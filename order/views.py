@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
@@ -19,7 +21,7 @@ from order.models import Transaction, Order, Transfer
 from order.permissions import TransactionPermission, OrderPermission
 from order.serializers import TransactionSerializer, TransactionForAdminSerializer, TransactionCreateSerializer, \
     TransactionUpdateSerializer, OrderForAdminSerializer, OrderCreateSerializer, OrderSerializer, TransferSerializer, \
-    TransferCreateSerializer
+    TransferCreateSerializer, CalculateOrderCommissionSerializer
 
 CRYPTO_TRANSACTION_TAGS = ["Transactions - Crypto"]
 ORDER_TAGS = ["Orders"]
@@ -197,6 +199,29 @@ class OrderDetailView(generics.RetrieveAPIView, IsModeratorMixin):
         return Response({
             "result": "success",
             "object": self.get_serializer(self.get_object()).data
+        })
+
+
+class CalculateOrderCommissionView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    @swagger_auto_schema(operation_id="Calculate Withdraw Commission",
+                         request_body=CalculateOrderCommissionSerializer)
+    def post(self, request, *args, **kwargs):
+        serializer = CalculateOrderCommissionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        currency = get_object_or_404(BitPinCurrency, code=request.data.get("currency_code"))
+        amount = Decimal(request.data.get("amount"))
+        _type = request.data.get("type")
+        total = Order.get_amount_for_increase(_type, amount, currency)
+        comm = Order.get_commission_amount(currency, _type, amount)
+        return Response({
+            "result": "success",
+            "amount": amount,
+            "current_price": currency.get_price(),
+            "amount_after_commission": total - comm,
+            "commission": comm,
         })
 
 

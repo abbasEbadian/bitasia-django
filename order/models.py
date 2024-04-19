@@ -138,26 +138,34 @@ class Order(BaseModelWithDate):
             return self.amount
         return self.amount * self.currency_id.get_price()
 
-    def get_amount_for_increase(self):
-        if self.type == self.Type.SELL:
-            return self.amount * self.currency_id.get_price()
-        return self.amount
+    @staticmethod
+    def get_amount_for_increase(type, amount, currency):
+        if type == Order.Type.SELL:
+            return amount * currency.get_price()
+        return amount
 
-    def get_commission_amount(self):
-        comm = self.currency_id.buy_sell_commission
-        comm_type = self.currency_id.buy_sell_commission_type
-        if self.type == self.Type.SELL:
-            comm_amount = comm * self.currency_id.get_price()
-            if comm_type == self.currency_id.CommissionType.PERCENT:
-                comm_amount *= self.amount
+    def _get_amount_for_increase(self):
+        return self.get_amount_for_increase(self.type, self.amount, self.currency_id)
+
+    @staticmethod
+    def get_commission_amount(currency, _type, amount):
+        comm = currency.buy_sell_commission
+        comm_type = currency.buy_sell_commission_type
+        if _type == Order.Type.SELL:
+            comm_amount = comm * currency.get_price()
+            if comm_type == currency.CommissionType.PERCENT:
+                comm_amount *= amount
             return comm_amount
-        if comm_type == self.currency_id.CommissionType.VALUE:
+        if comm_type == currency.CommissionType.VALUE:
             return comm
-        return comm * self.amount
+        return comm * amount
+
+    def _get_commission_amount(self):
+        return self.get_commission_amount(self.currency_id, self.type, self.amount)
 
     def get_amount_after_commission(self):
         amount = self.get_amount_for_increase()
-        commission_amount = self.get_commission_amount()
+        commission_amount = self._get_commission_amount()
         return amount - commission_amount
 
     def after_create_request(self):
