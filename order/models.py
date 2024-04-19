@@ -143,6 +143,23 @@ class Order(BaseModelWithDate):
             return self.amount * self.currency_id.get_price()
         return self.amount
 
+    def get_commission_amount(self):
+        comm = self.currency_id.buy_sell_commission
+        comm_type = self.currency_id.buy_sell_commission_type
+        if self.type == self.Type.SELL:
+            comm_amount = comm * self.currency_id.get_price()
+            if comm_type == self.currency_id.CommissionType.PERCENT:
+                comm_amount *= self.amount
+            return comm_amount
+        if comm_type == self.currency_id.CommissionType.VALUE:
+            return comm
+        return comm * self.amount
+
+    def get_amount_after_commission(self):
+        amount = self.get_amount_for_increase()
+        commission_amount = self.get_commission_amount()
+        return amount - commission_amount
+
     def after_create_request(self):
         wallet = self.user_id.get_wallet(self.get_wallet_code_for_decrease())
         wallet.charge(-1 * self.get_amount_for_decrease())
@@ -151,7 +168,7 @@ class Order(BaseModelWithDate):
 
     def approve(self):
         wallet = self.user_id.get_wallet(self.get_wallet_code_for_increase())
-        wallet.charge(self.get_amount_for_increase())
+        wallet.charge(self.get_amount_after_commission())
         self.submit_date = datetime.datetime.now(tz=datetime.timezone.utc)
         self.change_state(self.Status.APPROVE)
         return True
