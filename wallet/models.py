@@ -29,13 +29,15 @@ class Wallet(BaseModelWithDate):
         return self.balance
 
     def charge(self, amount):
+        print("amount", amount, type(amount))
+        print("balance", self.balance, type(self.balance))
         if amount < 0:
             if self.balance < amount:
                 raise CustomError(ERRORS.custom_message_error(_("Insufficient balance.")))
-            self.balance += Decimal(amount)
+            self.balance = Decimal(self.balance) + Decimal(amount)
             self.save()
             return True
 
-        self.balance += Decimal(amount)
+        self.balance = Decimal(self.balance) + Decimal(amount)
         self.save()
         return True

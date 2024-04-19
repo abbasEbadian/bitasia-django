@@ -100,14 +100,17 @@ class Order(BaseModelWithDate):
 
     type = models.CharField(verbose_name=_("Transaction Type"), max_length=8, choices=Type.choices)
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
-
     user_id = models.ForeignKey(User, on_delete=models.RESTRICT)
     currency_id = models.ForeignKey(BitPinCurrency, on_delete=models.RESTRICT)
+    base_currency_id = models.ForeignKey(BitPinCurrency, related_name="usdt_order_set", on_delete=models.RESTRICT)
     amount = models.DecimalField(max_digits=20, decimal_places=9, verbose_name=_("Amount"))
     submit_date = models.DateTimeField(verbose_name=_("Submit Date"), blank=True, null=True)
     currency_current_value = models.PositiveBigIntegerField(
-        verbose_name=_("The irt price at the time of placing the ordering."),
+        verbose_name=_("The irt price at the time of placing the order."),
         default=0)
+    currency_currency_usdt_value = models.DecimalField(max_digits=20, decimal_places=9,
+                                                       verbose_name=_("USDT price at the time of placing the order."),
+                                                       default=0)
     factor_number = models.CharField(max_length=255, verbose_name=_("Factor Number"))
 
     def __str__(self):
@@ -126,33 +129,33 @@ class Order(BaseModelWithDate):
     def get_wallet_code_for_decrease(self):
         if self.type == self.Type.SELL:
             return self.currency_id.code
-        return "IRT"
+        return self.base_currency_id.code
 
     def get_wallet_code_for_increase(self):
         if self.type == self.Type.SELL:
-            return "IRT"
+            return self.base_currency_id.code
         return self.currency_id.code
 
     def get_amount_for_decrease(self):
         if self.type == self.Type.SELL:
             return self.amount
-        return self.amount * self.currency_id.get_price()
+        return self.amount * self.currency_id.get_price(self.base_currency_id.code)
 
     @staticmethod
-    def get_amount_for_increase(type, amount, currency):
+    def get_amount_for_increase(type, amount, currency, base_currency_code="IRT"):
         if type == Order.Type.SELL:
-            return amount * currency.get_price()
+            return amount * currency.get_price(base_currency_code)
         return amount
 
     def _get_amount_for_increase(self):
-        return self.get_amount_for_increase(self.type, self.amount, self.currency_id)
+        return self.get_amount_for_increase(self.type, self.amount, self.currency_id, self.base_currency_id.code)
 
     @staticmethod
-    def get_commission_amount(currency, _type, amount):
+    def get_commission_amount(currency, _type, amount, base_currency_code="IRT"):
         comm = currency.buy_sell_commission
         comm_type = currency.buy_sell_commission_type
         if _type == Order.Type.SELL:
-            comm_amount = comm * currency.get_price()
+            comm_amount = comm * currency.get_price(base_currency_code)
             if comm_type == currency.CommissionType.PERCENT:
                 comm_amount *= amount
             return comm_amount
@@ -161,10 +164,10 @@ class Order(BaseModelWithDate):
         return comm * amount
 
     def _get_commission_amount(self):
-        return self.get_commission_amount(self.currency_id, self.type, self.amount)
+        return self.get_commission_amount(self.currency_id, self.type, self.amount, self.base_currency_id.code)
 
     def get_amount_after_commission(self):
-        amount = self.get_amount_for_increase()
+        amount = self._get_amount_for_increase()
         commission_amount = self._get_commission_amount()
         return amount - commission_amount
 
@@ -185,7 +188,7 @@ class Order(BaseModelWithDate):
 class Transfer(BaseModelWithDate):
     user_id = models.ForeignKey(User, on_delete=models.RESTRICT)
     currency_id = models.ForeignKey(BitPinCurrency, on_delete=models.RESTRICT)
-    amount = models.FloatField()
+    amount = models.DecimalField(max_digits=20, decimal_places=9, verbose_name=_("Amount"))
     successful = models.BooleanField()
     destination_mobile = models.CharField(max_length=11)
 

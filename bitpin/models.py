@@ -94,6 +94,7 @@ class BitPinCurrency(BaseModelWithDate):
                                                         verbose_name=_("Total Market Amount USDT"), default=0.0)
 
     price = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Sales Price"), default=0)
+    price_usdt = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Sales USDT Price"), default=0)
     markup_percent = models.DecimalField(max_digits=10, decimal_places=5, verbose_name=_("Sales Markup Percent"),
                                          default=0.001)
     buy_sell_commission = models.DecimalField(max_digits=10, decimal_places=5, verbose_name=_("Buy Sell Commission"),
@@ -106,10 +107,14 @@ class BitPinCurrency(BaseModelWithDate):
 
     @staticmethod
     def post_save(sender, instance, created, **kwargs):
-        BitPinCurrency.objects.filter(pk=instance.pk).update(price=instance.get_price())
+        BitPinCurrency.objects.filter(pk=instance.pk).update(price=instance.get_price(),
+                                                             price_usdt=instance.get_price("USDT"))
 
-    def get_price(self):
-        return self.price_info_price + (self.price_info_price * self.markup_percent)
+    def get_price(self, currency_code="IRT"):
+        new_irt_price = self.price_info_price * (1 + self.markup_percent)
+        if currency_code != "IRT":
+            return new_irt_price * self.price_info_usdt_price / self.price_info_price
+        return new_irt_price
 
     def _has_network(self, network):
         return self.network_ids.all().contains(network)
