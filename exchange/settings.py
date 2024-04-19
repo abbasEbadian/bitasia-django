@@ -57,7 +57,8 @@ APPS = [
     "order",
     "zarinpal",
     "permission",
-    "commission"
+    "commission",
+    "ticket"
 ]
 LIBS = [
     "rest_framework",
