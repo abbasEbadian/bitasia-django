@@ -67,8 +67,8 @@ def get_bitpin_currencies_cron():
             if not bool(currency):
                 defaults = {k: v for k, v in row.items()}
                 defaults["bitasia_active"] = bitasia_active
-                defaults["min_withdraw"] = float(defaults["min_withdraw"])
-                defaults["max_withdraw_commission"] = float(defaults["max_withdraw_commission"])
+                defaults["min_withdraw"] = Decimal(defaults["min_withdraw"])
+                defaults["max_withdraw_commission"] = Decimal(defaults["max_withdraw_commission"])
                 created = True
                 currency = BitPinCurrency.objects.create(**defaults, **prices)
             else:

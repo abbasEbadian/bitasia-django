@@ -1,6 +1,9 @@
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
+from django.contrib.contenttypes.models import ContentType
+from django.core.serializers import get_serializer
 from django.core.validators import MinLengthValidator, MaxLengthValidator, EmailValidator
 from django.utils.translation import gettext as _
 from rest_framework import serializers
@@ -17,12 +20,47 @@ class UserSimplifiedSerializer(serializers.ModelSerializer):
         exclude = ['password', 'is_superuser', 'is_staff', 'is_active', 'groups', 'user_permissions']
 
 
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ["name", "content_type_id"]
+        depth = 1
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        cid = data.pop("content_type_id")
+        data["category"] = ContentType.objects.get(pk=cid).model
+        return data
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    permissions = PermissionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Group
+        fields = '__all__'
+        depth = 1
+
+    def get_permissions(self, obj):
+        get_serializer
+        return
+
+
 class UserSerializer(serializers.ModelSerializer):
     user_level = serializers.SerializerMethodField('_get_user_level')
     approved_rule_ids = serializers.SerializerMethodField('_approved_rule_ids')
     authentication_status = serializers.SerializerMethodField('_authentication_status')
     wallets = serializers.SerializerMethodField('_wallets')
     total_ir_balance = serializers.SerializerMethodField("_total_balance")
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if not self.context.get("is_moderator"):
+            return ret
+        ret["is_staff"] = instance.is_staff
+        ret["is_active"] = instance.is_active
+        ret["groups"] = GroupSerializer(instance.groups.all(), many=True).data
+        return ret
 
     def _get_user_level(self, obj):
         return get_user_level(obj)
@@ -75,8 +113,22 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return data
 
 
-class UserUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('first_name', 'last_name', 'email', 'gender', 'birthdate',
-                  'national_card_image', 'birth_card_image', 'avatar_image')
+class UserUpdateSerializer(serializers.Serializer):
+    is_active = serializers.BooleanField(required=False)
+    is_staff = serializers.BooleanField(required=False)
+    groups = serializers.CharField(help_text=_('Comma separated list of groups'), required=False)
+
+    def update(self, instance, validated_data):
+        is_active = validated_data.get('is_active', None)
+        is_staff = validated_data.get('is_staff', None)
+        _groups = validated_data.get('groups', None)
+        if is_active is not None:
+            instance.is_active = is_active
+        if is_staff is not None:
+            instance.is_staff = is_staff
+        _groups = [x.strip() for x in _groups.split(",")]
+        groups = Group.objects.filter(name__in=_groups)
+        print(groups)
+        instance.groups.set(groups)
+        instance.save()
+        return instance
