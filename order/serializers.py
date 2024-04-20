@@ -100,7 +100,6 @@ class TransactionUpdateSerializer(serializers.Serializer):
             raise CustomError(
                 ERRORS.custom_message_error(_("Cannot update transaction which is not in pending status.")))
         action = attrs.get('action')
-        user = self.context.get("user_id")
         is_moderator = self.context.get("is_moderator")
 
         if action != "cancel":

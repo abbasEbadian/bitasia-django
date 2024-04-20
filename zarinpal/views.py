@@ -66,7 +66,7 @@ class RialWithdrawConfirmView(generics.UpdateAPIView):
 
     @swagger_auto_schema(operation_id=_("Approve or reject withdraw"), tags=["Transactions - Rial"])
     def patch(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(self.get_object(), data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({

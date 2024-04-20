@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
 from django.core.validators import MinLengthValidator, MaxLengthValidator, EmailValidator
 from django.utils.translation import gettext as _
@@ -36,12 +38,12 @@ class UserSerializer(serializers.ModelSerializer):
             approved=False).count() > 0 and "pending" or f"level_{self._get_user_level(obj)}"
 
     def _total_balance(self, obj):
-        total = float(0)
+        total = Decimal(0)
         for wallet in obj.wallet_set.all():
             if wallet.currency_id.code == "IRT":
-                total += wallet.balance
+                total += Decimal(wallet.balance)
             else:
-                total += wallet.currency_id.price * wallet.balance
+                total += Decimal(wallet.currency_id.get_price()) * Decimal(wallet.balance)
 
         return total
 
