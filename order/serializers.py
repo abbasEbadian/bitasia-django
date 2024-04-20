@@ -40,21 +40,20 @@ class TransactionCreateSerializer(serializers.Serializer):
         currency = get_object_or_404(BitPinCurrency, pk=attrs.get("currency_id"))
         network = get_object_or_404(BitPinNetwork, pk=attrs.get("network_id"))
         amount = attrs.get("amount")
+        _type = attrs.get('type')
 
-        print(amount, currency.min_withdraw)
-        if amount < currency.min_withdraw:
+        if _type == Transaction.Type.WITHDRAW and amount < currency.min_withdraw:
             raise CustomError(ERRORS.custom_message_error("Min withdraw is %f." % currency.min_withdraw))
 
         if not currency._has_network(network):
             raise CustomError(
                 ERRORS.custom_message_error(_("Provided network %s not present in currency networks.") % network.title))
 
-        type = attrs.get('type')
         tx_id = attrs.get('tx_id')
-        if type == Transaction.Type.DEPOSIT and not tx_id:
+        if _type == Transaction.Type.DEPOSIT and not tx_id:
             raise CustomError(ERRORS.custom_message_error(_("tx_id is required for deposit. ")))
 
-        if type == Transaction.Type.WITHDRAW:
+        if _type == Transaction.Type.WITHDRAW:
             user = self.context.get('user_id')
             wallet = user.get_wallet(currency.code)
             if wallet.balance < amount:
@@ -84,6 +83,7 @@ class TransactionCreateSerializer(serializers.Serializer):
         })
         if type == Transaction.Type.WITHDRAW:
             tr.after_create_request()
+        tr.set_order_info()
         return tr
 
 
@@ -104,7 +104,7 @@ class TransactionUpdateSerializer(serializers.Serializer):
         is_moderator = self.context.get("is_moderator")
 
         if action != "cancel":
-            if not user.is_staff:
+            if not is_moderator and False:
                 raise PermissionError()
             if action == "accept":
                 if not attrs.get('tx_id'):

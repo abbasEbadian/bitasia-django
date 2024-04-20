@@ -59,12 +59,20 @@ class Transaction(BaseModelWithDate):
         wallet.save()
         return True
 
+    def set_order_info(self):
+        if self.type == self.Type.WITHDRAW:
+            self.amount_after_commission = self.currency_id.calculate_amount_after_withdraw_commission(self.amount,
+                                                                                                       self.network_id)
+            self.applied_commission_amount = self.currency_id.calculate_withdraw_commission(self.amount,
+                                                                                            self.network_id)
+        else:
+            self.amount_after_commission = self.amount
+            self.applied_commission_amount = 0
+        self.save()
+
     def after_create_request(self):
         wallet = self.user_id.get_wallet(self.currency_id.code)
-        amount_after_commission = self.currency_id.calculate_amount_after_withdraw_commission(self.amount,
-                                                                                              self.network_id)
-        self.amount_after_commission = amount_after_commission
-        self.applied_commission_amount = self.currency_id.calculate_withdraw_commission(self.amount, self.network_id)
+
         wallet.charge(-1 * self.amount)
         wallet.save()
         return True
@@ -82,6 +90,7 @@ class Transaction(BaseModelWithDate):
         return True
 
     def approve(self):
+        self.user_id.get_wallet(self.currency_id.code).charge(self.amount)
         self.submit_date = datetime.datetime.now(tz=datetime.timezone.utc)
         self.change_state(self.Status.APPROVE)
         return True

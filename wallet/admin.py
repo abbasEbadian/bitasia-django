@@ -11,3 +11,4 @@ def sep_balance(obj):
 @admin.register(Wallet)
 class WalletAdmin(admin.ModelAdmin):
     list_display = ('id', sep_balance, 'user_id', 'currency_id')
+    list_filter = ("user_id",)
