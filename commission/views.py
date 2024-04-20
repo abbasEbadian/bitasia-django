@@ -69,7 +69,7 @@ class WithdrawCommissionDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     @swagger_auto_schema(operation_id=_("Update withdraw commission"))
     def patch(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(self.get_object(), data=request.data)
         serializer.is_valid(raise_exception=True)
         newb = serializer.save()
         return Response({

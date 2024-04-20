@@ -104,7 +104,7 @@ class TransactionUpdateSerializer(serializers.Serializer):
         is_moderator = self.context.get("is_moderator")
 
         if action != "cancel":
-            if not is_moderator and False:
+            if not is_moderator:
                 raise PermissionError()
             if action == "accept":
                 if not attrs.get('tx_id'):
