@@ -69,7 +69,7 @@ class UserSerializer(serializers.ModelSerializer):
         return [x.rule_id.id for x in obj.authorityrequest_set.filter(approved=True)]
 
     def _wallets(self, obj):
-        return WalletSerializer(obj.wallet_set.all(), many=True).data
+        return WalletSerializer(obj.wallets.all(), many=True).data
 
     def _authentication_status(self, obj):
         return obj.authorityrequest_set.filter(
@@ -77,7 +77,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def _total_balance(self, obj):
         total = Decimal(0)
-        for wallet in obj.wallet_set.all():
+        for wallet in obj.wallets.all():
             if wallet.currency_id.code == "IRT":
                 total += Decimal(wallet.balance)
             else:

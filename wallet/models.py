@@ -13,7 +13,7 @@ User = get_user_model()
 
 
 class Wallet(BaseModelWithDate):
-    user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user_id = models.ForeignKey(User, related_name="wallets", on_delete=models.SET_NULL, null=True)
     currency_id = models.ForeignKey(BitPinCurrency, on_delete=models.SET_NULL, null=True)
     balance = models.DecimalField(_('Balance'), default=0.0, decimal_places=11, max_digits=24)
 
@@ -29,8 +29,6 @@ class Wallet(BaseModelWithDate):
         return self.balance
 
     def charge(self, amount):
-        print("amount", amount, type(amount))
-        print("balance", self.balance, type(self.balance))
         if amount < 0:
             if self.balance < amount:
                 raise CustomError(ERRORS.custom_message_error(_("Insufficient balance.")))

@@ -20,19 +20,15 @@ auth_status = [
 
 def get_file_path_for_birth(instance, filename):
     ext = filename.split('.')[-1]
-    filename = "images/national_cards/%s.%s" % (uuid.uuid4(), ext)
-    return filename
+    return "images/users/%d/birth_card.%s" % (instance.id, ext)
 
 
 def get_file_path_for_national(instance, filename):
     ext = filename.split('.')[-1]
-    filename = "images/birth_cards/%s.%s" % (uuid.uuid4(), ext)
-    return filename
+    return "images/users/%d/national_card.%s" % (instance.id, ext)
 
 
 def get_file_path_for_avatar(instance, filename):
-    ext = filename.split('.')[-1]
-    filename = "images/avatars/%s.%s" % (uuid.uuid4(), ext)
     return filename
 
 
@@ -51,8 +47,7 @@ class CustomUser(AbstractUser):
         verbose_name='تصویر کارت ملی', upload_to=get_file_path_for_birth, null=True, blank=True, )
     birth_card_image = models.ImageField(
         verbose_name='تصویر شناسنامه', upload_to=get_file_path_for_national, null=True, blank=True, )
-    avatar_image = models.ImageField(
-        verbose_name='تصویر کاربری', upload_to=get_file_path_for_avatar, null=True, blank=True, )
+
     last_login = models.DateTimeField(verbose_name="آخرین ورود", null=True, blank=True, auto_now=True)
 
     def __str__(self):
@@ -76,10 +71,6 @@ class CustomUser(AbstractUser):
     def has_birth_card_image(self):
         return bool(self.birth_card_image)
 
-    @property
-    def has_avatar_image(self):
-        return bool(not not self.avatar_image)
-
     def send_otp(self, otp_type):
         code, success = send_otp_sms(self.mobile, otp_type)
         if success:
@@ -90,20 +81,20 @@ class CustomUser(AbstractUser):
         Currency = apps.get_model('bitpin', 'BitPinCurrency')
         try:
             currency = Currency.objects.get(code=code)
-            wallet = self.wallet_set.create(currency_id=currency)
+            wallet = self.wallets.create(currency_id=currency)
             return wallet
         except Exception as _:
             return None
 
     def get_wallet(self, code):
-        wallet = self.wallet_set.filter(currency_id__code=code).first()
+        wallet = self.wallets.filter(currency_id__code=code).first()
         if not wallet:
             wallet = self.create_wallet(code)
 
         return wallet
 
     def has_wallet(self, code):
-        return self.wallet_set.filter(currency_id__code=code).exists()
+        return self.wallets.filter(currency_id__code=code).exists()
 
     def log_login(self, successful, ip, reason=None):
         return self.loginhistory_set.create(successful=successful, ip=ip, reason=reason)
