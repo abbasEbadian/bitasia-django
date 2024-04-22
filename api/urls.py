@@ -14,5 +14,5 @@ urlpatterns = [
     path('transfers/', include('order.transfer_urls'), name='transfers'),
     path('commisions/', include('commission.urls'), name='commissions'),
     path('tickets/', include('ticket.urls'), name='tickets'),
-
+    path('jibit-requests/', include('jibit.urls'), name='jibit-requests'),
 ]

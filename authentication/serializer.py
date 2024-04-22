@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, get_user_model
 from django.core.validators import FileExtensionValidator
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
@@ -110,9 +111,8 @@ class VerifyAccountSerializer(serializers.Serializer):
 
     def validate(self, attrs, **kw):
         rule_id = attrs.get('rule_id', None)
-        rule = AuthorityRule.objects.filter(pk=int(rule_id))
+        rule = get_object_or_404(AuthorityRule, pk=int(rule_id))
         if not rule: raise CustomError(ERRORS.ERROR_INVALID_RULE)
-        rule = rule.first()
         fields = list(map(lambda x: x.field_key, rule.option_ids.all()))
         for field in fields:
             value = attrs.get(field, None)

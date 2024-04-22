@@ -36,3 +36,14 @@ class AuthorityRequestSerializer(serializers.ModelSerializer):
         model = AuthorityRequest
         fields = "__all__"
         depth = 1
+
+
+class AuthorityRequestUpdateSerializer(serializers.Serializer):
+    action = serializers.ChoiceField(required=True, choices=[('accept', 'Accept'), ('reject', 'Reject')])
+
+    def update(self, instance, attrs):
+        instance = self.instance
+        user = self.context.get('request').user
+        user.authority_option_ids.set(user.authority_option_ids.all() | instance.rule_id.option_ids.all())
+        user.save()
+        return instance

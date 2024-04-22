@@ -9,7 +9,8 @@ from api.permissions import IsModerator
 from authority.models import AuthorityLevel, AuthorityRule, AuthorityRuleOption, AuthorityRequest
 from authority.permissions import AuthorityLevelPermission, AuthorityRulePermission, AuthorityRuleOptionPermission, \
     AuthorityRequestPermission
-from authority.serializer import AuthorityLevelSerializer, AuthorityRuleWithOptionSerializer, AuthorityRequestSerializer
+from authority.serializer import AuthorityLevelSerializer, AuthorityRuleWithOptionSerializer, \
+    AuthorityRequestSerializer, AuthorityRequestUpdateSerializer
 
 
 class AuthorityLevelView(generics.ListAPIView):
@@ -88,13 +89,15 @@ class AuthorityRequestView(generics.ListAPIView, IsModeratorMixin):
         })
 
 
-class AuthorityRequestDetailView(generics.RetrieveAPIView, IsModeratorMixin):
+class AuthorityRequestDetailView(generics.RetrieveUpdateAPIView, IsModeratorMixin):
     authentication_classes = [TokenAuthentication]
+    http_method_names = ["get", "patch"]
     permission_classes = [(IsAuthenticated & ~IsModerator) | (IsModerator & AuthorityRequestPermission)]
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return AuthorityRequestSerializer
+        return AuthorityRequestUpdateSerializer
 
     def get_queryset(self):
         if self.is_moderator(self.request):
@@ -107,4 +110,14 @@ class AuthorityRequestDetailView(generics.RetrieveAPIView, IsModeratorMixin):
         return Response({
             "result": "success",
             "object": serializer.data
+        })
+
+    @swagger_auto_schema(operation_id="Accept/Reject single authority request", tags=["Authority"])
+    def patch(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object(), data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        return Response({
+            "result": "success",
+            "object": AuthorityRequestSerializer(instance).data
         })

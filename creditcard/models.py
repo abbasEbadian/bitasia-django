@@ -11,7 +11,8 @@ class CreditCard(BaseModelWithDate):
     card_number = models.CharField(_('Credit card number'), max_length=16)
     iban = models.CharField(_("IBAN"), max_length=26)
     approved = models.BooleanField(_("Approved"), default=False)
-
+    card_number_matched_owner = models.BooleanField(_("Card number matched owner credit card"), default=False)
+    iban_matched_owner = models.BooleanField(_("Card number matched owner credit card"), default=False)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:

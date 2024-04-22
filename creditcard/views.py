@@ -1,3 +1,4 @@
+from django.db.transaction import atomic
 from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
@@ -5,7 +6,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from api.mixins import IsModeratorMixin
-from api.permissions import IsOwner, IsSimpleUser
+from api.permissions import IsOwner
 from creditcard.models import CreditCard
 from creditcard.permissions import CreditCardPermission
 from creditcard.schema import creditcard_create_schema
@@ -42,14 +43,14 @@ class CreditCardView(generics.ListCreateAPIView, IsModeratorMixin):
 
     @swagger_auto_schema(**creditcard_create_schema)
     def post(self, request):
-        serializer = CreditCardCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        user = self.request.user
-        serializer.save(user_id=user)
+        with atomic():
+            serializer = CreditCardCreateSerializer(data=request.data, context={"user": request.user})
+            serializer.is_valid(raise_exception=True)
+            instance = serializer.save(user_id=self.request.user)
 
         return Response({
-            "result": "success"
+            "result": "success",
+            "object": CreditCardSerializer(instance).data
         }, status.HTTP_201_CREATED)
 
 

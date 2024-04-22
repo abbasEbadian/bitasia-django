@@ -18,11 +18,14 @@ import os
 from pathlib import Path
 
 import environ
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+
+from exchange import settings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -44,11 +47,12 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('v1/', include('api.urls')),
-    path('api-auth/', include('rest_framework.urls')),
+                  path('v1/', include('api.urls')),
+                  path('api-auth/', include('rest_framework.urls')),
 
-    path('admin/', admin.site.urls),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+                  path('admin/', admin.site.urls),
+                  path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+                  path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
-]
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
+              + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

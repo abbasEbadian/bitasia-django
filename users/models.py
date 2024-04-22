@@ -44,11 +44,13 @@ class CustomUser(AbstractUser):
     birthdate = models.CharField(
         null=True, blank=True, verbose_name="تاریخ تولد")
     national_card_image = models.ImageField(
-        verbose_name='تصویر کارت ملی', upload_to=get_file_path_for_birth, null=True, blank=True, )
+        verbose_name='تصویر کارت ملی', upload_to=get_file_path_for_national, null=True, blank=True, )
     birth_card_image = models.ImageField(
-        verbose_name='تصویر شناسنامه', upload_to=get_file_path_for_national, null=True, blank=True, )
+        verbose_name='تصویر شناسنامه', upload_to=get_file_path_for_birth, null=True, blank=True, )
 
     last_login = models.DateTimeField(verbose_name="آخرین ورود", null=True, blank=True, auto_now=True)
+    authority_option_ids = models.ManyToManyField('authority.authorityruleoption')
+    mobile_matched_national_code = models.BooleanField(default=False)
 
     def __str__(self):
         return self.first_name and (self.first_name + " " + self.last_name + "(" + self.username + ")") or self.username

@@ -58,14 +58,17 @@ APPS = [
     "zarinpal",
     "permission",
     "commission",
-    "ticket"
+    "ticket",
+    "config",
+    "jibit"
 ]
 LIBS = [
     "rest_framework",
     "drf_yasg",
     "knox",
     "corsheaders",
-    "django_crontab"
+    "django_crontab",
+    "solo"
 ]
 
 INSTALLED_APPS = [
@@ -204,5 +207,6 @@ OTP_EXPIRE_MINUTES = 30
 
 CRONJOBS = [
     ("* * * * *", "bitpin.crons.get_bitpin_currencies_cron", ">> /srv/bitasia-django/log.log"),
-    ("* * * * *", "authentication.crons.check_otp_expiration", ">> /srv/bitasia-django/otp/log.log")
+    ("* * * * *", "authentication.crons.check_otp_expiration", ">> /srv/bitasia-django/otp/log.log"),
+    ("* */12 * * *", "jibit.crons.update_token", ">> /srv/bitasia-django/jibit/log.log"),
 ]
