@@ -247,7 +247,10 @@ class TransferCreateSerializer(serializers.Serializer):
 
 class CalculateOrderCommissionSerializer(serializers.Serializer):
     currency_code = serializers.CharField(required=True)
-    base_currency_code = serializers.CharField(required=True)
+    base_currency_code = serializers.ChoiceField(required=True, choices=[
+        ("USDT", "USDT"),
+        ("IRT", "IRT"),
+    ])
     amount = serializers.DecimalField(required=False, max_digits=20, decimal_places=9, min_value=0)
     cost = serializers.DecimalField(required=False, max_digits=20, decimal_places=9, min_value=0)
     type = serializers.ChoiceField(required=True, choices=Order.Type.choices)
