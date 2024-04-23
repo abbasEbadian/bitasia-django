@@ -247,5 +247,20 @@ class TransferCreateSerializer(serializers.Serializer):
 
 class CalculateOrderCommissionSerializer(serializers.Serializer):
     currency_code = serializers.CharField(required=True)
-    amount = serializers.DecimalField(required=True, max_digits=20, decimal_places=9)
+    base_currency_code = serializers.CharField(required=True)
+    amount = serializers.DecimalField(required=False, max_digits=20, decimal_places=9, min_value=0)
+    cost = serializers.DecimalField(required=False, max_digits=20, decimal_places=9, min_value=0)
     type = serializers.ChoiceField(required=True, choices=Order.Type.choices)
+
+    def validate(self, attrs):
+        currency_code = attrs.get('currency_code')
+        base_currency_code = attrs.get('base_currency_code')
+        cost = attrs.get('cost', 0)
+        amount = attrs.get('amount', 0)
+        if not cost and not amount:
+            raise CustomError(ERRORS.custom_message_error(_("Either cost or amount must be specified.")))
+        if base_currency_code == currency_code:
+            raise CustomError(ERRORS.custom_message_error(_("Source and Destination currency Cant be same")))
+        if base_currency_code not in ["IRT", "USDT"]:
+            raise CustomError(ERRORS.custom_message_error(_("Destination must be either IRT or USDT.")))
+        return attrs

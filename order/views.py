@@ -206,22 +206,29 @@ class CalculateOrderCommissionView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    @swagger_auto_schema(operation_id="Calculate Withdraw Commission",
+    @swagger_auto_schema(operation_id="Calculate BuySell Commission",
                          request_body=CalculateOrderCommissionSerializer)
     def post(self, request, *args, **kwargs):
         serializer = CalculateOrderCommissionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         currency = get_object_or_404(BitPinCurrency, code=request.data.get("currency_code"))
         amount = Decimal(request.data.get("amount"))
+        cost = Decimal(request.data.get("cost"))
         _type = request.data.get("type")
-        total = Order.get_amount_for_increase(_type, amount, currency)
-        comm = Order.get_commission_amount(currency, _type, amount)
+        base_currency = get_object_or_404(BitPinCurrency, code=request.data.get("base_currency_code"))
+        if cost and not amount:
+            amount = cost / currency.get_price(base_currency.code)
+        else:
+            cost = amount * currency.get_price(base_currency.code)
+        total = Order.get_amount_for_increase(_type, amount, currency, base_currency)
+        comm = Order.get_commission_amount(currency, _type, amount, base_currency)
         return Response({
             "result": "success",
             "amount": amount,
-            "current_price": currency.get_price(),
+            "current_price": currency.get_price(base_currency.code),
             "amount_after_commission": total - comm,
             "commission": comm,
+            "cost": cost
         })
 
 
