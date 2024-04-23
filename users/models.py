@@ -1,5 +1,7 @@
 # Create your models here.
+import string
 import uuid
+from random import choice
 
 from django.apps import apps
 from django.contrib.auth.models import AbstractUser
@@ -32,6 +34,14 @@ def get_file_path_for_avatar(instance, filename):
     return filename
 
 
+def _generate_referral_code():
+    characters = (string.digits + string.ascii_uppercase + string.ascii_lowercase).replace("l", "").replace("I",
+                                                                                                            "").replace(
+        "o", "").replace("O", "").replace("0", "")
+    code = ''.join(choice(characters) for _ in range(7))
+    return code
+
+
 class CustomUser(AbstractUser):
     uid = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="شناسه", )
     mobile = models.CharField(max_length=11, verbose_name="شماره همراه")
@@ -51,6 +61,8 @@ class CustomUser(AbstractUser):
     last_login = models.DateTimeField(verbose_name="آخرین ورود", null=True, blank=True, auto_now=True)
     authority_option_ids = models.ManyToManyField('authority.authorityruleoption')
     mobile_matched_national_code = models.BooleanField(default=False)
+    referral_code = models.CharField(max_length=8, default=_generate_referral_code)
+    parent = models.ForeignKey("customuser", related_name="subsets", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.first_name and (self.first_name + " " + self.last_name + "(" + self.username + ")") or self.username
@@ -62,8 +74,10 @@ class CustomUser(AbstractUser):
         verbose_name_plural = "کاربرها"
 
     def save(self, *args, **kwargs):
-        # if needed sth
         return super().save(*args, **kwargs)
+
+    def get_referral_incomes(self):
+        return []
 
     @property
     def has_national_card_image(self):

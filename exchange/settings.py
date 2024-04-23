@@ -60,7 +60,8 @@ APPS = [
     "commission",
     "ticket",
     "config",
-    "jibit"
+    "jibit",
+    "referral"
 ]
 LIBS = [
     "rest_framework",

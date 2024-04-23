@@ -15,4 +15,5 @@ urlpatterns = [
     path('commisions/', include('commission.urls'), name='commissions'),
     path('tickets/', include('ticket.urls'), name='tickets'),
     path('jibit-requests/', include('jibit.urls'), name='jibit-requests'),
+    path('referrals/', include('referral.urls'), name='referrals'),
 ]

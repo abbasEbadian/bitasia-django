@@ -3,7 +3,6 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.serializers import get_serializer
 from django.core.validators import MinLengthValidator, MaxLengthValidator, EmailValidator
 from django.utils.translation import gettext as _
 from rest_framework import serializers
@@ -40,10 +39,6 @@ class GroupSerializer(serializers.ModelSerializer):
         model = Group
         fields = '__all__'
         depth = 1
-
-    def get_permissions(self, obj):
-        get_serializer
-        return
 
 
 class UserSerializer(serializers.ModelSerializer):

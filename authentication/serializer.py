@@ -68,12 +68,15 @@ class RegisterSerializer(serializers.Serializer):
     password = serializers.CharField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
+    referral = serializers.CharField(required=False)
 
     def validate(self, attrs):
         mobile = attrs.get('mobile')
         password = attrs.get('password')
         first_name = attrs.get('first_name')
         last_name = attrs.get('last_name')
+        referral = attrs.get('referral')
+
         if not mobile or not check_mobile(mobile) or len(mobile) != 11:
             raise CustomError(ERRORS.ERROR_INVALID_MOBILE)
         if not password or len(password) < 6:
@@ -82,12 +85,14 @@ class RegisterSerializer(serializers.Serializer):
             raise CustomError(ERRORS.ERROR_INVALID_FIRST_NAME)
         if not last_name or len(last_name) < 3:
             raise CustomError(ERRORS.ERROR_INVALID_LAST_NAME)
-
+        if not User.objects.only("referral_code").filter(referral_code=referral).exists():
+            raise CustomError(ERRORS.custom_message_error(_("Invalid referral code")))
+        parent = User.objects.filter(referral_code=referral)
         if User.objects.filter(mobile=mobile).exists():
             raise CustomError(ERRORS.ERROR_MOBILE_ALREADY_EXISTS)
 
         user = User.objects.create_user(mobile=mobile, username=mobile, first_name=first_name,
-                                        last_name=last_name)
+                                        last_name=last_name, parent=parent)
         user.set_password(password)
         user.save()
         attrs['user'] = user
