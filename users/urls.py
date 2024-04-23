@@ -6,7 +6,7 @@ from .views_password import forget_password_change_view, reset_password_change_v
 
 urlpatterns = [
     path("", UserListView.as_view(), name="user-list"),
-    path("details/", UserCurrentUserView.as_view(), name="user-detail"),
+    path("detail/", UserCurrentUserView.as_view(), name="user-detail"),
     path("history/", LoginHistoryView.as_view(), name="login-history-list"),
     path("<int:pk>/", UserDetailView.as_view(), name="user-detail-update"),
     # path("create/", UserCreateView.as_view(), name="user-create"),
