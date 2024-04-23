@@ -212,8 +212,8 @@ class CalculateOrderCommissionView(APIView):
         serializer = CalculateOrderCommissionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         currency = get_object_or_404(BitPinCurrency, code=request.data.get("currency_code"))
-        amount = Decimal(request.data.get("amount"), 0)
-        cost = Decimal(request.data.get("cost"), 0)
+        amount = Decimal(request.data.get("amount", 0), )
+        cost = Decimal(request.data.get("cost", 0))
         _type = request.data.get("type")
         base_currency = get_object_or_404(BitPinCurrency, code=request.data.get("base_currency_code"))
         if cost and not amount:
