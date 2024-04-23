@@ -20,7 +20,7 @@ User = get_user_model()
 # Create your views here.
 class UserListView(generics.ListAPIView):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (IsModerator, )
 
     serializer_class = UserSerializer
     queryset = User.objects.all()
@@ -29,7 +29,21 @@ class UserListView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
+class UserCurrentUserView(generics.APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserSerializer
 
+    def get_queryset(self):
+        return User.objects.filter(pk=self.request.user.pk)
+
+    @swagger_auto_schema(operation_id="Current user detail")
+    def get(self, request, *args, **args):
+        return Response({
+            "result": "success",
+            "object": self.get_serializer(request.user).data
+        })
+    
 class UserCreateView(generics.CreateAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.IsAdminUser,)
