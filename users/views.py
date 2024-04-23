@@ -30,7 +30,7 @@ class UserListView(generics.ListAPIView):
         return super().list(request, *args, **kwargs)
 
 
-class UserCurrentUserView(generics.APIView):
+class UserCurrentUserView(generics.GenericAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
