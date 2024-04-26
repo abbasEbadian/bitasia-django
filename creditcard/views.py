@@ -6,7 +6,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from api.mixins import IsModeratorMixin
-from api.permissions import IsOwner
+from api.permissions import IsOwner, IsSimpleUser
 from creditcard.models import CreditCard
 from creditcard.permissions import CreditCardPermission
 from creditcard.schema import creditcard_create_schema
