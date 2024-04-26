@@ -22,7 +22,7 @@ class JibitView(generics.ListCreateAPIView):
         user_id = self.request.GET.get("user_id", None)
         if user_id:
             return JibitRequest.objects.filter(user_id=user_id)
-        return self.queryset
+        return super().get_queryset()
 
     def get_serializer_class(self):
         if self.request.method == "GET":
