@@ -33,7 +33,7 @@ class JibitView(generics.ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         return Response({
             "result": "success",
-            "objects": self.list(request, *args, **kwargs)
+            "objects": self.get_serializer(self.get_queryset(), many=True).data
         })
 
     @swagger_auto_schema(operation_id=_("New request for user or card"))
