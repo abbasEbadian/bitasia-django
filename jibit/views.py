@@ -19,7 +19,7 @@ class JibitView(generics.ListCreateAPIView):
     default_limit = 50
 
     def get_queryset(self):
-        user_id = self.request.get("user_id", None)
+        user_id = self.request.GET.get("user_id", None)
         if user_id:
             return JibitRequest.objects.filter(user_id=user_id)
         return self.queryset
