@@ -16,7 +16,7 @@ User = get_user_model()
 class UserSimplifiedSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        exclude = ['password', 'is_superuser', 'is_staff', 'is_active', 'groups', 'user_permissions']
+        exclude = ['password', 'is_superuser', 'is_staff', 'is_active']
 
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -52,9 +52,8 @@ class UserSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         if not self.context.get("is_moderator"):
             return ret
-        ret["is_staff"] = instance.is_staff
-        ret["is_active"] = instance.is_active
         ret["groups"] = GroupSerializer(instance.groups.all(), many=True).data
+        ret["user_permissions"] = PermissionSerializer(instance.user_permissions.all(), many=True).data
         return ret
 
     def _get_user_level(self, obj):
@@ -82,7 +81,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ('password', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
+        fields = ("__all__")
+        depth = 1
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
