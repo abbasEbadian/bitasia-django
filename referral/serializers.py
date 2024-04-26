@@ -22,7 +22,9 @@ class ReferralProgramCreateSerializer(serializers.Serializer):
         max_subset_count = attrs.get('max_subset_count')
         if min_subset_count > max_subset_count:
             max_subset_count, min_subset_count = min_subset_count, max_subset_count
-        for ref in ReferralProgram.objects.exclude(pk=self.instance.id).order_by("min_subset_count"):
+        qs = ReferralProgram.objects.all().order_by("min_subset_count")
+        if hasattr(self, "instance") and self.instance is not None: qs = qs.filter(pk=self.instance.id)
+        for ref in qs:
             if min_subset_count <= ref.min_subset_count <= max_subset_count:
                 raise CustomError(ERRORS.custom_message_error(_("This program has overlapped with another program.")))
         return attrs
