@@ -42,7 +42,7 @@ class JibitView(generics.ListCreateAPIView):
             serializer = JibitCreateSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response({
-                "result": "success",
-                "message": _("Request sent to Jibit, Result will be available soon.")
-            })
+        return Response({
+            "result": "success",
+            "message": _("Request sent to Jibit, Result will be available soon.")
+        })
