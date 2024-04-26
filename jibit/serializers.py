@@ -35,7 +35,7 @@ class JibitCreateSerializer(serializers.Serializer):
             if card_number and iban:
                 raise CustomError(ERRORS.custom_message_error(_("Request for Card number and IBAN separately")))
         else:
-            if not user_id.national_code:
+            if not user.national_code:
                 raise CustomError(ERRORS.custom_message_error(_("Specified user has no national code.")))
 
         attrs["user"] = user
