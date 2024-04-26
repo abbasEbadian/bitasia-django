@@ -45,6 +45,7 @@ class JibitRequest(BaseModelWithDate):
             self.user_id.mobile_matched_national_code = matched
             self.user_id.save()
         elif status_code == 400:
+            res = res.json()
             self.result_json = res
         elif str(res.status_code).startswith("5"):
             self.successful_request = False

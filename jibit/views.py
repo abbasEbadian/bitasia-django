@@ -39,7 +39,7 @@ class JibitView(generics.ListCreateAPIView):
     @swagger_auto_schema(operation_id=_("New request for user or card"))
     def post(self, request, *args, **kwargs):
         with atomic():
-            serializer = JibitCreateSerializer(data=request.data)
+            serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
         return Response({
