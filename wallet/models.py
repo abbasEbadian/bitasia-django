@@ -33,6 +33,9 @@ class Wallet(BaseModelWithDate):
     def get_balance(self):
         return self.balance
 
+    def can_afford(self, amount):
+        return self.balance >= Decimal(amount)
+
     def charge(self, amount):
         if amount < 0:
             if self.balance < amount:

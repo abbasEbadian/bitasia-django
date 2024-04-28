@@ -186,6 +186,24 @@ class OrderView(generics.ListCreateAPIView, IsModeratorMixin):
         }, status=status.HTTP_201_CREATED)
 
 
+@swagger_auto_schema(operation_id=_("Send otp for Crypto withdraw"), method="POST", tags=CRYPTO_TRANSACTION_TAGS)
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def send_crypto_withdraw_otp(request):
+    user = request.user
+    instance = user.send_otp(OTP.Type.WITHDRAW)
+    if instance:
+        return Response({
+            "result": "success",
+            "message": _("OTP sent successfully")
+        }, status=status.HTTP_201_CREATED)
+    return Response({
+        "result": "error",
+        "message": _("Unable to connect to the SMS service provider at the moment.")
+    })
+
+
 class OrderDetailView(generics.RetrieveAPIView, IsModeratorMixin):
     authentication_classes = (TokenAuthentication,)
     permission_classes = [(~IsModerator & IsAuthenticated) | (IsModerator & OrderPermission)]

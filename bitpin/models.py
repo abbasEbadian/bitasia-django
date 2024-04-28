@@ -140,7 +140,7 @@ class BitPinCurrency(BaseModelWithDate):
         comm = self.get_withdraw_commission_obj(network)
         if comm.type == withdraw_commission_klass.CommissionType.VALUE:
             return Decimal(comm.amount)
-        return Decimal(amount * comm.amount)
+        return Decimal(amount) * Decimal(comm.amount)
 
     def calculate_amount_after_commission(self, amount, network):
         c1 = self._get_bitpin_commission(amount)

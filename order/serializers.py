@@ -30,22 +30,31 @@ class TransactionSerializer(CustomModelSerializer):
 
 
 class TransactionCreateSerializer(serializers.Serializer):
+    otp = serializers.IntegerField(required=False, max_value=99999, help_text="If is withdraw")
     type = serializers.ChoiceField(required=True, choices=Transaction.Type.choices)
     wallet_address = serializers.CharField(required=True, max_length=255)
-    currency_id = serializers.IntegerField(required=True)
-    network_id = serializers.IntegerField(required=True)
+    currency_code = serializers.CharField(required=True)
+    network_code = serializers.CharField(required=True)
     amount = serializers.DecimalField(required=True, min_value=0, decimal_places=9, max_digits=20)
     tx_id = serializers.CharField(required=False)
 
     def validate(self, attrs, *args, **kwargs):
-        currency = get_object_or_404(BitPinCurrency, pk=attrs.get("currency_id"))
-        network = get_object_or_404(BitPinNetwork, pk=attrs.get("network_id"))
+        currency = get_object_or_404(BitPinCurrency, code=attrs.get("currency_code"))
+        network = get_object_or_404(BitPinNetwork, code=attrs.get("network_code"))
         amount = attrs.get("amount")
         _type = attrs.get('type')
+        user = self.context.get('user_id')
 
-        if _type == Transaction.Type.WITHDRAW and amount < currency.min_withdraw:
-            raise CustomError(ERRORS.custom_message_error("Min withdraw is %f." % currency.min_withdraw))
+        otp = attrs.get("otp", None)
+        if _type == Transaction.Type.WITHDRAW:
+            if amount < currency.min_withdraw:
+                raise CustomError(ERRORS.custom_message_error("Min withdraw is %f." % currency.min_withdraw))
+            if not user.get_wallet(currency.code).can_afford(amount):
+                raise CustomError(ERRORS.custom_message_error(_("Insufficient balance.")))
 
+            otp = user.get_otp(code=otp, otp_type=OTP.Type.WITHDRAW)
+            if not otp:
+                raise CustomError(ERRORS.custom_message_error(_("Invalid OTP")))
         if not currency._has_network(network):
             raise CustomError(
                 ERRORS.custom_message_error(_("Provided network %s not present in currency networks.") % network.title))
@@ -61,6 +70,7 @@ class TransactionCreateSerializer(serializers.Serializer):
                 raise CustomError(ERRORS.custom_message_error(_("Insufficient balance.")))
         attrs["currency"] = currency
         attrs["network"] = network
+        attrs["otp"] = otp
         return attrs
 
     def create(self, validated_data, *args, **kwargs):
@@ -84,6 +94,8 @@ class TransactionCreateSerializer(serializers.Serializer):
         })
         if type == Transaction.Type.WITHDRAW:
             tr.after_create_request()
+            validated_data.get("otp").consume()
+
         tr.set_order_info()
         return tr
 
@@ -157,6 +169,7 @@ class OrderCreateSerializer(serializers.Serializer):
         type = attrs.get('type')
         wallet = user.get_wallet(currency.code)
         cost = amount
+
         if type == Order.Type.BUY:
             cost *= currency.get_price(base_currency.code)
             wallet = user.get_wallet(base_currency.code)
@@ -207,11 +220,11 @@ class TransferCreateSerializer(serializers.Serializer):
     mobile = serializers.CharField(required=True, min_length=11, max_length=11)
 
     def validate(self, attrs, *args, **kwargs):
-        otp = attrs.get("otp")
         currency = get_object_or_404(BitPinCurrency, code=attrs.get("currency_code"))
         mobile = attrs.get("mobile")
         amount = attrs.get("amount")
         user = self.context.get('request').user
+        otp = attrs.get("otp")
         otp = user.get_otp(code=otp, otp_type=OTP.Type.TRANSFER)
         if not otp:
             raise CustomError(ERRORS.custom_message_error(_("Invalid OTP")))
