@@ -11,7 +11,6 @@ class RoundedDecimalField(models.DecimalField):
 
     def pre_save(self, model_instance, add):
         """Return field's value just before saving."""
-        print("pre_save")
         value = getattr(model_instance, self.attname)
         if isinstance(value, decimal.Decimal):
             return decimal.Decimal(value).quantize(decimal.Decimal("0.00001"), rounding=decimal.ROUND_HALF_UP)

@@ -27,7 +27,7 @@ class OTP(BaseModelWithDate):
 
     def consume(self):
         self.consumed = True
-        self.save()
+        self.save(update_fields=["consumed"])
 
     def expire(self):
         self.expired = True

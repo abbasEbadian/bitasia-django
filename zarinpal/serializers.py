@@ -3,6 +3,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from authentication.exception import CustomError
+from authentication.models import OTP
 from exchange.error_codes import ERRORS
 from zarinpal.models import RialDeposit, RialWithdraw
 
@@ -20,15 +21,22 @@ class RialDepositAdminSerializer(serializers.ModelSerializer):
 
 
 class RialWithdrawCreateSerializer(serializers.Serializer):
+    otp = serializers.CharField(required=True)
     amount = serializers.DecimalField(max_digits=10, decimal_places=0, required=True)
     sheba_number = serializers.CharField(required=True, max_length=26)
 
     def validate(self, attrs):
-        amount = attrs.get('amount')
-        sheba_number = attrs.get('sheba_number')
+        otp = attrs.pop('otp')
+        amount = attrs.get('amount', 0)
+        sheba_number = attrs.get('sheba_number', "")
         user_id = self.context.get("user_id")
+        otp = user_id.get_otp(otp, OTP.Type.WITHDRAW)
+        if not otp:
+            raise CustomError(ERRORS.custom_message_error(_("Invalid OTP")))
         if not amount:
             raise CustomError(ERRORS.empty_field_error("amount"))
+        if user_id.get_wallet("IRT").balance < amount:
+            raise CustomError(ERRORS.custom_message_error(_("Insufficient balance")))
         if not sheba_number:
             raise CustomError(ERRORS.empty_field_error("sheba_number"))
         sheba = user_id.creditcard_set.filter(iban=sheba_number)
@@ -37,10 +45,13 @@ class RialWithdrawCreateSerializer(serializers.Serializer):
         if not sheba.first().approved:
             raise CustomError(ERRORS.custom_message_error(_("Sheba not approved.")))
 
+        attrs["otp"] = otp
         attrs["user_id"] = user_id
         return attrs
 
     def create(self, validated_data):
+        otp = validated_data.pop('otp')
+        otp.consume()
         return RialWithdraw.objects.create(**validated_data)
 
 

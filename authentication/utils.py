@@ -16,6 +16,12 @@ env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 sms = ghasedakpack.Ghasedak(env("SMS_API_KEY"))
 
+LOGIN = "login"
+RESET = "reset_password"
+FORGET = "forget_password"
+TRANSFER = "transfer"
+WITHDRAW = "withdraw"
+
 
 def check_mobile(mobile=''):
     pattern = re.compile(r"^09\d{9}$")
@@ -33,13 +39,6 @@ def generate_otp(length=5):
     characters = string.digits.replace('0', '')
     otp = ''.join(random.choice(characters) for _ in range(length))
     return otp
-
-
-LOGIN = "login"
-RESET = "reset_password"
-FORGET = "forget_password"
-TRANSFER = "transfer"
-WITHDRAW = "withdraw"
 
 
 def get_otp_template(otp_type):

@@ -93,6 +93,9 @@ class CustomUser(AbstractUser):
             return self.otp_set.create(code=code, type=otp_type)
         return False
 
+    def get_otp(self, code, otp_type):
+        return self.otp_set.filter(code=code, type=otp_type, consumed=False, expired=False).first()
+
     def create_wallet(self, code):
         Currency = apps.get_model('bitpin', 'BitPinCurrency')
         try:

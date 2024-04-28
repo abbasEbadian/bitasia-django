@@ -1,3 +1,4 @@
+from django.db.transaction import atomic
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
@@ -11,6 +12,7 @@ from api.mixins import IsModeratorMixin
 from api.permissions import IsModerator
 from api.schema import create_payment_schema
 from authentication.exception import CustomError
+from authentication.models import OTP
 from exchange.error_codes import ERRORS
 from .models import RialDeposit, RialWithdraw
 from .permissions import RialWithdrawPermission, RialDepositPermission
@@ -47,15 +49,16 @@ class RialWithdrawView(generics.ListCreateAPIView, IsModeratorMixin):
 
     @swagger_auto_schema(operation_id=_("Create new withdraw"), tags=["Transactions - Rial"])
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={"user_id": request.user})
-        serializer.is_valid(raise_exception=True)
-        withdraw = serializer.save()
-        withdraw.submit()
+        with atomic():
+            serializer = self.get_serializer(data=request.data, context={"user_id": request.user})
+            serializer.is_valid(raise_exception=True)
+            withdraw = serializer.save()
+            withdraw.submit()
 
-        return Response({
-            "result": "success",
-            "object": serializer.data
-        }, status=status.HTTP_201_CREATED)
+            return Response({
+                "result": "success",
+                "object": RialWithdrawSerializer(withdraw).data
+            }, status=status.HTTP_201_CREATED)
 
 
 class RialWithdrawConfirmView(generics.UpdateAPIView):
@@ -186,4 +189,22 @@ def payment_callback(request):
         "amount": f"{transaction.amount:,}",
         "factor_number": transaction.factor_number,
         "ref_id": transaction.verifyline_set.last() and transaction.verifyline_set.last().ref_id
+    })
+
+
+@swagger_auto_schema(operation_id=_("Send otp for Rial Withdrawal"), method="POST", tags=["Transactions - Rial"])
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def send_rial_withdraw_otp(request):
+    user = request.user
+    instance = user.send_otp(OTP.Type.WITHDRAW)
+    if instance:
+        return Response({
+            "result": "success",
+            "message": _("OTP sent successfully")
+        }, status=status.HTTP_201_CREATED)
+    return Response({
+        "result": "error",
+        "message": _("Unable to connect to the SMS service provider at the moment.")
     })
