@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from api.serializers import CustomModelSerializer
 from authentication.exception import CustomError
+from authentication.models import OTP
 from bitpin.serializers import CurrencySerializer, CurrencySimplifiedSerializer
 from exchange.error_codes import ERRORS
 from order.models import *
@@ -200,16 +201,20 @@ class TransferSerializer(CustomModelSerializer):
 
 
 class TransferCreateSerializer(serializers.Serializer):
+    otp = serializers.IntegerField(required=True, max_value=99999)
     currency_code = serializers.CharField(required=True)
     amount = serializers.DecimalField(required=True, min_value=0, max_digits=20, decimal_places=9)
     mobile = serializers.CharField(required=True, min_length=11, max_length=11)
 
     def validate(self, attrs, *args, **kwargs):
+        otp = attrs.get("otp")
         currency = get_object_or_404(BitPinCurrency, code=attrs.get("currency_code"))
         mobile = attrs.get("mobile")
         amount = attrs.get("amount")
         user = self.context.get('request').user
-
+        otp = user.get_otp(code=otp, otp_type=OTP.Type.TRANSFER)
+        if not otp:
+            raise CustomError(ERRORS.custom_message_error(_("Invalid OTP")))
         wallet = user.has_wallet(currency.code)
         if not wallet or user.get_wallet(currency.code).balance < amount:
             raise CustomError(ERRORS.custom_message_error(_("Insufficient balance.")))
@@ -220,6 +225,7 @@ class TransferCreateSerializer(serializers.Serializer):
         attrs["currency_id"] = currency
         attrs["user_id"] = user
         attrs["dest_user_id"] = dest_user
+        attrs["otp"] = otp
         return attrs
 
     def create(self, validated_data, *args, **kwargs):
@@ -242,6 +248,7 @@ class TransferCreateSerializer(serializers.Serializer):
             wallet_2.charge(amount)
             new_transfer.successful = True
             new_transfer.save()
+            validated_data.get("otp").consume()
             return new_transfer
 
 

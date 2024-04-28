@@ -1,12 +1,14 @@
 from decimal import Decimal
 
 from django.db import transaction
+from django.db.transaction import atomic
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -15,6 +17,7 @@ from rest_framework.views import APIView
 from api.mixins import IsModeratorMixin
 from api.permissions import IsModerator
 from authentication.exception import CustomError
+from authentication.models import OTP
 from bitpin.models import BitPinCurrency, BitPinNetwork
 from exchange.error_codes import ERRORS
 from order.models import Transaction, Order, Transfer
@@ -255,10 +258,29 @@ class TransferView(generics.ListCreateAPIView, IsModeratorMixin):
 
     @swagger_auto_schema(operation_id=_("Create new Transfer "), tags=TRANSFER_TAGS)
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        instance = serializer.save()
+        with atomic():
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            instance = serializer.save()
+            return Response({
+                "result": "success",
+                "object": TransferSerializer(instance).data
+            })
+
+
+@swagger_auto_schema(operation_id=_("Send otp for In-Site transfer"), method="POST", tags=TRANSFER_TAGS)
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def send_transfer_otp(request):
+    user = request.user
+    instance = user.send_otp(OTP.Type.TRANSFER)
+    if instance:
         return Response({
             "result": "success",
-            "object": TransferSerializer(instance).data
-        })
+            "message": _("OTP sent successfully")
+        }, status=status.HTTP_201_CREATED)
+    return Response({
+        "result": "error",
+        "message": _("Unable to connect to the SMS service provider at the moment.")
+    })

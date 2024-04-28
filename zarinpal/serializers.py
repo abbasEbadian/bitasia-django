@@ -21,7 +21,7 @@ class RialDepositAdminSerializer(serializers.ModelSerializer):
 
 
 class RialWithdrawCreateSerializer(serializers.Serializer):
-    otp = serializers.CharField(required=True)
+    otp = serializers.IntegerField(required=True, max_value=99999)
     amount = serializers.DecimalField(max_digits=10, decimal_places=0, required=True)
     sheba_number = serializers.CharField(required=True, max_length=26)
 
@@ -50,8 +50,7 @@ class RialWithdrawCreateSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        otp = validated_data.pop('otp')
-        otp.consume()
+        validated_data.pop('otp').consume()
         return RialWithdraw.objects.create(**validated_data)
 
 
