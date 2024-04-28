@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext as _
 
+from api.models import RoundedDecimalField
 from authentication.exception import CustomError
 from bitpin.models import BitPinCurrency
 from exchange.error_codes import ERRORS
@@ -15,7 +16,11 @@ User = get_user_model()
 class Wallet(BaseModelWithDate):
     user_id = models.ForeignKey(User, related_name="wallets", on_delete=models.SET_NULL, null=True)
     currency_id = models.ForeignKey(BitPinCurrency, on_delete=models.SET_NULL, null=True)
-    balance = models.DecimalField(_('Balance'), default=0.0, decimal_places=11, max_digits=24)
+    balance = RoundedDecimalField(_('Balance'), default=0.0, decimal_places=5, max_digits=18)
+
+    def save(self, *args, **kwargs):
+        print(args, kwargs)
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user_id.username} ({self.balance})"

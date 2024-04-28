@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext as _
 
+from api.models import RoundedDecimalField
 from bitpin.models import BitPinCurrency, BitPinNetwork
 from exchange.models import BaseModelWithDate
 
@@ -24,7 +25,7 @@ class Transaction(BaseModelWithDate):
         REJECT = 'reject', _("Reject")
 
     type = models.CharField(verbose_name=_("Transaction Type"), max_length=8, choices=Type.choices)
-    amount = models.DecimalField(verbose_name=_("Amount"), max_digits=20, decimal_places=9)
+    amount = RoundedDecimalField(verbose_name=_("Amount"), max_digits=18, decimal_places=5)
     wallet_address = models.CharField(verbose_name=_("Wallet Address"), max_length=255)
     currency_id = models.ForeignKey(BitPinCurrency, verbose_name=_("Currency"), on_delete=models.RESTRICT)
     currency_current_value = models.PositiveBigIntegerField(
@@ -36,10 +37,10 @@ class Transaction(BaseModelWithDate):
     tx_id = models.CharField(max_length=255, verbose_name=_("Transaction ID"))
     submit_date = models.DateTimeField(verbose_name=_("Submit Date"), blank=True, null=True)
     factor_number = models.CharField(max_length=255, verbose_name=_("Factor Number"))
-    amount_after_commission = models.DecimalField(verbose_name=_("Amount after commission"), max_digits=20,
-                                                  decimal_places=8, null=True, blank=True)
-    applied_commission_amount = models.DecimalField(verbose_name=_("Commission in request time"), max_digits=20,
-                                                    decimal_places=8, null=True, blank=True)
+    amount_after_commission = RoundedDecimalField(verbose_name=_("Amount after commission"), max_digits=18,
+                                                  decimal_places=5, null=True, blank=True)
+    applied_commission_amount = RoundedDecimalField(verbose_name=_("Commission in request time"), max_digits=18,
+                                                    decimal_places=5, null=True, blank=True)
 
     def __str__(self):
         return f"{self.type} / {self.amount} {self.currency_id.code} / {self.user_id.username}"
@@ -112,12 +113,12 @@ class Order(BaseModelWithDate):
     user_id = models.ForeignKey(User, on_delete=models.RESTRICT)
     currency_id = models.ForeignKey(BitPinCurrency, on_delete=models.RESTRICT)
     base_currency_id = models.ForeignKey(BitPinCurrency, related_name="usdt_order_set", on_delete=models.RESTRICT)
-    amount = models.DecimalField(max_digits=20, decimal_places=9, verbose_name=_("Amount"))
+    amount = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Amount"))
     submit_date = models.DateTimeField(verbose_name=_("Submit Date"), blank=True, null=True)
     currency_current_value = models.PositiveBigIntegerField(
         verbose_name=_("The irt price at the time of placing the order."),
         default=0)
-    currency_currency_usdt_value = models.DecimalField(max_digits=20, decimal_places=9,
+    currency_currency_usdt_value = RoundedDecimalField(max_digits=18, decimal_places=5,
                                                        verbose_name=_("USDT price at the time of placing the order."),
                                                        default=0)
     factor_number = models.CharField(max_length=255, verbose_name=_("Factor Number"))
@@ -197,7 +198,7 @@ class Order(BaseModelWithDate):
 class Transfer(BaseModelWithDate):
     user_id = models.ForeignKey(User, on_delete=models.RESTRICT)
     currency_id = models.ForeignKey(BitPinCurrency, on_delete=models.RESTRICT)
-    amount = models.DecimalField(max_digits=20, decimal_places=9, verbose_name=_("Amount"))
+    amount = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Amount"))
     successful = models.BooleanField()
     destination_mobile = models.CharField(max_length=11)
 

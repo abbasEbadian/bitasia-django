@@ -61,7 +61,8 @@ APPS = [
     "ticket",
     "config",
     "jibit",
-    "referral"
+    "referral",
+
 ]
 LIBS = [
     "rest_framework",
@@ -69,7 +70,8 @@ LIBS = [
     "knox",
     "corsheaders",
     "django_crontab",
-    "solo"
+    "solo",
+    "django_extensions",
 ]
 
 INSTALLED_APPS = [

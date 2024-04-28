@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.forms import forms
 from django.utils.translation import gettext as _
 
+from api.models import RoundedDecimalField
 from exchange.models import BaseModelWithDate
 
 
@@ -34,16 +35,17 @@ class BitPinCurrency(BaseModelWithDate):
     title_fa = models.CharField(_("Title (فارسی)"), max_length=255, blank=True)
     code = models.CharField(_("Code"), max_length=10)
     image = models.URLField(_("Image URL"), null=True, blank=True)
-    min_withdraw = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Minimum Withdrawal"),
+    min_withdraw = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Minimum Withdrawal"),
                                        blank=True,
                                        null=True)
     color = models.CharField(_("Color"), max_length=6)
     alias = models.CharField(_("Alias"), max_length=255, blank=True)
-    withdraw_commission = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Withdrawal Commission"),
+    withdraw_commission = RoundedDecimalField(max_digits=18, decimal_places=5,
+                                              verbose_name=_("Withdrawal Commission"),
                                               blank=True,
                                               null=True)
     withdraw_commission_type = models.CharField(_("Withdrawal Commission Type"), max_length=10, blank=True, null=True)
-    max_withdraw_commission = models.DecimalField(max_digits=24, decimal_places=9,
+    max_withdraw_commission = RoundedDecimalField(max_digits=18, decimal_places=5,
                                                   verbose_name=_("Maximum Withdrawal Commission"),
                                                   blank=True, null=True)
     tradable = models.BooleanField(_("Tradable"), default=False)
@@ -57,47 +59,52 @@ class BitPinCurrency(BaseModelWithDate):
     for_loan = models.BooleanField(_("For Loan"), default=False)
     for_stake = models.BooleanField(_("For Stake"), default=False)
     network_ids = models.ManyToManyField(BitPinNetwork, blank=True)
-    price_info_price = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Price"), default=0.0)
+    price_info_price = models.PositiveBigIntegerField(verbose_name=_("Price"), default=0)
     price_info_time = models.DateTimeField(_("Time"), null=True, blank=True)
-    price_info_change = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Change"), default=0.0)
-    price_info_min = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Minimum"), default=0.0)
-    price_info_max = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Maximum"), default=0.0)
-    price_info_mean = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Mean"), default=0.0)
-    price_info_value = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Market Value"),
-                                           default=0.0)  # Assuming value refers to market value
-    price_info_amount = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Market Amount"),
+    price_info_change = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Change"),
                                             default=0.0)
-    price_info_market_value = models.DecimalField(max_digits=24, decimal_places=9,
+    price_info_min = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Minimum"), default=0.0)
+    price_info_max = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Maximum"), default=0.0)
+    price_info_mean = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Mean"), default=0.0)
+    price_info_value = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Market Value"),
+                                           default=0.0)  # Assuming value refers to market value
+    price_info_amount = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Market Amount"),
+                                            default=0.0)
+    price_info_market_value = RoundedDecimalField(max_digits=18, decimal_places=5,
                                                   verbose_name=_("Total Market Value"),
                                                   default=0.0)
-    price_info_market_amount = models.DecimalField(max_digits=24, decimal_places=9,
+    price_info_market_amount = RoundedDecimalField(max_digits=18, decimal_places=5,
                                                    verbose_name=_("Total Market Amount"),
                                                    default=0.0)
-    price_info_usdt_price = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Price USDT"),
+    price_info_usdt_price = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Price USDT"),
                                                 default=0.0)
     price_info_usdt_time = models.DateTimeField(_("Time USDT"), null=True, blank=True)
-    price_info_usdt_change = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Change USDT"),
+    price_info_usdt_change = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Change USDT"),
                                                  default=0.0)
-    price_info_usdt_min = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Minimum USDT"),
+    price_info_usdt_min = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Minimum USDT"),
                                               default=0.0)
-    price_info_usdt_max = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Maximum USDT"),
+    price_info_usdt_max = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Maximum USDT"),
                                               default=0.0)
-    price_info_usdt_mean = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Mean USDT"),
+    price_info_usdt_mean = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Mean USDT"),
                                                default=0.0)
-    price_info_usdt_value = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Market Value USDT"),
+    price_info_usdt_value = RoundedDecimalField(max_digits=18, decimal_places=5,
+                                                verbose_name=_("Market Value USDT"),
                                                 default=0.0)  # Assuming value refers to market value
-    price_info_usdt_amount = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Market Amount USDT"),
+    price_info_usdt_amount = RoundedDecimalField(max_digits=18, decimal_places=5,
+                                                 verbose_name=_("Market Amount USDT"),
                                                  default=0.0)
-    price_info_usdt_market_value = models.DecimalField(max_digits=24, decimal_places=9,
+    price_info_usdt_market_value = RoundedDecimalField(max_digits=18, decimal_places=5,
                                                        verbose_name=_("Total Market Value USDT"), default=0.0)
-    price_info_usdt_market_amount = models.DecimalField(max_digits=24, decimal_places=9,
+    price_info_usdt_market_amount = RoundedDecimalField(max_digits=18, decimal_places=5,
                                                         verbose_name=_("Total Market Amount USDT"), default=0.0)
 
-    price = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Sales Price"), default=0)
-    price_usdt = models.DecimalField(max_digits=24, decimal_places=9, verbose_name=_("Sales USDT Price"), default=0)
-    markup_percent = models.DecimalField(max_digits=10, decimal_places=5, verbose_name=_("Sales Markup Percent"),
+    price = models.PositiveBigIntegerField(verbose_name=_("Sales Price"), default=0)
+    price_usdt = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Sales USDT Price"),
+                                     default=0)
+    markup_percent = RoundedDecimalField(max_digits=5, decimal_places=5, verbose_name=_("Sales Markup Percent"),
                                          default=0.001)
-    buy_sell_commission = models.DecimalField(max_digits=10, decimal_places=5, verbose_name=_("Buy Sell Commission"),
+    buy_sell_commission = RoundedDecimalField(max_digits=5, decimal_places=5,
+                                              verbose_name=_("Buy Sell Commission"),
                                               default=0.001)
     buy_sell_commission_type = models.CharField(_("Buy Sell Commission Type"), max_length=10,
                                                 choices=CommissionType.choices, default=CommissionType.PERCENT)
