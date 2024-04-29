@@ -4,6 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics
 from rest_framework.decorators import authentication_classes, permission_classes, api_view
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.const import MODERATOR_FIELD, MODERATOR_VALUE
@@ -15,8 +16,13 @@ from referral.serializers import ReferralProgramSerializer, ReferralProgramCreat
 
 class ReferralProgramView(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsModerator, ReferralProgramPermission]
     queryset = ReferralProgram.objects.all()
+
+    @property
+    def permission_classes(self):
+        if self.request.method == "GET":
+            return [IsAuthenticated]
+        return [IsModerator, ReferralProgramPermission]
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
