@@ -138,5 +138,6 @@ class LoginHistory(BaseModelWithDate):
     reason = models.CharField(max_length=16, choices=Reason.choices, null=True, blank=True)
 
     class Meta:
+        ordering = ("-id",)
         verbose_name = _("Login history")
         verbose_name_plural = _("Login histories")
