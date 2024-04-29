@@ -239,11 +239,11 @@ class CalculateOrderCommissionView(APIView):
         base_currency = get_object_or_404(BitPinCurrency, code=request.data.get("base_currency_code"))
         current_price = currency.get_simple_price(base_currency.code)
         if cost and not amount:
-            amount = cost / current_price
+            amount = Decimal(cost / current_price).quantize(Decimal("0.00001"))
         else:
-            cost = amount * current_price
-        total = Order.get_amount_for_increase(_type, amount, currency, base_currency)
-        comm = Order.get_commission_amount(currency, _type, amount, base_currency)
+            cost = Decimal(amount * current_price).quantize(Decimal("0.00001"))
+        total = Order.get_amount_for_increase(_type, amount, currency, base_currency.code)
+        comm = Order.get_commission_amount(currency, _type, amount, base_currency.code)
         return Response({
             "result": "success",
             "amount": amount,

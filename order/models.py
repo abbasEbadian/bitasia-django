@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -149,12 +150,15 @@ class Order(BaseModelWithDate):
     def get_amount_for_decrease(self):
         if self.type == self.Type.SELL:
             return self.amount
-        return self.amount * self.currency_id.get_simple_price(self.base_currency_id.code)
+        return Decimal(self.amount * self.currency_id.get_simple_price(self.base_currency_id.code)).quantize(
+            Decimal("0.00001"))
 
     @staticmethod
     def get_amount_for_increase(type, amount, currency, base_currency_code="IRT"):
         if type == Order.Type.SELL:
-            return amount * currency.get_simple_price(base_currency_code)
+            amount = Decimal(amount * currency.get_simple_price(base_currency_code)).quantize(Decimal("0.00001"))
+        if base_currency_code == "IRT":
+            amount = Decimal(amount).quantize(Decimal("0"))
         return amount
 
     def _get_amount_for_increase(self):
@@ -165,13 +169,15 @@ class Order(BaseModelWithDate):
         comm = currency.buy_sell_commission
         comm_type = currency.buy_sell_commission_type
         if _type == Order.Type.SELL:
-            comm_amount = comm * currency.get_price(base_currency_code)
+            comm_amount = Decimal(comm * currency.get_simple_price(base_currency_code)).quantize(Decimal("0.00001"))
             if comm_type == currency.CommissionType.PERCENT:
-                comm_amount *= amount
+                comm_amount = Decimal(comm_amount * amount).quantize(Decimal("0.00001"))
+            if base_currency_code == "IRT":
+                comm_amount = Decimal(comm_amount).quantize(Decimal("0"))
             return comm_amount
         if comm_type == currency.CommissionType.VALUE:
             return comm
-        return comm * amount
+        return Decimal(comm * amount).quantize(Decimal("0.00001"))
 
     def _get_commission_amount(self):
         return self.get_commission_amount(self.currency_id, self.type, self.amount, self.base_currency_id.code)
