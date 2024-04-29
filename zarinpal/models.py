@@ -47,7 +47,7 @@ class RialDeposit(BaseModelWithDate):
         CANCEL = "cancel", _("Cancel")
 
     user_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    amount = models.DecimalField(_("Amount"), decimal_places=0, max_digits=6)
+    amount = models.DecimalField(_("Amount"), decimal_places=0, max_digits=11)
     factor_number = models.CharField(_("Factor number"), unique=True)
     gateway_token = models.CharField(_("Gateway Token"), blank=True, null=True, help_text='Authority')
     gateway_status = models.CharField(_("Gateway Status"), blank=True, null=True)
@@ -102,7 +102,6 @@ class RialDeposit(BaseModelWithDate):
             raise CustomError(ERRORS.ERROR_GATEWAY)
 
         r = req.json().get("data", {})
-
         if str(req.status_code)[0] == '2':
             token = r.get('authority', "")
 

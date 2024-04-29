@@ -114,7 +114,6 @@ def create_rial_deposit(request):
     amount = data.get('amount', 0)
     card_number = data.get('card_number')
     try:
-        int(amount)
         amount = int(amount)
         if not amount or amount < 10000:
             raise CustomError(ERRORS.ERROR_INVALID_AMOUNT)
@@ -131,8 +130,6 @@ def create_rial_deposit(request):
                 "result": "success",
                 "url": result
             })
-    except CustomError as c:
-        raise c
 
     except Exception as e:
         raise CustomError(ERRORS.ERROR_GATEWAY)

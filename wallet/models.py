@@ -19,7 +19,6 @@ class Wallet(BaseModelWithDate):
     balance = RoundedDecimalField(_('Balance'), default=0.0, decimal_places=5, max_digits=18)
 
     def save(self, *args, **kwargs):
-        print(args, kwargs)
         return super().save(*args, **kwargs)
 
     def __str__(self):

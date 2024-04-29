@@ -25,7 +25,6 @@ class Vandar:
             "refreshtoken": self.VANDAR_TOKEN
         }
         req = requests.post(url, json=body)
-        print(req.json())
 
     @staticmethod
     def create_payment(self):

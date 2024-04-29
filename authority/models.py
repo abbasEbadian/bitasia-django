@@ -82,7 +82,6 @@ def get_user_level(user):
     user_approved_rules = [x.rule_id.id for x in user.authorityrequest_set.filter(approved=True)]
     for lvl in AuthorityLevel.objects.all():
         for rule in lvl.rule_ids.all():
-            print(rule)
             if rule.id not in user_approved_rules:
                 return level
         level = lvl.level
