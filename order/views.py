@@ -233,20 +233,21 @@ class CalculateOrderCommissionView(APIView):
         serializer = CalculateOrderCommissionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         currency = get_object_or_404(BitPinCurrency, code=request.data.get("currency_code"))
-        amount = Decimal(request.data.get("amount", 0), )
-        cost = Decimal(request.data.get("cost", 0))
+        amount = Decimal(request.data.get("amount", 0)).quantize(Decimal("0.00001"))
+        cost = Decimal(request.data.get("cost", 0)).quantize(Decimal("0.00001"))
         _type = request.data.get("type")
         base_currency = get_object_or_404(BitPinCurrency, code=request.data.get("base_currency_code"))
+        current_price = currency.get_simple_price(base_currency.code)
         if cost and not amount:
-            amount = cost / currency.get_price(base_currency.code)
+            amount = cost / current_price
         else:
-            cost = amount * currency.get_price(base_currency.code)
+            cost = amount * current_price
         total = Order.get_amount_for_increase(_type, amount, currency, base_currency)
         comm = Order.get_commission_amount(currency, _type, amount, base_currency)
         return Response({
             "result": "success",
             "amount": amount,
-            "current_price": currency.get_price(base_currency.code),
+            "current_price": currency.get_simple_price(base_currency.code),
             "amount_after_commission": total - comm,
             "commission": comm,
             "cost": cost

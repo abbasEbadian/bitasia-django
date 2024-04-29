@@ -149,12 +149,12 @@ class Order(BaseModelWithDate):
     def get_amount_for_decrease(self):
         if self.type == self.Type.SELL:
             return self.amount
-        return self.amount * self.currency_id.get_price(self.base_currency_id.code)
+        return self.amount * self.currency_id.get_simple_price(self.base_currency_id.code)
 
     @staticmethod
     def get_amount_for_increase(type, amount, currency, base_currency_code="IRT"):
         if type == Order.Type.SELL:
-            return amount * currency.get_price(base_currency_code)
+            return amount * currency.get_simple_price(base_currency_code)
         return amount
 
     def _get_amount_for_increase(self):

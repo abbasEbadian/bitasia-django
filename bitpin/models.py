@@ -117,6 +117,11 @@ class BitPinCurrency(BaseModelWithDate):
         BitPinCurrency.objects.filter(pk=instance.pk).update(price=instance.get_price(),
                                                              price_usdt=instance.get_price("USDT"))
 
+    def get_simple_price(self, code="IRT"):
+        if code == "IRT":
+            return self.price
+        return self.price_usdt
+
     def get_price(self, currency_code="IRT"):
         price = Decimal(self.price_info_price)
         if not price: return 0
