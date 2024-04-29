@@ -102,7 +102,7 @@ class BitPinCurrency(BaseModelWithDate):
     price_usdt = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Sales USDT Price"),
                                      default=0)
     markup_percent = RoundedDecimalField(max_digits=5, decimal_places=5, verbose_name=_("Sales Markup Percent"),
-                                         default=0.001)
+                                         default=0.00100)
     buy_sell_commission = RoundedDecimalField(max_digits=5, decimal_places=5,
                                               verbose_name=_("Buy Sell Commission"),
                                               default=0.001)
@@ -118,9 +118,12 @@ class BitPinCurrency(BaseModelWithDate):
                                                              price_usdt=instance.get_price("USDT"))
 
     def get_price(self, currency_code="IRT"):
-        new_irt_price = self.price_info_price * (1 + self.markup_percent)
+        price = Decimal(self.price_info_price)
+        if not price: return 0
+        price_u = Decimal(self.price_info_usdt_price)
+        new_irt_price = price * (Decimal(1.0) + self.markup_percent)
         if currency_code != "IRT":
-            return new_irt_price * self.price_info_usdt_price / self.price_info_price
+            return new_irt_price * price_u / price
         return new_irt_price
 
     def _has_network(self, network):

@@ -39,10 +39,8 @@ def get_bitpin_currencies_cron():
         return
     data = response.json()
     for row in data["results"]:
-
         if not isinstance(row, dict):
             continue
-
         del row["id"]
         price = row.pop("price_info") if "price_info" in row else {}
         price_usdt = row.pop("price_info_usdt") if "price_info_usdt" in row else {}
@@ -56,7 +54,7 @@ def get_bitpin_currencies_cron():
                 if str(v) == "0":
                     v = None
             else:
-                v = Decimal(v)
+                v = Decimal(v or 0)
             prices[f"price_info_{k}"] = v
 
         for k, v in price_usdt.items():
@@ -64,13 +62,15 @@ def get_bitpin_currencies_cron():
                 if str(v) == "0":
                     v = None
             else:
-                v = Decimal(v)
+                v = Decimal(v or 0)
             prices[f"price_info_usdt_{k}"] = v
 
         if not prices:
             prices = get_default_prices()
 
         currency = BitPinCurrency.objects.filter(code=row.get('code'))
+        if row.get('code') == "USDT":
+            print(row)
         created = False
         if not bool(currency):
             defaults = {k: v for k, v in row.items()}
