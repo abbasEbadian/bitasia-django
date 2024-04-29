@@ -157,8 +157,8 @@ class Order(BaseModelWithDate):
     def get_amount_for_increase(type, amount, currency, base_currency_code="IRT"):
         if type == Order.Type.SELL:
             amount = Decimal(amount * currency.get_simple_price(base_currency_code)).quantize(Decimal("0.00001"))
-        if base_currency_code == "IRT":
-            amount = Decimal(amount).quantize(Decimal("0"))
+            if base_currency_code == "IRT":
+                amount = Decimal(amount).quantize(Decimal("0"))
         return amount
 
     def _get_amount_for_increase(self):
@@ -171,6 +171,8 @@ class Order(BaseModelWithDate):
         if _type == Order.Type.SELL:
             comm_amount = Decimal(comm * currency.get_simple_price(base_currency_code)).quantize(Decimal("0.00001"))
             if comm_type == currency.CommissionType.PERCENT:
+                # value : comm_percent * price
+                # percent: (comm_percent * amount) * price
                 comm_amount = Decimal(comm_amount * amount).quantize(Decimal("0.00001"))
             if base_currency_code == "IRT":
                 comm_amount = Decimal(comm_amount).quantize(Decimal("0"))
