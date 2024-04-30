@@ -15,7 +15,7 @@ from django.utils.translation import gettext as _
 
 from authentication.exception import CustomError
 from exchange.error_codes import ERRORS
-from exchange.models import BaseModelWithDate
+from exchange.models import BaseModel
 
 _logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ class RialDepositVars:
     callback_url = env('CALLBACK_URL')
 
 
-class RialDeposit(BaseModelWithDate):
+class RialDeposit(BaseModel):
     class Status(models.TextChoices):
         PENDING = "pending", _("Pending")
         SUCCESS = "success", _("Success")
@@ -159,7 +159,7 @@ class RialDeposit(BaseModelWithDate):
             return False
 
 
-class RialWithdraw(BaseModelWithDate):
+class RialWithdraw(BaseModel):
     class Status(models.TextChoices):
         PENDING = "pending", _("Pending")
         SUCCESS = "success", _("Success")
@@ -209,7 +209,7 @@ class RialWithdraw(BaseModelWithDate):
         return True
 
 
-class VerifyLine(BaseModelWithDate):
+class VerifyLine(BaseModel):
     deposit_id = models.ForeignKey(RialDeposit, on_delete=models.CASCADE)
     ref_id = models.CharField(_("Verify Ref ID"), blank=True, null=True)
     message = models.CharField(_("Verify message"), blank=True, null=True)

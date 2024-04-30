@@ -9,7 +9,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from authentication.utils import send_otp_sms
-from exchange.models import BaseModelWithDate
+from exchange.models import BaseModel
 
 auth_status = [
     ('unauthorized', 'احراز نشده'),
@@ -127,7 +127,7 @@ class LoginHistoryQuerySet(models.QuerySet):
         return self.all()
 
 
-class LoginHistory(BaseModelWithDate):
+class LoginHistory(BaseModel):
     class Reason(models.TextChoices):
         INVALID_OTP = "invalid_otp", _("Invalid OTP")
         INVALID_PASSWORD = "invalid_password", _("Invalid Password")

@@ -9,12 +9,12 @@ from django.utils.translation import gettext as _
 
 from api.models import RoundedDecimalField
 from bitpin.models import BitPinCurrency, BitPinNetwork
-from exchange.models import BaseModelWithDate
+from exchange.models import BaseModel
 
 User = get_user_model()
 
 
-class Transaction(BaseModelWithDate):
+class Transaction(BaseModel):
     class Type(models.TextChoices):
         DEPOSIT = 'deposit', _("Deposit")
         WITHDRAW = 'withdraw', _("Withdraw")
@@ -98,7 +98,7 @@ class Transaction(BaseModelWithDate):
         return True
 
 
-class Order(BaseModelWithDate):
+class Order(BaseModel):
     class Type(models.TextChoices):
         BUY = 'buy', _("Buy")
         SELL = 'sell', _("Sell")
@@ -203,7 +203,7 @@ class Order(BaseModelWithDate):
         return True
 
 
-class Transfer(BaseModelWithDate):
+class Transfer(BaseModel):
     user_id = models.ForeignKey(User, on_delete=models.RESTRICT)
     currency_id = models.ForeignKey(BitPinCurrency, on_delete=models.RESTRICT)
     amount = RoundedDecimalField(max_digits=18, decimal_places=5, verbose_name=_("Amount"))

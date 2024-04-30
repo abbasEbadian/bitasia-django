@@ -4,12 +4,12 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from config.models import JibitConfiguration
-from exchange.models import BaseModelWithDate
+from exchange.models import BaseModel
 
 User = get_user_model()
 
 
-class JibitRequest(BaseModelWithDate):
+class JibitRequest(BaseModel):
     class Type(models.TextChoices):
         NATIONAL_WITH_MOBILE = "national_with_mobile", _("Check national code with mobile number")
         NATIONAL_WITH_CARD = "national_with_creditcard", _("Check national code with credit card number")

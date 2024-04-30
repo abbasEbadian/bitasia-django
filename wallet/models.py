@@ -8,12 +8,12 @@ from api.models import RoundedDecimalField
 from authentication.exception import CustomError
 from bitpin.models import BitPinCurrency
 from exchange.error_codes import ERRORS
-from exchange.models import BaseModelWithDate
+from exchange.models import BaseModel
 
 User = get_user_model()
 
 
-class Wallet(BaseModelWithDate):
+class Wallet(BaseModel):
     user_id = models.ForeignKey(User, related_name="wallets", on_delete=models.SET_NULL, null=True)
     currency_id = models.ForeignKey(BitPinCurrency, on_delete=models.SET_NULL, null=True)
     balance = RoundedDecimalField(_('Balance'), default=0.0, decimal_places=5, max_digits=18)

@@ -2,12 +2,12 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext as _
 
-from exchange.models import BaseModelWithDate
+from exchange.models import BaseModel
 
 User = get_user_model()
 
 
-class Ticket(BaseModelWithDate):
+class Ticket(BaseModel):
     class Department(models.TextChoices):
         FINANCE = "finance", _("Finance")
         SUPPORT = "support", _("Support")
@@ -31,7 +31,7 @@ class Ticket(BaseModelWithDate):
         verbose_name_plural = _('Tickets')
 
 
-class TicketMessage(BaseModelWithDate):
+class TicketMessage(BaseModel):
     ticket_id = models.ForeignKey(Ticket, related_name='messages', on_delete=models.CASCADE)
     user_id = models.ForeignKey(User, related_name='ticket_messages', on_delete=models.CASCADE)
     message = models.TextField()

@@ -2,10 +2,10 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from bitpin.models import BitPinCurrency, BitPinNetwork
-from exchange.models import BaseModelWithDate
+from exchange.models import BaseModel
 
 
-class WithdrawCommission(BaseModelWithDate):
+class WithdrawCommission(BaseModel):
     class CommissionType(models.TextChoices):
         VALUE = 'value', _("Value")
         PERCENT = "percent", _("Percent")

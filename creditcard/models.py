@@ -2,12 +2,12 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext as _
 
-from exchange.models import BaseModelWithDate
+from exchange.models import BaseModel
 
 User = get_user_model()
 
 
-class CreditCard(BaseModelWithDate):
+class CreditCard(BaseModel):
     card_number = models.CharField(_('Credit card number'), max_length=16)
     iban = models.CharField(_("IBAN"), max_length=26)
     approved = models.BooleanField(_("Approved"), default=False)

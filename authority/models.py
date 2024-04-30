@@ -2,12 +2,12 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext as _
 
-from exchange.models import BaseModelWithDate
+from exchange.models import BaseModel
 
 User = get_user_model()
 
 
-class AuthorityRuleOption(BaseModelWithDate):
+class AuthorityRuleOption(BaseModel):
     title = models.CharField(_("title"))
     field_key = models.CharField(_("field key"))
     field_type = models.CharField(_("field type"),
@@ -26,7 +26,7 @@ class AuthorityRuleOption(BaseModelWithDate):
         return f"{_('Authority rule option')} ({self.title})"
 
 
-class AuthorityRule(BaseModelWithDate):
+class AuthorityRule(BaseModel):
     title = models.CharField(_("title"))
     option_ids = models.ManyToManyField(AuthorityRuleOption)
     sequence = models.IntegerField(_("Priority"), default=1)
@@ -40,7 +40,7 @@ class AuthorityRule(BaseModelWithDate):
         return self.title
 
 
-class AuthorityLevel(BaseModelWithDate):
+class AuthorityLevel(BaseModel):
     level = models.CharField(_("Level"))
     rule_ids = models.ManyToManyField(AuthorityRule)
     deposit_ir_limit = models.IntegerField(_("daily Rial deposit limit"))
@@ -59,7 +59,7 @@ class AuthorityLevel(BaseModelWithDate):
         return f"{_('Level')} {self.level}"
 
 
-class AuthorityRequest(BaseModelWithDate):
+class AuthorityRequest(BaseModel):
     user_id = models.ForeignKey(User, verbose_name=_("Requesting user"), on_delete=models.CASCADE)
     rule_id = models.ForeignKey(AuthorityRule, verbose_name=_("Rule ID"), on_delete=models.CASCADE)
     approved = models.BooleanField(default=False)

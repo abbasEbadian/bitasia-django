@@ -7,10 +7,10 @@ from django.forms import forms
 from django.utils.translation import gettext as _
 
 from api.models import RoundedDecimalField
-from exchange.models import BaseModelWithDate
+from exchange.models import BaseModel
 
 
-class BitPinNetwork(BaseModelWithDate):
+class BitPinNetwork(BaseModel):
     code = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
     title_fa = models.CharField(max_length=255)
@@ -23,7 +23,7 @@ class BitPinNetwork(BaseModelWithDate):
         verbose_name_plural = _('Networks')
 
 
-class BitPinCurrency(BaseModelWithDate):
+class BitPinCurrency(BaseModel):
     class CommissionType(models.TextChoices):
         VALUE = 'value', _('Value')
         PERCENT = 'percent', _('Percent')
@@ -167,7 +167,7 @@ class BitPinCurrency(BaseModelWithDate):
         verbose_name_plural = _('Currencies')
 
 
-class BitPinWalletAddress(BaseModelWithDate):
+class BitPinWalletAddress(BaseModel):
     address = models.CharField(_("Address"), max_length=255)
     currency_id = models.ForeignKey(BitPinCurrency, verbose_name=_("Currency"), on_delete=models.CASCADE)
     network_id = models.ForeignKey(BitPinNetwork, verbose_name=_("Network"), on_delete=models.CASCADE)

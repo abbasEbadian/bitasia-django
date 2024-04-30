@@ -6,12 +6,12 @@ from django.db.models import SET_NULL
 from django.utils.translation import gettext as _
 
 from exchange import settings
-from exchange.models import BaseModelWithDate
+from exchange.models import BaseModel
 
 User = get_user_model()
 
 
-class OTP(BaseModelWithDate):
+class OTP(BaseModel):
     class Type(models.TextChoices):
         LOGIN = "login", _("Login")
         WITHDRAW = "withdraw", _("Withdraw")
