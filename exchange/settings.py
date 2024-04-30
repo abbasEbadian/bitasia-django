@@ -62,6 +62,7 @@ APPS = [
     "config",
     "jibit",
     "referral",
+    "notification"
 
 ]
 LIBS = [

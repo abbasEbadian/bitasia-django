@@ -4,7 +4,7 @@ from rest_framework.permissions import DjangoModelPermissions
 User = get_user_model()
 
 
-class CreditCardPermission(DjangoModelPermissions):
+class NotificationPermission(DjangoModelPermissions):
     authenticated_users_only = True
 
     perms_map = {

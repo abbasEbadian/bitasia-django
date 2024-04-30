@@ -8,6 +8,8 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from authority.models import get_user_level
+from notification.models import Notification
+from notification.serializers import NotificationSerializer
 from wallet.serializers import WalletSerializer
 
 User = get_user_model()
@@ -47,6 +49,7 @@ class UserSerializer(serializers.ModelSerializer):
     authentication_status = serializers.SerializerMethodField('_authentication_status')
     wallets = serializers.SerializerMethodField('_wallets')
     total_ir_balance = serializers.SerializerMethodField("_total_balance")
+    notifications = serializers.SerializerMethodField('_notifications')
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -78,6 +81,10 @@ class UserSerializer(serializers.ModelSerializer):
                 total += Decimal(wallet.currency_id.get_price()) * Decimal(wallet.balance)
 
         return total
+
+    def _notifications(self, obj):
+        qs = Notification.objects.for_user(obj, True)
+        return NotificationSerializer(qs, many=True, context={"user": obj}).data
 
     class Meta:
         model = User
