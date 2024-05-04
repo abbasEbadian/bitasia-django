@@ -3,7 +3,7 @@ from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, permissions
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from api.mixins import IsModeratorMixin
@@ -20,7 +20,7 @@ User = get_user_model()
 # Create your views here.
 class UserListView(generics.ListAPIView):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsModerator,)
+    permission_classes = (IsAdminUser | IsModerator)
 
     serializer_class = UserSerializer
     queryset = User.objects.all()
