@@ -43,7 +43,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class GroupUpdateCreateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
-    permission_codes = serializers.CharField(max_length=255)
+    permission_codes = serializers.CharField(max_length=4048)
 
     def validate(self, attrs):
         permission_codes = [str(x).strip() for x in attrs.get("permission_codes", "").split(",")]
