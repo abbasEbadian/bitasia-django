@@ -147,7 +147,7 @@ class WalletAddressView(generics.ListAPIView, IsModeratorMixin):
 
 class WalletAddressDetailView(generics.RetrieveUpdateAPIView):
     authentication_classes = (TokenAuthentication,)
-    http_method_names = ["get", "patch"]
+    http_method_names = ["get", "patch", "delete"]
     queryset = BitPinWalletAddress.objects.all()
     serializer_class = WalletAddressSerializer
     permission_classes = [IsModerator, WalletAddressPermission]
@@ -169,4 +169,12 @@ class WalletAddressDetailView(generics.RetrieveUpdateAPIView):
         return Response({
             "result": "success",
             "object": serializer.data
+        })
+
+    @swagger_auto_schema(operation_id=_("Delete Wallet Address"))
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.delete()
+        return Response({
+            "result": "success"
         })

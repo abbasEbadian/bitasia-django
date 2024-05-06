@@ -36,4 +36,5 @@ class WalletAddressPermission(DjangoModelPermissions):
         'HEAD': [],
         'POST': [CREATE_PERM],
         'PATCH': [CHANGE_PERM],
+        'DELETE': [CREATE_PERM]
     }
