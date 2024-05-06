@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.mixins import IsModeratorMixin
-from api.permissions import IsModerator, IsSimpleUser
+from api.permissions import IsModerator
 from notification.models import Notification
 from notification.permissions import NotificationPermission
 from notification.serializers import NotificationSerializer, NotificationCreateSerializer, \
@@ -63,7 +63,7 @@ class NotificationView(generics.ListCreateAPIView, IsModeratorMixin):
 
 class NotificationSeenView(generics.GenericAPIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsSimpleUser]
+    permission_classes = [IsAuthenticated, ~IsModerator]
     http_method_names = ["patch"]
     serializer_class = NotificationSeenUpdateSerializer
 
