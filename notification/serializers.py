@@ -31,7 +31,8 @@ class NotificationAdminSerializer(serializers.ModelSerializer):
 
 
 class NotificationCreateSerializer(serializers.Serializer):
-    user_ids = serializers.CharField(required=False, help_text="Comma separated list of user ids (no space)")
+    user_ids = serializers.CharField(required=False, help_text="Comma separated list of user ids (no space)",
+                                     min_length=0)
     title = serializers.CharField(required=True)
     content = serializers.CharField(required=True)
 

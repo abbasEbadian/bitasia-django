@@ -24,6 +24,7 @@ class NotificationView(generics.ListCreateAPIView, IsModeratorMixin):
     def permission_classes(self):
         if self.request.method == "GET":
             return [(IsAuthenticated & ~IsModerator) | (IsModerator & NotificationPermission)]
+        return [IsAuthenticated]
         return [IsModerator, NotificationPermission]
 
     def get_serializer_class(self):
@@ -63,7 +64,7 @@ class NotificationView(generics.ListCreateAPIView, IsModeratorMixin):
 
 class NotificationSeenView(generics.GenericAPIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, ~IsModerator]
+    permission_classes = [IsAuthenticated]
     http_method_names = ["patch"]
     serializer_class = NotificationSeenUpdateSerializer
 
