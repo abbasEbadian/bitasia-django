@@ -4,6 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, status
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.mixins import IsModeratorMixin
@@ -22,7 +23,7 @@ class NotificationView(generics.ListCreateAPIView, IsModeratorMixin):
     @property
     def permission_classes(self):
         if self.request.method == "GET":
-            return [IsSimpleUser | (IsModerator & NotificationPermission)]
+            return [(IsAuthenticated & ~IsModerator) | (IsModerator & NotificationPermission)]
         return [IsModerator, NotificationPermission]
 
     def get_serializer_class(self):
