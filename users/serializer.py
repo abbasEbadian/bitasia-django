@@ -128,9 +128,9 @@ class UserUpdateSerializer(serializers.Serializer):
             instance.is_active = is_active
         if is_staff is not None:
             instance.is_staff = is_staff
-        _groups = [x.strip() for x in _groups.split(",")]
-        groups = Group.objects.filter(name__in=_groups)
-        print(groups)
-        instance.groups.set(groups)
+        if _groups is not None:
+            _groups = [x.strip() for x in _groups.split(",")]
+            groups = Group.objects.filter(name__in=_groups)
+            instance.groups.set(groups)
         instance.save()
         return instance

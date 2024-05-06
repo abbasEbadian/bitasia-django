@@ -11,6 +11,15 @@ class IsOwner(BasePermission):
         return bool(request.user.id == pk)
 
 
+class UserPermissions(DjangoModelPermissions):
+    perms_map = {
+        'GET': ['%(app_label)s.view_%(model_name)s'],
+        'OPTIONS': [],
+        'HEAD': [],
+        'PATCH': ['%(app_label)s.change_%(model_name)s'],
+    }
+
+
 class LoginHistoryPermissions(DjangoModelPermissions):
     perms_map = {
         'GET': ['%(app_label)s.view_%(model_name)s'],

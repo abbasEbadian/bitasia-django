@@ -1,16 +1,17 @@
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 from knox.auth import TokenAuthentication
 from rest_framework import generics, permissions
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.mixins import IsModeratorMixin
 from api.permissions import IsModerator
 from permission.serializers import LoginHistorySerializer
 from .models import LoginHistory
-from .permission import LoginHistoryPermissions
+from .permission import LoginHistoryPermissions, UserPermissions
 from .schema import create_user_schema, list_user_schema
 from .serializer import UserSerializer, UserUpdateSerializer, UserCreateSerializer
 
@@ -20,7 +21,7 @@ User = get_user_model()
 # Create your views here.
 class UserListView(generics.ListAPIView):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAdminUser | IsModerator,)
+    permission_classes = (IsModerator, UserPermissions)
 
     serializer_class = UserSerializer
     queryset = User.objects.all()
@@ -79,6 +80,7 @@ class UserDetailView(generics.RetrieveUpdateAPIView, IsModeratorMixin):
             "objects": self.get_serializer(self.get_object()).data
         })
 
+    @swagger_auto_schema(operation_id=_("Update user"))
     def patch(self, request, *args, **kwargs):
         serializer = self.get_serializer(self.get_object(), data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -91,7 +93,7 @@ class UserDetailView(generics.RetrieveUpdateAPIView, IsModeratorMixin):
 
 class UserDeleteView(generics.DestroyAPIView):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (IsModerator,)
 
     serializer_class = UserSerializer
     queryset = User.objects.all()
