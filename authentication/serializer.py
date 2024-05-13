@@ -68,7 +68,7 @@ class RegisterSerializer(serializers.Serializer):
     password = serializers.CharField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
-    referral = serializers.CharField(required=False)
+    referral = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
     def validate(self, attrs):
         mobile = attrs.get('mobile')
