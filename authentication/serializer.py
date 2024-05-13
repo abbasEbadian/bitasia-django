@@ -85,7 +85,7 @@ class RegisterSerializer(serializers.Serializer):
             raise CustomError(ERRORS.ERROR_INVALID_FIRST_NAME)
         if not last_name or len(last_name) < 3:
             raise CustomError(ERRORS.ERROR_INVALID_LAST_NAME)
-        if not User.objects.only("referral_code").filter(referral_code=referral).exists():
+        if referral and not User.objects.only("referral_code").filter(referral_code=referral).exists():
             raise CustomError(ERRORS.custom_message_error(_("Invalid referral code")))
         parent = User.objects.filter(referral_code=referral)
         if User.objects.filter(mobile=mobile).exists():
