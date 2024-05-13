@@ -90,9 +90,12 @@ class RegisterSerializer(serializers.Serializer):
         parent = User.objects.filter(referral_code=referral)
         if User.objects.filter(mobile=mobile).exists():
             raise CustomError(ERRORS.ERROR_MOBILE_ALREADY_EXISTS)
+        vals = dict(mobile=mobile, username=mobile, first_name=first_name,
+                    last_name=last_name)
+        if parent:
+            vals["parent"] = parent
 
-        user = User.objects.create_user(mobile=mobile, username=mobile, first_name=first_name,
-                                        last_name=last_name, parent=parent)
+        user = User.objects.create_user(**vals)
         user.set_password(password)
         user.save()
         attrs['user'] = user
